@@ -47,6 +47,7 @@ import { User, Lock } from '@element-plus/icons-vue'
 import { useStore } from "vuex";
 import router from '@/router'
 
+
 export default {
     setup() {
         const store = useStore();
@@ -67,6 +68,22 @@ export default {
             store.commit("updateTokenHeader", tokenHead);
             store.dispatch("getInfo", {
                 success() {
+                    // const socketUrl = `ws://101.37.246.72:9090/websocket/admin${store.state.user.telephone}`;
+                    // console.log(socketUrl);
+                    // socket = new WebSocket(socketUrl);
+                    // socket.onopen = () => {
+                    //     console.log("websocket connected!");
+                    //     store.commit("updateSocket", socket);
+                    // }
+
+                    // socket.onmessage = msg => {
+                    //     console.log(msg);
+                    // }
+
+                    // socket.onclose = () => {
+                    //     console.log("websocket disconnected!");
+                    // }
+
                     router.push({ name: "home" });
                 },
                 error() {
@@ -83,6 +100,20 @@ export default {
                 success() {
                     store.dispatch("getInfo", {
                         success() {
+                            // const socketUrl = `ws://101.37.246.72:9090/websocket/admin${store.state.user.telephone}`
+                            // socket = new WebSocket(socketUrl);
+                            // socket.onopen = () => {
+                            //     console.log("websocket connected!");
+                            //     store.commit("updateSocket", socket);
+                            // }
+
+                            // socket.onmessage = msg => {
+                            //     console.log(msg);
+                            // }
+
+                            // socket.onclose = () => {
+                            //     console.log("websocket disconnected!");
+                            // }
                             router.push({ name: "home" });
                         },
                         error() {

@@ -26,9 +26,9 @@
                             @click="addPerson()">添加人员</button>
                     </div>
                     <div class="card-body">
-                        <el-table :data="ifShowQueryResult ? queryResultList: patrols"
+                        <el-table :data="ifShowQueryResult ? queryResultList : patrols"
                             style="width: 100%; font-size: 18px;" size="large" max-height="700"
-                            :empty-text="ifShowQueryResult? '未找到该人员': 'Loading...'">
+                            :empty-text="ifShowQueryResult ? '未找到该人员' : 'Loading...'">
                             <!-- <el-table-column prop="id" label="id" width="150" /> -->
                             <el-table-column prop="name" label="姓名" width="140" header-align="center" align="center" />
                             <el-table-column prop="title" label="职务" width="220" header-align="center" align="center" />
@@ -172,7 +172,7 @@
             <template v-for="tableItem in tableDataFence" :key="tableItem.id">
                 <el-table :data="tableItem.data" class="table" :fit="false" max-height="300px">
                     <el-table-column type="selection" width="55" />
-                    <el-table-column v-for="i in tableItem.headerNames.length-2" :label="tableItem.headerNames[i - 1]"
+                    <el-table-column v-for="i in tableItem.headerNames.length - 2" :label="tableItem.headerNames[i - 1]"
                         :key="i" :prop="tableItem.dataNames[i - 1]" width="200" />
 
                 </el-table>
@@ -721,6 +721,8 @@ export default {
         }
         pull_page(current_page.value);
 
+
+
         return {
             editInfo,
             confirmEdit,
@@ -734,6 +736,7 @@ export default {
             //click_page,
             pull_page,
             size_change,
+
             rules,
             form,
             dialogFormVisible,

@@ -21,7 +21,7 @@
 
 
         <div class="modal fade" id="edit-fench" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">修改围栏</h5>
@@ -33,16 +33,16 @@
                                 <tr>
 
                                     <th>围栏名</th>
+                                    <th>所属办事处</th>
                                     <th>操作者</th>
-                                    <th>编辑时间</th>
                                     <th>操作</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="(value, key) in polygonInfo" :key="key">
-                                    <td>{{value.name}}</td>
-                                    <td>{{value.operator}}</td>
-                                    <td>{{value.editTime}}</td>
+                                    <td>{{ value.name }}</td>
+                                    <td>{{ value.agency }}</td>
+                                    <td>{{ value.operator }}</td>
                                     <td>
                                         <el-button v-if="!confirmOperation" class="editFench" link size="small"
                                             type="primary" plain text style="font-size:14px; "
@@ -77,13 +77,14 @@
                     <el-form-item label="围栏名称" width="100px">
                         <el-input v-model="fenceInfo.name" />
                     </el-form-item>
+                    <el-form-item label="所属办事处">
+                        <el-input v-model="fenceInfo.agency" />
+                    </el-form-item>
 
                     <el-form-item label="创建者">
                         <el-input v-model="fenceInfo.operator" />
                     </el-form-item>
-                    <el-form-item label="创建/编辑时间">
-                        <el-input :disabled="isDisabled" v-model="fenceInfo.editTime" />
-                    </el-form-item>
+
 
 
                 </el-form>
@@ -92,13 +93,13 @@
                 <span class="dialog-footer">
                     <button type="button" class="btn btn-primary" @click="addFence()">确定</button>
                     <button type="button" class="btn btn-secondary" style="margin-left:10px;"
-                        @click="addFenceVisiable=false;">取消</button>
+                        @click="addFenceVisiable = false;">取消</button>
                 </span>
             </template>
         </el-dialog>
 
 
-        <div class="map" id="olMap"></div>
+        <div class="map" id="olMap" v-if="$route.path == '/fench/'"></div>
         <div id="popup" class="ol-popup">
             <a href="#" id="popup-closer" class="ol-popup-closer"></a>
             <div id="popup-content"></div>
@@ -142,7 +143,7 @@ export default {
             operator: "",
             editTime: '',
             pointList: '',
-
+            agency: '',
         });
 
         const isDisabled = ref(true);
@@ -168,6 +169,7 @@ export default {
                 url: "http://t4.tianditu.com/DataServer?T=vec_w&tk=b523e4ded27f524672a488e758227070&x={x}&y={y}&l={z}",
             });
             let terLayer = new TileLayer({
+                className: "tileLayer",
                 source: Tersource,
                 zIndex: 1,
             });
@@ -178,6 +180,7 @@ export default {
             });
             let CTAlayer = new TileLayer({
                 source: CTAsource,
+
                 zIndex: 1,
             });
             map.addLayer(CTAlayer);
@@ -293,6 +296,7 @@ export default {
                     polygonInfo[item.id] = {
                         id: item.id,
                         name: item.name,
+                        agency: item.agency,
                         operator: item.creator,
                         editTime: getStandardTime(item.createTime),
                         markList: pointList,
@@ -365,13 +369,15 @@ export default {
                         name.innerText = '围栏名: ' + polygonInfo[featureId].name;
                         content.appendChild(name);
 
+                        let agency = document.createElement('p');
+                        agency.innerText = '所属办事处: ' + polygonInfo[featureId].agency;
+                        content.appendChild(agency);
+
                         let operator = document.createElement('p');
                         operator.innerText = '操作人: ' + polygonInfo[featureId].operator;
                         content.appendChild(operator);
 
-                        let editTime = document.createElement('p');
-                        editTime.innerText = '编辑时间: ' + polygonInfo[featureId].editTime;
-                        content.appendChild(editTime);
+
 
                         popup.setPosition(coordinate);
                     } else if (featureId == "banshichu") {
@@ -417,6 +423,7 @@ export default {
                 createDblClick();
                 fenceInfo.value.name = "";
                 fenceInfo.value.operator = "";
+                fenceInfo.value.agency = "";
                 fenceInfo.value.editTime = getTTime(new Date().toISOString());
 
                 confirmOperation.value = true;
@@ -472,7 +479,7 @@ export default {
 
         let num = 0;
         const createPolygonFeature = (markerList) => {
-            const color = ['rgba(0, 255, 0, 0.5)', 'rgba(0, 0, 255, 0.5)', 'rgba(255, 0, 0, 0.5)', 'rgba(255, 255, 0, 0.5)', 'rgba(255,0,255, 0.5)'];
+            const color = ['rgba(0, 255, 0, 0.5)', 'rgba(0, 0, 255, 0.5)', 'rgba(255, 0, 0, 0.5)', 'rgba(255, 255, 0, 0.5)', 'rgba(255,0,255, 0.5)', 'rgba(0,255,255, 0.5)'];
             let oltarget;
 
             if (markerList.length < 3) {
@@ -487,7 +494,7 @@ export default {
             oltarget = new Feature(tmp);
             oltarget.setStyle(
                 new Style({
-                    fill: new Fill({ color: color[num % 5] }),
+                    fill: new Fill({ color: color[num % 6] }),
                     stroke: new Stroke({
                         lineDash: [10, 10, 10, 10],
                         color: "#4e98f444",
@@ -529,6 +536,7 @@ export default {
                         newPolygon = {
                             id: beforeFeatureId,
                             name: fenceInfo.value.name,
+                            agency: fenceInfo.value.agency,
                             creator: fenceInfo.value.operator,
                             createTime: getTTime(new Date().toISOString()),
                             pointList: JSON.stringify(markerList),
@@ -537,6 +545,7 @@ export default {
                         newPolygon = {
                             name: fenceInfo.value.name,
                             creator: fenceInfo.value.operator,
+                            agency: fenceInfo.value.agency,
                             createTime: getTTime(new Date().toISOString()),
                             pointList: JSON.stringify(markerList),
                         }
@@ -593,6 +602,7 @@ export default {
                 let feature = polygonInfo[editFence].feature;
                 fenceInfo.value.name = polygonInfo[editFence].name;
                 fenceInfo.value.operator = polygonInfo[editFence].operator;
+                fenceInfo.value.agency = polygonInfo[editFence].agency;
                 fenceInfo.value.editTime = getStandardTime(new Date().toISOString());
 
                 beforeFeatureId = editFence;
@@ -604,9 +614,9 @@ export default {
                 let marklist = polygonInfo[editFence].markList
 
                 for (let idx in marklist) {
-                    // if (idx == marklist.length - 1) {
-                    //     break;
-                    // }
+                    if (idx == marklist.length - 1) {
+                        break;
+                    }
                     let point = marklist[idx];
                     let iconFeature = new Feature({
                         geometry: new Point(point, "XY"),
@@ -702,6 +712,23 @@ export default {
             refresh_polygonInfo();
         }
 
+        // const deleteMoreViewPort = () => {
+        //     let dom = document.getElementsByClassName("ol-viewport");
+        //     if (dom.length > 1) {
+        //         dom[0].remove();
+        //     }
+        // }
+
+        // const switchColor = () => {
+        //     const canvas = document.getElementsByTagName('canvas');
+        //     console.log(canvas);
+        //     const vectorContext = toContext(canvas[1].getContext('2d'))
+        //     const fill = new Fill({ color: "rgba(255, 250, 250, 0.0)" });
+        //     const style = new Style({
+        //         fill: fill,
+        //     });
+        //     vectorContext.setStyle(style);
+        // }
 
         onMounted(() => {
             initMap();
@@ -774,9 +801,32 @@ export default {
 </script>
   
 <style scoped>
+.tileLayer {
+    background-color: rgba(255, 165, 0, 0.05);
+    -webkit-filter: grayscale(100%);
+    filter: grayscale(100%);
+    opacity: 50%;
+}
+
 .map {
     width: 100vw;
     height: 100vh;
+    /* background-color: rgba(255, 165, 0, 0.05);
+    -webkit-filter: grayscale(100%);
+    filter: grayscale(100%);
+    opacity: 50%; */
+    /*深色样式div背景色*/
+
+    /* background-color: rgba(43, 51, 73, 0.82);
+    background-image: radial-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.3), #000); */
+
+}
+
+canvas {
+    background-color: rgba(255, 165, 0, 0.05);
+    -webkit-filter: grayscale(100%);
+    filter: grayscale(100%);
+    opacity: 50%;
 }
 
 .buttonBox {

@@ -1,7 +1,7 @@
 <template>
     <MapContent />
 
-    <div class="map" id="olMap"></div>
+    <div class="map" id="olMap" v-if="$route.path == '/map/'"></div>
     <div id="popup" class="ol-popup">
         <a href="#" id="popup-closer" class="ol-popup-closer"></a>
         <div id="popup-content"></div>
@@ -37,8 +37,9 @@
         <div style="margin-top: 5vh;">
             <div class="dialog-title">指令发布</div>
 
-            <div style="margin-left: 7vw;">
-                <el-space wrap size="large" style="margin-bottom: 1vh;">
+            <!-- <div style="margin-left: 7vw;"> -->
+            <div>
+                <!-- <el-space wrap size="large" style="margin-bottom: 1vh;">
                     <el-button type="primary" plain>规范周边单车</el-button>
                     <el-button type="primary" plain>取缔流动摊贩</el-button>
                     <el-button type="primary" plain>整治越门经营</el-button>
@@ -48,7 +49,12 @@
                     <el-button type="primary" plain>整治乱堆乱放</el-button>
                     <el-button type="primary" plain>整治乱牵乱挂</el-button>
                     <el-button type="primary" plain>整治乱扔乱排乱倒</el-button>
-                </el-space>
+                </el-space> -->
+                <el-input v-model="derectiveInfo" autosize type="textarea" placeholder="请输入指令" />
+                <div style="margin-top: 5vh; margin-bottom: 5vh;">
+                    <button type="button" class="btn btn-outline-primary float-end" @click="sendDerective">发布</button>
+                </div>
+                <div style="width: 100%; height: 5vh;"></div>
             </div>
 
         </div>
@@ -60,7 +66,7 @@
 <script >
 import "ol/ol.css";
 import { Tile as TileLayer, Vector as LayerVec } from "ol/layer";
-import { Vector as SourceVec, Raster } from 'ol/source';
+import { Vector as SourceVec } from 'ol/source';
 import XYZ from "ol/source/XYZ";
 import Map from "ol/Map.js";
 import View from "ol/View.js";
@@ -69,7 +75,7 @@ import { Style, Fill, Circle, Stroke, Icon } from "ol/style"
 import { Overlay, Feature } from "ol";
 import { DoubleClickZoom } from "ol/interaction";
 import { Polygon } from "ol/geom";
-import ImageLayer from "ol/layer/Image";
+// import ImageLayer from "ol/layer/Image";
 import MapContent from "@/components/MapContent.vue";
 import axios from "axios";
 import { stringToList, getStandardTime } from '../scripts/utils'
@@ -77,10 +83,18 @@ import { banshichu } from '../scripts/constant'
 import { Point } from "ol/geom";
 import AMapLoader from "@amap/amap-jsapi-loader"
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
-
+import { ElMessage } from 'element-plus';
 import { useStore } from 'vuex';
 
 export default {
+    // beforeRouteEnter(to, from, next) {
+    //     console.log(to);
+    //     console.log(from);
+    //     next((e) => {
+    //         window.console.log(e);
+    //     })
+    // },
+
     setup() {
         const store = useStore();
         const locale = zhCn;
@@ -100,6 +114,7 @@ export default {
         let ifShowWorkStatistics = ref(false);
 
         const initMap = () => {
+
             let terMap = new Map({
                 target: "olMap",
                 view: new View({
@@ -120,7 +135,7 @@ export default {
                 zIndex: 1,
 
             });
-            // map.addLayer(terLayer);
+            map.addLayer(terLayer);
             //添加注记
             let CTAsource = new XYZ({
                 url: "http://t4.tianditu.com/DataServer?T=cva_w&tk=b523e4ded27f524672a488e758227070&x={x}&y={y}&l={z}",
@@ -128,14 +143,15 @@ export default {
             });
             let CTAlayer = new TileLayer({
                 source: CTAsource,
-                zIndex: 2,
+                zIndex: 1,
 
             });
-            // map.addLayer(CTAlayer);
-            let reverseTerLayer = getReverseLayer(terLayer);
-            map.addLayer(reverseTerLayer);
-            let reverseCTALayer = getReverseLayer(CTAlayer);
-            map.addLayer(reverseCTALayer);
+            map.addLayer(CTAlayer);
+
+            // let reverseTerLayer = getReverseLayer(terLayer);
+            // map.addLayer(reverseTerLayer);
+            // let reverseCTALayer = getReverseLayer(CTAlayer);
+            // map.addLayer(reverseCTALayer);
 
             let container = document.getElementById("popup");
             content = document.getElementById("popup-content");
@@ -159,6 +175,19 @@ export default {
                 let hit = map.hasFeatureAtPixel(pixel);
                 map.getTargetElement().style.cursor = hit ? "pointer" : "";
             });
+
+            terLayer.on("prerender", function (evt) {
+
+                const context = evt.context;
+                context.filter = "grayscale(5%) invert(100%) opacity(50%)";
+                context.fillStyle = "rgba(255, 250, 250, 0.0)";
+            })
+
+            CTAlayer.on("prerender", function (evt) {
+                const context = evt.context;
+                context.filter = "grayscale(50%) invert(100%) opacity(80%)";
+                context.fillStyle = "rgba(255, 165, 0, 0.05)";
+            })
             // 去除双击地图缩放
             const dblClickInteraction = map
                 .getInteractions()
@@ -170,25 +199,6 @@ export default {
 
             createPolygonLayer();
             createIconLayer();
-
-            // for (const path of jinNiuFencePath) {
-            //     const tmp = new Polygon(path);
-            //     let oltarget = new Feature(tmp);
-            //     oltarget.set('name', 'jinNiu');
-            //     oltarget.setStyle(
-            //         new Style({
-            //             fill: new Fill({ color: 'rgba(135, 206, 255, 0.5)' }),
-            //             stroke: new Stroke({
-            //                 lineDash: [10, 10, 10, 10],
-            //                 // color: "#4e98f444",
-            //                 // color: '#2b8cbe',
-            //                 color: "red",
-            //                 width: 1,
-            //             })
-            //         })
-            //     );
-            //     polygonSource.addFeature(oltarget);
-            // }
 
             for (const item of banshichu) {
                 const tmp = new Polygon(item.path);
@@ -238,6 +248,7 @@ export default {
                         id: item.id,
                         name: item.name,
                         operator: item.creator,
+                        agency: item.agency,
                         editTime: getStandardTime(item.createTime),
                         markList: pointList,
                         feature: polygonFeature
@@ -260,6 +271,7 @@ export default {
                 },
             }).then(function (resp) {
                 if (resp.status == 200) {
+
                     for (const feature of iconFeatureList) {
                         iconSource.removeFeature(feature);
                     }
@@ -268,6 +280,7 @@ export default {
                     for (const item of resp.data.data) {
 
                         if (item.location != null && item.patrol_id != null && item.relatedRegion != null) {
+
                             patrolLocation[item.patrol_id] = {
                                 patrolId: item.patrol_id,
                                 location: stringToSingleLocation(item.location),
@@ -316,102 +329,6 @@ export default {
             })
         }
 
-        //getPatrolsLocation();
-
-
-        // const getPatrolLocation = () => {
-        //     axios({
-        //         url: '/api/patrol-location',
-        //         method: 'get',
-        //     }).then(function (resp) {
-
-        //         if (resp.status == 200) {
-        //             for (const feature of iconFeatureList) {
-        //                 iconSource.removeFeature(feature);
-        //             }
-        //             iconFeatureList.splice(0, iconFeatureList.length);
-
-        //             for (const item of resp.data.data) {
-
-        //                 if (item.location != null && item.patrolId != null) {
-        //                     patrolLocation[item.id] = {
-        //                         id: item.id,
-        //                         patrolId: item.patrolId,
-        //                         location: stringToSingleLocation(item.location),
-        //                     }
-
-        //                     let point = stringToSingleLocation(item.location);
-        //                     let iconFeature = new Feature({
-        //                         geometry: new Point(point, "XY"),
-
-        //                     });
-
-        //                     let identity;
-        //                     let relateRegion;
-        //                     let name;
-        //                     let department;
-
-        //                     let telephone;
-        //                     getPatrolInfo(item.patrolId).then(res => {
-        //                         //console.log(res);
-        //                         name = res.name;
-        //                         identity = res.identity;
-        //                         department = res.department;
-        //                         telephone = res.telephone;
-        //                         relateRegion = polygonInfo[res.relatedRegion].markList;
-        //                         iconFeature.set('name', 'icon');
-        //                         iconFeature.set('polygonId', res.relatedRegion);
-        //                         iconFeature.set('patrolId', item.patrolId);
-        //                         iconFeature.set('patrolName', name);
-        //                         iconFeature.set('department', department);
-        //                         iconFeature.set('telephone', telephone);
-        //                         iconFeature.set('identity', identity);
-
-        //                         if (identity == "执法人员") {
-        //                             let isInRing = Amap.GeometryUtil.isPointInRing(point, relateRegion);
-        //                             if (isInRing) {
-        //                                 iconFeature.set('bgId', 0);
-
-        //                             } else {
-        //                                 iconFeature.set('bgId', 1);
-        //                             }
-        //                             iconFeature.set('isInOwnRing', isInRing);
-
-        //                         } else if (identity == "协管人员") {
-        //                             let isInRing = Amap.GeometryUtil.isPointInRing(point, relateRegion);
-        //                             if (isInRing) {
-        //                                 iconFeature.set('bgId', 2);
-        //                             } else {
-        //                                 iconFeature.set('bgId', 3);
-        //                             }
-        //                             iconFeature.set('isInOwnRing', isInRing);
-        //                         }
-        //                         iconSource.addFeature(iconFeature);
-        //                         iconFeatureList.push(iconFeature);
-        //                     });
-
-
-        //                 }
-        //             }
-        //         }
-        //     })
-        // }
-
-        // const getPatrolInfo = id => {
-        //     return axios({
-        //         url: '/api/patrol/' + id,
-        //         method: 'get',
-        //         params: {
-        //             id: id
-        //         }
-        //     }).then(function (resp) {
-        //         return resp.data.data;
-
-        //     })
-
-
-        // }
-
         const stringToSingleLocation = path => {
             let pathLng = path.replace("[", "").replace("]", "").split(",")[0] * 1;
             let pathLat = path.replace("[", "").replace("]", "").split(",")[1] * 1;
@@ -436,48 +353,48 @@ export default {
         // postPatrolLocation();
 
 
-        function getReverseLayer(layer) {
-            const raster = new Raster({
-                sources: [
-                    //传入图层，这里是天地图矢量图或者天地图矢量注记
-                    layer,
-                ],
-                //这里设置为image类型，与官方示例不同，优化速度
-                operationType: "image",
-                operation: function (pixels) {
-                    //执行颜色转换方法，注意，这里的方法需要使用lib引入进来才可以使用
-                    // reverseFunction(pixels[0].data);
-                    for (var i = 0; i < pixels[0].data.length; i += 4) {
-                        var r = pixels[0].data[i];
-                        var g = pixels[0].data[i + 1];
-                        var b = pixels[0].data[i + 2];
-                        //运用图像学公式，设置灰度值
-                        var grey = r * 0.3 + g * 0.59 + b * 0.11;
-                        //将rgb的值替换为灰度值
-                        pixels[0].data[i] = grey;
-                        pixels[0].data[i + 1] = grey;
-                        pixels[0].data[i + 2] = grey;
-                        //基于灰色，设置为蓝色，这几个数值是我自己试出来的，可以根据需求调整
-                        pixels[0].data[i] = 55 - pixels[0].data[i];
-                        pixels[0].data[i + 1] = 255 - pixels[0].data[i + 1];
-                        pixels[0].data[i + 2] = 305 - pixels[0].data[i + 2];
-                    }
-                    return pixels[0];
-                },
-                //线程数量
-                threads: 10,
-                //允许operation使用外部方法
-                // lib: {
-                //     reverseFunction: reverseFunc,
-                // },
+        // function getReverseLayer(layer) {
+        //     const raster = new Raster({
+        //         sources: [
+        //             //传入图层，这里是天地图矢量图或者天地图矢量注记
+        //             layer,
+        //         ],
+        //         //这里设置为image类型，与官方示例不同，优化速度
+        //         operationType: "image",
+        //         operation: function (pixels) {
+        //             //执行颜色转换方法，注意，这里的方法需要使用lib引入进来才可以使用
+        //             // reverseFunction(pixels[0].data);
+        //             for (var i = 0; i < pixels[0].data.length; i += 4) {
+        //                 var r = pixels[0].data[i];
+        //                 var g = pixels[0].data[i + 1];
+        //                 var b = pixels[0].data[i + 2];
+        //                 //运用图像学公式，设置灰度值
+        //                 var grey = r * 0.3 + g * 0.59 + b * 0.11;
+        //                 //将rgb的值替换为灰度值
+        //                 pixels[0].data[i] = grey;
+        //                 pixels[0].data[i + 1] = grey;
+        //                 pixels[0].data[i + 2] = grey;
+        //                 //基于灰色，设置为蓝色，这几个数值是我自己试出来的，可以根据需求调整
+        //                 pixels[0].data[i] = 55 - pixels[0].data[i];
+        //                 pixels[0].data[i + 1] = 255 - pixels[0].data[i + 1];
+        //                 pixels[0].data[i + 2] = 305 - pixels[0].data[i + 2];
+        //             }
+        //             return pixels[0];
+        //         },
+        //         //线程数量
+        //         threads: 20,
+        //         //允许operation使用外部方法
+        //         // lib: {
+        //         //     reverseFunction: reverseFunc,
+        //         // },
 
-            });
-            let reverseLayer = new ImageLayer({
-                name: "天地图矢量图层",
-                source: raster
-            });
-            return reverseLayer;
-        }
+        //     });
+        //     let reverseLayer = new ImageLayer({
+        //         name: "天地图矢量图层",
+        //         source: raster
+        //     });
+        //     return reverseLayer;
+        // }
 
 
         let polygonSource;
@@ -553,12 +470,13 @@ export default {
                         let name = document.createElement("p");
                         name.innerText = "围栏名: " + polygonInfo[featureId].name;
                         content.appendChild(name);
+                        let agency = document.createElement("p");
+                        agency.innerText = "所处办事处: " + polygonInfo[featureId].agency;
+                        content.appendChild(agency);
                         let operator = document.createElement("p");
                         operator.innerText = "操作人: " + polygonInfo[featureId].operator;
                         content.appendChild(operator);
-                        let editTime = document.createElement("p");
-                        editTime.innerText = "编辑时间: " + polygonInfo[featureId].editTime;
-                        content.appendChild(editTime);
+
                         popup.setPosition(coordinate);
                     } else if (featureId == 'icon') {
                         checkWorkStatistics(feature);
@@ -617,7 +535,7 @@ export default {
 
         let num = 0;
         const createPolygonFeature = (markerList) => {
-            const color = ['rgba(0, 255, 0, 0.5)', 'rgba(0, 0, 255, 0.5)', 'rgba(255, 0, 0, 0.5)', 'rgba(255, 255, 0, 0.5)', 'rgba(255,0,255, 0.5)'];
+            const color = ['rgba(0, 255, 0, 0.5)', 'rgba(0, 0, 255, 0.5)', 'rgba(255, 0, 0, 0.5)', 'rgba(255, 255, 0, 0.5)', 'rgba(255,0,255, 0.5)', 'rgba(0,255,255, 0.5)'];
             let oltarget;
 
             if (markerList.length < 3) {
@@ -631,7 +549,7 @@ export default {
             oltarget = new Feature(tmp);
             oltarget.setStyle(
                 new Style({
-                    fill: new Fill({ color: color[num % 5] }),
+                    fill: new Fill({ color: color[num % 6] }),
                     stroke: new Stroke({
                         lineDash: [10, 10, 10, 10],
                         // color: "#4e98f444",
@@ -644,6 +562,31 @@ export default {
             return oltarget;
         }
 
+        let derectiveInfo = ref("");
+        const sendDerective = () => {
+            let sendObject = patrolWorkStatistics[0].telephone
+            const socket = store.state.user.socket;
+            if (derectiveInfo.value != "") {
+                socket.send(JSON.stringify({
+                    type: "custom",
+                    patrolTelephone: sendObject,
+                    identity: [],
+                    regions: [],
+                    message: derectiveInfo.value,
+                }))
+                ElMessage({
+                    message: '指令已发布！',
+                    type: 'success',
+                })
+                derectiveInfo.value = "";
+            } else if (derectiveInfo.value == "") {
+                ElMessage({
+                    message: "指令为空",
+                    type: 'warning'
+                })
+            }
+        }
+
         onMounted(() => {
             initMap();
         });
@@ -652,7 +595,9 @@ export default {
             checkWorkStatistics,
             disabledDate,
             dateChange,
+            sendDerective,
             ifShowWorkStatistics,
+            derectiveInfo,
             patrolWorkStatistics,
             workStat,
             locale,
@@ -675,6 +620,8 @@ export default {
 .map {
     width: 100vw;
     height: 100vh;
+    background-color: rgba(43, 51, 73, 0.82);
+    background-image: radial-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.3), #000);
 }
 
 /* .content {

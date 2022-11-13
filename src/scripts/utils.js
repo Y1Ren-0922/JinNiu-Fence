@@ -105,6 +105,12 @@ const sortPoint = function (pointList) {
     return res;
 }
 
+const stringToSingleLocation = path => {
+    let pathLng = path.replace("[", "").replace("]", "").split(",")[0] * 1;
+    let pathLat = path.replace("[", "").replace("]", "").split(",")[1] * 1;
+    return [pathLng, pathLat];
+}
+
 
 // const sortMarker = (markerList) => {
 //     let geometryPoints = [];
@@ -149,4 +155,5 @@ export {
     getStandardTime,
     getTTime,
     sortPoint,
+    stringToSingleLocation,
 }

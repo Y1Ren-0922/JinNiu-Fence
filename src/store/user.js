@@ -6,13 +6,20 @@ export default {
         username: "",
         token: "",
         tokenHeader: "",
+        telephone: "",
         is_login: false,
+        socket: null,
+        replyMessage: [],
     },
     mutations: {
+        updateSocket(state, socket) {
+            state.socket = socket;
+        },
         updateUser(state, user) {
             state.id = user.id;
             state.username = user.username;
-            state.is_login = user.is_login;
+            state.telephone = user.telephone,
+                state.is_login = user.is_login;
         },
         updateToken(state, token) {
             state.token = token;
@@ -75,7 +82,9 @@ export default {
         logout(context) {
             localStorage.removeItem("jwt_token");
             localStorage.removeItem("jwt_tokenHeader");
+            context.state.socket.close();
             context.commit("logout");
+            context.commit("updateSocket", null);
         },
 
     }

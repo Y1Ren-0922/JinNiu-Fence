@@ -4,6 +4,8 @@ import PersonManage from '../views/PersonManage'
 import FenchManage from '../views/FenchManage'
 import CheckAttendance from '../views/CheckAttendance'
 import UserLoginView from '../views/UserLoginView'
+import NotFound from '../views/NotFound'
+import BicycleSharing from '../views/BicycleSharing'
 import store from '@/store'
 
 const routes = [
@@ -18,12 +20,23 @@ const routes = [
   {
     path: '/login/',
     name: 'user_login_index',
-    component: UserLoginView
+    component: UserLoginView,
+    meta: {
+      requestAuth: false,
+    }
   },
   {
     path: '/map/',
     name: 'map_index',
     component: MapView,
+    meta: {
+      requestAuth: true,
+    }
+  },
+  {
+    path: '/bicycle-map/',
+    name: 'bicycle_map_index',
+    component: BicycleSharing,
     meta: {
       requestAuth: true,
     }
@@ -51,6 +64,18 @@ const routes = [
     meta: {
       requestAuth: true,
     }
+  },
+  {
+    path: "/404/",
+    name: "404",
+    component: NotFound,
+    meta: {
+      requestAuth: false,
+    }
+  },
+  {
+    path: "/:catchAll(.*)",
+    redirect: "/404/",
   },
 
 ]

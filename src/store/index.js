@@ -1,6 +1,6 @@
 import { createStore } from 'vuex'
-import ModuleFench from './fence'
 import ModuleUser from './user'
+import ModuleMap from './map'
 
 export default createStore({
   state: {
@@ -12,7 +12,7 @@ export default createStore({
   actions: {
   },
   modules: {
-    fence: ModuleFench,
-    user: ModuleUser
+    user: ModuleUser,
+    map: ModuleMap,
   }
 })

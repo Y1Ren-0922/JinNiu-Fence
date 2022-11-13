@@ -8,9 +8,24 @@
             </router-link>
             <div class="collapse navbar-collapse" id="navbarText">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <router-link :class="route_name == 'map_index' ? 'nav-link active' : 'nav-link'"
-                            :to="{ name: 'map_index' }">地图界面</router-link>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            地图界面
+                        </a>
+
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li>
+                                <router-link class="dropdown-item" :to="{ name: 'map_index' }">地图界面</router-link>
+                            </li>
+                            <li>
+                                <router-link class="dropdown-item" :to="{ name: 'bicycle_map_index' }">共享单车人员地图界面
+                                </router-link>
+                                <!-- :class="route_name == 'bicycle_map_index' ? 'nav-link active dropdown-item' : 'nav-link dropdown-item'" -->
+                            </li>
+                        </ul>
+                        <!-- <router-link :class="route_name == 'map_index' ? 'nav-link active' : 'nav-link'"
+                            :to="{ name: 'map_index' }">地图界面</router-link> -->
                     </li>
                     <li class="nav-item">
                         <router-link :class="route_name == 'person_index' ? 'nav-link active' : 'nav-link'"
@@ -100,10 +115,14 @@ img.navbar-icon {
 
 nav {
     position: absolute;
-    z-index: 20;
+    z-index: 100;
     width: 100vw;
     height: 7vh;
     margin: 0;
     padding: 0;
+}
+
+.glyphicon-bell:before {
+    content: "\e123";
 }
 </style>
