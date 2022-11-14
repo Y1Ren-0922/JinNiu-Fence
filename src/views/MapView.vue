@@ -564,12 +564,13 @@ export default {
 
         let derectiveInfo = ref("");
         const sendDerective = () => {
-            let sendObject = patrolWorkStatistics[0].telephone
+            // let sendObject = patrolWorkStatistics[0].telephone
             const socket = store.state.user.socket;
             if (derectiveInfo.value != "") {
                 socket.send(JSON.stringify({
                     type: "custom",
-                    patrolTelephone: sendObject,
+                    // patrolTelephone: sendObject,
+                    patrolTelephone: "12345678912",
                     identity: [],
                     regions: [],
                     message: derectiveInfo.value,
