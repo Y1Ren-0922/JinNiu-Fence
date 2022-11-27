@@ -85,6 +85,8 @@ import AMapLoader from "@amap/amap-jsapi-loader"
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import { ElMessage } from 'element-plus';
 import { useStore } from 'vuex';
+import { defaults as defaultControls } from 'ol/control'
+
 
 export default {
     // beforeRouteEnter(to, from, next) {
@@ -115,6 +117,11 @@ export default {
 
         const initMap = () => {
 
+            // if (this.$route.query.patrol) {
+            //     console.log(this.$route.query.patrol)
+            // }
+
+
             let terMap = new Map({
                 target: "olMap",
                 view: new View({
@@ -122,6 +129,9 @@ export default {
                     center: [104.05632020955566, 30.753519881818795],
                     zoom: 12.5,
                     projection: "EPSG:4326",
+                }),
+                controls: defaultControls({
+                    zoom: false,
                 }),
             });
             map = terMap;
@@ -621,6 +631,7 @@ export default {
 .map {
     width: 100vw;
     height: 100vh;
+    /* margin: auto; */
     background-color: rgba(43, 51, 73, 0.82);
     background-image: radial-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.3), #000);
 }

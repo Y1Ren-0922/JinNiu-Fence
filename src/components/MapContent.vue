@@ -30,7 +30,7 @@
                 </div>
 
                 <div class="card text-white bg-success mb-3 " style="max-width: 18rem;">
-                    <div class="card-header">市容严管街人员情况</div>
+                    <!-- <div class="card-header">市容严管街人员情况</div>
                     <div class="card-body">
                         <div>严管街 数量：1条</div>
                         <div>人员达标 数量：1条</div>
@@ -39,7 +39,14 @@
                         <div>人员不达标路段报警提醒</div>
                         <ScrollBoard :config="config" style="width:14vw;height: 13vh;" />
 
+                    </div> -->
+                    <div class="card-header">共享单车人员</div>
+                    <div class="card-body">
+                        <div>美团：1人</div>
+                        <div>青桔：1人</div>
+                        <div>哈罗：1人</div>
                     </div>
+
 
                 </div>
             </div>
@@ -47,51 +54,72 @@
     </div>
     <div class="content-mid">
 
-        <div class="card text-white bg-primary mb-3 person-box ">
+        <div class="card text-white bg-primary mb-3 person-box " v-if="$route.path == '/map/'">
             <div class="card-body">
-                <h5 class="card-title">队员编制总数</h5>
+                <h5 class="card-title">编制总数</h5>
                 <DigitalFlop :config="memberNumber" />
             </div>
         </div>
 
-        <div class="card text-white bg-primary mb-3 person-box ">
+        <div class="card text-white bg-primary mb-3 person-box " v-if="$route.path == '/map/'">
             <div class="card-body">
                 <h5 class="card-title">抽调</h5>
                 <DigitalFlop :config="deployed" />
             </div>
         </div>
 
-        <div class="card text-white bg-primary mb-3 person-box">
+        <div class="card text-white bg-primary mb-3 person-box" v-if="$route.path == '/map/'">
             <div class="card-body">
                 <h5 class="card-title">补休</h5>
                 <DigitalFlop :config="digitConfig" />
             </div>
         </div>
 
-        <div class="card text-white bg-primary mb-3 person-box">
+        <div class="card text-white bg-primary mb-3 person-box" v-if="$route.path == '/map/'">
             <div class="card-body">
                 <h5 class="card-title">请假</h5>
                 <DigitalFlop :config="excused" />
             </div>
         </div>
 
-        <div class="card text-white bg-primary mb-3 person-box">
+        <div class="card text-white bg-primary mb-3 person-box" v-if="$route.path == '/map/'">
             <div class="card-body">
                 <h5 class="card-title">在岗在位</h5>
                 <DigitalFlop :config="situ" />
             </div>
         </div>
 
-        <div class="card text-white bg-primary mb-3 person-box">
+        <div class="card text-white bg-primary mb-3 person-box" v-if="$route.path == '/map/'">
             <div class="card-body">
                 <h5 class="card-title">定位异常</h5>
                 <DigitalFlop :config="positionException" />
             </div>
         </div>
+
+        <div class="card text-white bg-primary mb-3 bicycle-box" v-if="$route.path == '/bicycle-map/'">
+            <div class="card-body">
+                <h5 class="card-title">美团</h5>
+                <DigitalFlop :config="meituanConfig" />
+            </div>
+        </div>
+
+        <div class="card text-white bg-primary mb-3 bicycle-box" v-if="$route.path == '/bicycle-map/'">
+            <div class="card-body">
+                <h5 class="card-title">哈罗</h5>
+                <DigitalFlop :config="haluoConfig" />
+            </div>
+        </div>
+
+        <div class="card text-white bg-primary mb-3 bicycle-box" v-if="$route.path == '/bicycle-map/'">
+            <div class="card-body">
+                <h5 class="card-title">青桔</h5>
+                <DigitalFlop :config="qingjuConfig" />
+            </div>
+        </div>
     </div>
     <div class="content-r">
         <div class="container">
-            <div class="card text-white bg-primary mb-3 " style="max-width: 18rem; margin-left: auto;">
+            <!-- <div class="card text-white bg-primary mb-3 " style="max-width: 18rem; margin-left: auto;">
                 <div class="card-header">综合执法指令发布
                     <el-badge :value="12" class="item float-end">
                         <button type="button" class="btn btn-outline-warning float-end"
@@ -142,7 +170,7 @@
                     </div>
 
                 </div>
-            </div>
+            </div> -->
 
             <!-- <div class="card text-white bg-secondary mb-3 " style="max-width: 18rem;margin-left: auto;"
                 v-if="$route.path == '/bicycle-map/'">
@@ -154,13 +182,25 @@
                     <div>哈罗：1人</div>
                 </div>
             </div> -->
-
-            <div class="card text-white bg-success mb-3 ">
+            <div class="leave-map">
+                <router-link :to="{ name: 'person_index' }"><img src="../assets/img/leave.png" alt=""></router-link>
+            </div>
+            <div class="card text-white bg-secondary mb-3 ">
                 <div class="card-header">市容严管街人员情况</div>
                 <div class="card-body">
-
-                    <ScrollBoard :config="problemCount" style="width:20vw;height: 25vh;" @click="scrollBoardClick" />
-
+                    <div>严管街 数量：1条</div>
+                    <div>人员达标 数量：1条</div>
+                    <div>人员不达标 数量：1条</div>
+                    <p></p>
+                    <!-- <ScrollBoard :config="problemCount" style="width:20vw;height: 25vh;" @click="scrollBoardClick" /> -->
+                    <el-table :data="problemCount" style="width: 100%">
+                        <el-table-column prop="street" label="街道" header-align="center" align="center" />
+                        <el-table-column prop="clock_problem" label="打卡问题" header-align="center" align="center" />
+                        <el-table-column prop="street_problem" label="严管街到位问题" header-align="center" align="center"
+                            :show-overflow-tooltip="true" width="130" />
+                        <el-table-column prop="position_exception" label="定位异常" header-align="center" align="center" />
+                        <el-table-column prop="message_receive" label="信息接收" header-align="center" align="center" />
+                    </el-table>
                 </div>
 
             </div>
@@ -312,56 +352,75 @@
 
 <script setup>
 import { reactive, ref } from 'vue';
-import { ScrollBoard, DigitalFlop } from '@kjgl77/datav-vue3'
+import { DigitalFlop } from '@kjgl77/datav-vue3'
 import { useStore } from 'vuex';
 import {
     Delete,
 } from '@element-plus/icons-vue'
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
+import router from '@/router'
 
 const store = useStore();
 let derectiveSelect = ref("first");
 
-let config = reactive({
-    header: ['街道', '应到', '实到'],
-    headerHeight: 25,
-    data: [
-        ['抚琴', '1', '1'],
-        ['西华', '1', '1'],
-        ['街道1', '1', '1'],
-        ['街道2', '1', '1'],
-        ['街道3', '1', '1'],
-        ['街道4', '1', '1'],
-        ['街道5', '1', '1'],
-        ['街道6', '1', '1'],
-        ['街道7', '1', '1'],
-        ['街道8', '1', '1'],
-    ],
-    align: ['center'],
-    rowNum: 3,
-    columnWidth: [140, 60, 60],
-    headerBGC: '#006400',
-    oddRowBGC: '#3CB371',
-    evenRowBGC: '#8FBC8F',
-});
+// let config = reactive({
+//     header: ['街道', '应到', '实到'],
+//     headerHeight: 25,
+//     data: [
+//         ['抚琴', '1', '1'],
+//         ['西华', '1', '1'],
+//         ['街道1', '1', '1'],
+//         ['街道2', '1', '1'],
+//         ['街道3', '1', '1'],
+//         ['街道4', '1', '1'],
+//         ['街道5', '1', '1'],
+//         ['街道6', '1', '1'],
+//         ['街道7', '1', '1'],
+//         ['街道8', '1', '1'],
+//     ],
+//     align: ['center'],
+//     rowNum: 3,
+//     columnWidth: [140, 60, 60],
+//     headerBGC: '#006400',
+//     oddRowBGC: '#3CB371',
+//     evenRowBGC: '#8FBC8F',
+// });
 
-let problemCount = reactive({
-    header: ['街道', '打卡问题', '严管街道到位问题', '定位异常', '信息接收'],
-    data: [
-        ['抚琴', '1', '1', '问题', '问题'],
-        ['西华', '1', '1', '问题', '问题'],
-        ['街道1', '1', '1', '问题', '问题'],
-        ['街道2', '1', '1', '问题', '问题'],
-        ['街道3', '1', '1', '问题', '问题'],
-        ['街道4', '1', '1', '问题', '问题'],
-        ['街道5', '1', '1', '问题', '问题'],
-        ['街道6', '1', '1', '问题', '问题'],
-        ['街道7', '1', '1', '问题', '问题'],
-        ['街道8', '1', '1', '问题', '问题'],
-    ],
-    align: ['center'],
-})
+// let problemCount = reactive({
+//     header: ['街道', '打卡问题', '严管街道到位问题', '定位异常', '信息接收'],
+//     data: [
+//         ['抚琴', '1', '1', '问题', '问题'],
+//         ['西华', '1', '1', '问题', '问题'],
+//         ['街道1', '1', '1', '问题', '问题'],
+//         ['街道2', '1', '1', '问题', '问题'],
+//         ['街道3', '1', '1', '问题', '问题'],
+//         ['街道4', '1', '1', '问题', '问题'],
+//         ['街道5', '1', '1', '问题', '问题'],
+//         ['街道6', '1', '1', '问题', '问题'],
+//         ['街道7', '1', '1', '问题', '问题'],
+//         ['街道8', '1', '1', '问题', '问题'],
+//     ],
+//     align: ['center'],
+//     headerBGC: '#006400',
+//     oddRowBGC: '#3CB371',
+//     evenRowBGC: '#8FBC8F',
+// })
+
+// const tableHeader = ({ column }) => {
+//     console.log(column);
+//     column.minWith
+// }
+
+let problemCount = reactive([
+    {
+        street: "抚琴",
+        clock_problem: "1",
+        street_problem: "1",
+        position_exception: "问题",
+        message_receive: "问题",
+    }
+])
 
 let peopleData = reactive([{
     street: "抚琴",
@@ -494,6 +553,33 @@ let positionException = reactive({
         fill: '#E95547',
     }
 })
+
+let meituanConfig = reactive({
+    number: [100],
+    content: '{nt}人',
+    style: {
+        fontSize: 40,
+        fill: '#E1B95A',
+    }
+})
+
+let haluoConfig = reactive({
+    number: [100],
+    content: '{nt}人',
+    style: {
+        fontSize: 40,
+        fill: '#5CA1D8',
+    }
+})
+
+let qingjuConfig = reactive({
+    number: [100],
+    content: '{nt}人',
+    style: {
+        fontSize: 40,
+    }
+})
+
 let lawEnforceOfficerVisiable = ref(false);
 let personnelDetailsTitle = ref("");
 let isPersonnelCenter = ref(true);
@@ -635,13 +721,15 @@ const parseTime = time => {
 }
 
 const lawEnforceOfficers = () => {
-    personnelDetailsTitle.value = "执法人员实时情况";
-    lawEnforceOfficerVisiable.value = true;
+    router.push({ name: 'person_index' });
+    // personnelDetailsTitle.value = "执法人员实时情况";
+    // lawEnforceOfficerVisiable.value = true;
 }
 
 const wardenOfficers = () => {
-    personnelDetailsTitle.value = "协管人员实时情况";
-    lawEnforceOfficerVisiable.value = true;
+    router.push({ name: 'person_index' });
+    // personnelDetailsTitle.value = "协管人员实时情况";
+    // lawEnforceOfficerVisiable.value = true;
 }
 
 const streetDetails = (row, column) => {
@@ -676,19 +764,19 @@ const handlePeopleChange = (val) => {
     isPeopleIndeterminate.value = checkedCount > 0 && checkedCount < peoples.length;
 }
 
-const issueDirective = () => {
-    derectiveIssueVisiable.value = true;
-    if (socket == null) {
-        websocketConnect();
-    }
-}
+// const issueDirective = () => {
+//     derectiveIssueVisiable.value = true;
+//     if (socket == null) {
+//         websocketConnect();
+//     }
+// }
 
-const scrollBoardClick = (data) => {
-    if (data.columnIndex === 3) {
-        locationExceptionInfoVisiable.value = true;
-        locationExceptionInfoTitle.value = "当日人员定位异常统计表（当日出现连续30分钟定位未发生移动）";
-    }
-}
+// const scrollBoardClick = (data) => {
+//     if (data.columnIndex === 3) {
+//         locationExceptionInfoVisiable.value = true;
+//         locationExceptionInfoTitle.value = "当日人员定位异常统计表（当日出现连续30分钟定位未发生移动）";
+//     }
+// }
 
 
 const sendDerective = () => {
@@ -740,14 +828,14 @@ const sendDerective = () => {
 
 }
 
-let isShowParkSituation = ref(true)
-const parkClick = () => {
-    isShowParkSituation.value = true;
-}
+// let isShowParkSituation = ref(true)
+// const parkClick = () => {
+//     isShowParkSituation.value = true;
+// }
 
-const bicycleClick = () => {
-    isShowParkSituation.value = false;
-}
+// const bicycleClick = () => {
+//     isShowParkSituation.value = false;
+// }
 
 const is_read = idx => {
     getBackMessage.data[idx].isRead = true
@@ -800,6 +888,10 @@ let agencyList = ["抚琴", "西安路", "荷花池", "驷马桥", "凤凰山", 
     color: #FFC125;
 }
 
+.label-head {
+    max-width: 20px;
+}
+
 .check-title {
     font-size: 15px;
     font-weight: 600;
@@ -826,31 +918,32 @@ let agencyList = ["抚琴", "西安路", "荷花池", "驷马桥", "凤凰山", 
 
 .content-l {
     left: 0;
-    width: 25vw;
+    width: 20vw;
     background-color: rgba(0, 11, 61, 0.2);
     padding: 3vh;
     display: flex;
     flex-direction: column;
     height: 93vh;
     position: absolute;
-    top: 7vh;
+    top: 1vh;
     z-index: 20;
     user-select: none;
 }
 
 .content-l-top {
-    height: 150px;
+    height: 50px;
 
 }
 
 .content-mid {
     left: 25vw;
     width: 50vw;
-    height: 40vh;
-    padding: 3vh;
+    height: 30vh;
+    padding: 1vh;
+    padding-left: 5vw;
     background-color: rgba(0, 11, 61, 0.2);
     position: absolute;
-    top: 7vh;
+    top: 3vh;
     z-index: 20;
     display: flex;
     flex-flow: wrap;
@@ -869,13 +962,26 @@ let agencyList = ["抚琴", "西安路", "荷花池", "驷马桥", "凤凰山", 
     flex-direction: column;
     height: 93vh;
     position: absolute;
-    top: 7vh;
+    top: 0vh;
     z-index: 20;
     user-select: none;
 }
 
+.leave-map {
+    margin-bottom: 2vh;
+    padding-left: 15vw;
+}
+
 .person-box {
-    margin-right: 10px;
+    margin-right: 5vw;
+    width: 8vw;
+    height: 12vh;
+    --bs-bg-opacity: .2;
+}
+
+.bicycle-box {
+    margin-right: 3vw;
+    margin-top: 5vh;
     width: 10vw;
     height: 15vh;
     --bs-bg-opacity: .2;
@@ -887,6 +993,10 @@ let agencyList = ["抚琴", "西安路", "荷花池", "驷马桥", "凤凰山", 
     font-weight: 600;
     margin-right: 30px;
     text-align: center;
+}
+
+.el-table {
+    background-color: grey;
 }
 
 .person-number {

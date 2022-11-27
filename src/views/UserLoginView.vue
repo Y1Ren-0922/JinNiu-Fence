@@ -46,12 +46,14 @@ import { ref, reactive } from "vue";
 import { User, Lock } from '@element-plus/icons-vue'
 import { useStore } from "vuex";
 import router from '@/router'
-
+import { onMounted } from "vue";
 
 export default {
-    setup() {
-        const store = useStore();
 
+    setup() {
+
+        console.log(document.referrer);
+        const store = useStore();
         const seen = ref(true)
         //   const Base64 = require("js-base64").Base64
         const params = reactive({
@@ -93,6 +95,25 @@ export default {
             router.push({ name: 'home' });
         }
 
+        const loginFromGuanJia = () => {
+            store.dispatch("login", {
+                username: "lyh",
+                password: "string",
+                success() {
+                    store.dispatch("getInfo", {
+                        success() {
+                            Object.defineProperty(document, 'referrer', { value: '' });
+                            router.push({ name: "home" });
+                        },
+                        error() {
+                            console.log("获取用户出错");
+                        }
+                    });
+
+                }
+            })
+        }
+
         const login = () => {
             store.dispatch("login", {
                 username: params.username,
@@ -124,7 +145,12 @@ export default {
                 }
             })
         }
+        onMounted(() => {
 
+            if (document.referrer == 'http://175.153.176.27:18801/') {
+                loginFromGuanJia();
+            }
+        })
         return {
             seen,
             params,

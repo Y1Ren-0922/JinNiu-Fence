@@ -6,6 +6,8 @@ import CheckAttendance from '../views/CheckAttendance'
 import UserLoginView from '../views/UserLoginView'
 import NotFound from '../views/NotFound'
 import BicycleSharing from '../views/BicycleSharing'
+import StatisticalAnalysis from '../views/StatisticalAnalysis'
+import IssueDisposal from '../views/IssueDisposal'
 import store from '@/store'
 
 const routes = [
@@ -53,6 +55,22 @@ const routes = [
     path: '/fench/',
     name: 'fench_index',
     component: FenchManage,
+    meta: {
+      requestAuth: true,
+    }
+  },
+  {
+    path: '/statistical-analysis/',
+    name: 'statistical_index',
+    component: StatisticalAnalysis,
+    meta: {
+      requestAuth: true,
+    }
+  },
+  {
+    path: '/issue-disposal/',
+    name: 'issue_index',
+    component: IssueDisposal,
     meta: {
       requestAuth: true,
     }

@@ -31,7 +31,8 @@
                             :empty-text="ifShowQueryResult ? '未找到该人员' : 'Loading...'">
                             <!-- <el-table-column prop="id" label="id" width="150" /> -->
                             <el-table-column prop="name" label="姓名" width="140" header-align="center" align="center" />
-                            <el-table-column prop="title" label="职务" width="220" header-align="center" align="center" />
+                            <el-table-column prop="title" label="职务" width="240" header-align="center" align="center"
+                                :show-overflow-tooltip="true" />
 
                             <el-table-column prop="department" label="部门" width="240" header-align="center"
                                 align="center" />
@@ -39,12 +40,12 @@
                                 align="center" />
                             <el-table-column prop="identity" label="人员类型" width="120" header-align="center"
                                 align="center" />
-                            <el-table-column prop="regionName" label="所处围栏" width="120" header-align="center"
-                                align="center" />
+                            <el-table-column prop="regionName" label="所处围栏" width="200" header-align="center"
+                                align="center" :show-overflow-tooltip="true" />
                             <el-table-column prop="task" label="任务" width="100" header-align="center" align="center" />
 
-                            <el-table-column prop="wechat" label="微信" width="150" header-align="center"
-                                align="center" />
+                            <!-- <el-table-column prop="wechat" label="微信" width="150" header-align="center"
+                                align="center" /> -->
 
 
                             <el-table-column fixed="right" label="操作" width="250" header-align="center" align="center">
@@ -64,10 +65,18 @@
                                             <PhoneFilled />
                                         </el-icon>
                                     </el-button>
-                                    <el-button size="small" type="primary" plain text style="font-size:12px">
+
+                                    <el-button link size="small" type="primary" plain text style="font-size:20px"
+                                        @click="personLocation(scope.row)">
+                                        <el-icon style="vertical-align: middle">
+                                            <Location />
+                                        </el-icon>
+                                    </el-button>
+
+                                    <!-- <el-button size="small" type="primary" plain text style="font-size:12px">
                                         <el-image class="logo-icon" :src="require('@/assets/img/wx_icon.png')"
                                             :size="35"></el-image>
-                                    </el-button>
+                                    </el-button> -->
                                     <el-button class="allocationFench" link size="small" type="danger" plain text
                                         style="font-size:14px" @click="removePerson(scope.$index)">删除
                                     </el-button>
@@ -142,9 +151,9 @@
                 <el-form-item label="手机号" :rules="rules.tel" prop="phone">
                     <el-input v-model="form.phone" />
                 </el-form-item>
-                <el-form-item label="微信号" prop="wechat">
+                <!-- <el-form-item label="微信号" prop="wechat">
                     <el-input v-model="form.wechat" />
-                </el-form-item>
+                </el-form-item> -->
                 <el-form-item label="任务负责" prop="task">
                     <el-input v-model="form.task" />
                 </el-form-item>
@@ -218,9 +227,9 @@
                 <el-form-item label="手机号" :rules="rules.tel" prop="phone">
                     <el-input v-model="form.phone" />
                 </el-form-item>
-                <el-form-item label="微信号" prop="wechat">
+                <!-- <el-form-item label="微信号" prop="wechat">
                     <el-input v-model="form.wechat" />
-                </el-form-item>
+                </el-form-item> -->
                 <el-form-item label="任务负责" prop="task">
                     <el-input v-model="form.task" />
                 </el-form-item>
@@ -249,10 +258,11 @@
 <script>
 import { reactive } from 'vue';
 import { ref } from 'vue';
-import { PhoneFilled, Search } from "@element-plus/icons-vue";
+import { PhoneFilled, Search, Location } from "@element-plus/icons-vue";
 // import _ from 'lodash';
 import axios from 'axios';
 import { useStore } from 'vuex';
+import router from '@/router'
 
 export default {
     setup() {
@@ -331,7 +341,7 @@ export default {
         })
 
         let polygons = reactive({});
-        const initPatrolList = () => {
+        const initPatrolListAndPullPage = () => {
             Object.keys(polygons).map(key => {
                 delete polygons[key]
             });
@@ -351,10 +361,11 @@ export default {
                         }
                     }
                 }
+                pull_page(current_page.value)
                 //getPatrolList();
             })
         }
-        initPatrolList();
+        initPatrolListAndPullPage();
 
         let patrolInfo = reactive({});
         let patrolList = reactive([]);
@@ -435,8 +446,8 @@ export default {
                         }
 
                     }).then(function () {
-                        initPatrolList();
-                        pull_page(current_page);
+                        initPatrolListAndPullPage();
+                        // pull_page(current_page.value);
                     })
 
                 }
@@ -520,8 +531,8 @@ export default {
                             task: form.task,
                         }
                     }).then(function () {
-                        initPatrolList();
-                        pull_page(current_page.value);
+                        initPatrolListAndPullPage();
+                        // pull_page(current_page.value);
                     })
 
                 }
@@ -546,8 +557,8 @@ export default {
                     id: removeId,
                 }
             }).then(function () {
-                initPatrolList();
-                pull_page(current_page.value);
+                initPatrolListAndPullPage();
+                // pull_page(current_page.value);
 
             })
 
@@ -619,7 +630,7 @@ export default {
 
         const backToFirstPage = () => {
             ifShowQueryResult.value = false;
-            // initPatrolList();
+            // initPatrolListAndPullPage();
             pull_page(current_page.value);
         }
 
@@ -655,7 +666,6 @@ export default {
                 for (let item of resp.data.data.records) {
                     let relatedRegion;
                     let regionName;
-
                     if (item.relatedRegion == null) {
                         relatedRegion = "暂未分配";
                         regionName = "暂未分配";
@@ -719,8 +729,11 @@ export default {
         const size_change = page => {
             console.log(page);
         }
-        pull_page(current_page.value);
-
+        // pull_page(current_page.value);
+        const personLocation = row => {
+            console.log(row)
+            router.push({ name: 'bicycle_map_index', query: { "patrol": row.id } })
+        }
 
 
         return {
@@ -736,7 +749,7 @@ export default {
             //click_page,
             pull_page,
             size_change,
-
+            personLocation,
             rules,
             form,
             dialogFormVisible,
@@ -759,6 +772,7 @@ export default {
     components: {
         PhoneFilled,
         Search,
+        Location,
     }
 }
 </script>

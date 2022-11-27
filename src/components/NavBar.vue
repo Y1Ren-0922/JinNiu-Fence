@@ -4,14 +4,14 @@
 
         <div class="container">
             <img src="../assets/img/logo.jpg" alt="" class="navbar-icon">
-            <router-link class="navbar-brand" :to="{ name: 'home' }">成都市金牛区电子围栏系统
+            <router-link class="navbar-brand" :to="{ name: 'home' }">调度指挥系统
             </router-link>
             <div class="collapse navbar-collapse" id="navbarText">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
-                            地图界面
+                            指挥调度
                         </a>
 
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -33,9 +33,36 @@
                     </li>
                     <li class="nav-item">
                         <router-link :class="route_name == 'fench_index' ? 'nav-link active' : 'nav-link'"
-                            :to="{ name: 'fench_index' }">围栏管理</router-link>
+                            :to="{ name: 'fench_index' }">严管街管理</router-link>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            共享单车管理
+                        </a>
+
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li>
+                                <router-link class="dropdown-item" :to="{ name: 'bicycle_map_index' }">共享单车管理
+                                </router-link>
+                            </li>
+                            <li>
+                                <router-link class="dropdown-item" :to="{ name: 'bicycle_map_index' }">共享单车人员地图界面
+                                </router-link>
+                                <!-- :class="route_name == 'bicycle_map_index' ? 'nav-link active dropdown-item' : 'nav-link dropdown-item'" -->
+                            </li>
+                        </ul>
                     </li>
                     <li class="nav-item">
+                        <router-link :class="route_name == 'issue_index' ? 'nav-link active' : 'nav-link'"
+                            :to="{ name: 'issue_index' }">问题处置</router-link>
+                    </li>
+
+                    <li class="nav-item">
+                        <router-link :class="route_name == 'statistical_index' ? 'nav-link active' : 'nav-link'"
+                            :to="{ name: 'statistical_index' }">统计分析</router-link>
+                    </li>
+                    <li class="nav-item" v-if="false">
                         <router-link :class="route_name == 'checkin_index' ? 'nav-link active' : 'nav-link'"
                             :to="{ name: 'checkin_index' }">签到考勤</router-link>
                     </li>

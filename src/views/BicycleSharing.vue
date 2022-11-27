@@ -25,11 +25,14 @@ import axios from "axios";
 import { useStore } from 'vuex'
 import { stringToSingleLocation } from "../scripts/utils"
 import { Point } from "ol/geom";
+import router from '@/router'
+import { defaults as defaultControls } from 'ol/control'
 
 let map = null;
 const store = useStore();
 
 const initBicyleMap = () => {
+    console.log(router.currentRoute.value.query)
     let terMap = new Map({
         target: "olMap",
         view: new View({
@@ -37,6 +40,9 @@ const initBicyleMap = () => {
             center: [104.05632020955566, 30.753519881818795],
             zoom: 12.5,
             projection: "EPSG:4326",
+        }),
+        controls: defaultControls({
+            zoom: false,
         }),
     });
     map = terMap;
@@ -187,7 +193,57 @@ const getBikePersonnelLocation = () => {
     })
 }
 
-getBikePersonnelLocation()
+const getSingleBikePersonnel = id => {
+    axios({
+        url: '/api/bike-location/' + id,
+        method: 'get',
+        params: {
+            id: id,
+        },
+        headers: {
+            Authorization: store.state.user.tokenHeader + store.state.user.token,
+        },
+    }).then(function (response) {
+
+        if (response.status == 200) {
+            let item = response.data.data;
+            if (item.company != null && item.location != null && item.location != "") {
+                let point = stringToSingleLocation(item.location)
+                bikePersonnelLocation[item.bikeId] = {
+                    company: item.company,
+                    location: point,
+                }
+
+                let iconFeature = new Feature({
+                    geometry: new Point(point, "XY"),
+                });
+
+                let company_id = 0
+                if (item.company == "哈啰") {
+                    company_id = 1
+                } else if (item.company == "青桔") {
+                    company_id = 2
+                }
+                iconFeature.set("company", company_id)
+
+                iconSource.addFeature(iconFeature);
+            }
+
+
+        }
+    })
+}
+
+const getBikeLocation = () => {
+    if (router.currentRoute.value.query.patrol) {
+        getSingleBikePersonnel(1233432578);
+    } else {
+        getBikePersonnelLocation();
+    }
+}
+
+// getBikePersonnelLocation()
+getBikeLocation()
 onMounted(() => {
     initBicyleMap();
 })
