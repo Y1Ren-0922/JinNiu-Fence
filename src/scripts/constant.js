@@ -2,14 +2,18 @@ export {
     jinNiuFencePath,
     jinNiuFencePath1,
     jinNiuFencePath2,
-    banshichu
+    banshichu,
+    case_state,
 }
 import { reactive } from "vue"
+
+const case_state = ["全部", "现场核查", "现场整改", "跟进处理", "已结案", "即将到期", "超期未办结"]
 
 const banshichu = [
     reactive({
         name: "西安路",
-        color: 'rgba(245,255,250, 0.5)',
+        // color: 'rgba(245,255,250, 0.5)',
+        color: 'rgba(119, 136, 153, 0.5)',
         position: [104.040017, 30.67669],
         fillColor: "	#00FF00",
         strokeColor: "#F08080",
@@ -20,7 +24,8 @@ const banshichu = [
 
     reactive({
         name: "西华",
-        color: 'rgba(255,245,238, 0.5)',
+        // color: 'rgba(255,245,238, 0.5)',
+        color: 'rgba(105, 105, 105, 0.5)',
         position: [104.04591714, 30.68729304],
         fillColor: "#000080",
         strokeColor: "#F08080",
@@ -31,7 +36,8 @@ const banshichu = [
 
     reactive({
         name: "五块石",
-        color: 'rgba(255,239,213, 0.5)',
+        // color: 'rgba(255,239,213, 0.5)',
+        color: 'rgba(47, 79, 79, 0.5)',
         position: [104.061502, 30.705081],
         fillColor: "#006400",
         strokeColor: "#F08080",
@@ -42,7 +48,8 @@ const banshichu = [
 
     reactive({
         name: "荷花池",
-        color: 'rgba(253,245,230, 0.5)',
+        // color: 'rgba(253,245,230, 0.5)',
+        color: 'rgba(102, 139, 139, 0.5)',
         position: [104.063201, 30.690469],
         fillColor: "#FF8C00",
         strokeColor: "#F08080",
@@ -53,7 +60,8 @@ const banshichu = [
 
     reactive({
         name: "金泉",
-        color: 'rgba(255,240,245, 0.5)',
+        // color: 'rgba(255,240,245, 0.5)',
+        color: 'rgba(0, 134, 139, 0.5)',
         position: [103.988429, 30.712804],
         fillColor: "#FF8C00",
         strokeColor: "#F08080",
@@ -64,7 +72,8 @@ const banshichu = [
 
     reactive({
         name: '沙河源',
-        color: 'rgba(255,228,225, 0.5)',
+        // color: 'rgba(255,228,225, 0.5)',
+        color: 'rgba(25, 25, 112, 0.5)',
         position: [104.049849, 30.736595],
         fillColor: "#00FFFF",
         strokeColor: "#F08080",
@@ -75,7 +84,8 @@ const banshichu = [
 
     reactive({
         name: '驷马桥',
-        color: 'rgba(255,218,185, 0.5)',
+        // color: 'rgba(255,218,185, 0.5)',
+        color: 'rgba(139, 136, 120, 0.5)',
         position: [104.083594, 30.68692],
         fillColor: "#FFC0CB",
         strokeColor: "#F08080",
@@ -85,7 +95,8 @@ const banshichu = [
     }),
     reactive({
         name: '凤凰山',
-        color: 'rgba(248,248,255, 0.5)',
+        // color: 'rgba(248,248,255, 0.5)',
+        color: 'rgba(70, 130, 180, 0.5)',
         position: [104.108234, 30.764343],
         fillColor: "#800080",
         strokeColor: "#F08080",
@@ -97,7 +108,8 @@ const banshichu = [
 
     reactive({
         name: '茶店子',
-        color: 'rgba(224,255,255, 0.5)',
+        // color: 'rgba(224,255,255, 0.5)',
+        color: 'rgba(64, 224, 208, 0.5)',
         position: [104.023145, 30.689634],
         fillColor: "#800080",
         strokeColor: "#F08080",
@@ -108,7 +120,8 @@ const banshichu = [
 
     reactive({
         name: '九里堤',
-        color: 'rgba(238,232,170, 0.5)',
+        // color: 'rgba(238,232,170, 0.5)',
+        color: 'rgba(139, 129, 76, 0.5)',
         fillColor: "#DC143C",
         strokeColor: "#F08080",
         visible: true,
@@ -119,7 +132,8 @@ const banshichu = [
 
     reactive({
         name: '抚琴',
-        color: 'rgba(255,228,196, 0.5)',
+        // color: 'rgba(255,228,196, 0.5)',
+        color: 'rgba(205, 179, 139, 0.5)',
         fillColor: "#6A5ACD",
         strokeColor: "#F08080",
         visible: true,

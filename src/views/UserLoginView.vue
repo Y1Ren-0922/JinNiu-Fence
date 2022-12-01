@@ -68,24 +68,18 @@ export default {
         if (jwt_token && tokenHead) {
             store.commit("updateToken", jwt_token);
             store.commit("updateTokenHeader", tokenHead);
-            store.dispatch("getInfo", {
+            // store.dispatch("getInfo", {
+            //     success() {
+            //         router.push({ name: "home" });
+            //     },
+            //     error() {
+            //         console.log("获取用户出错");
+            //     }
+            // })
+            store.dispatch("login", {
+                username: 'lyh',
+                password: 'string',
                 success() {
-                    // const socketUrl = `ws://101.37.246.72:9090/websocket/admin${store.state.user.telephone}`;
-                    // console.log(socketUrl);
-                    // socket = new WebSocket(socketUrl);
-                    // socket.onopen = () => {
-                    //     console.log("websocket connected!");
-                    //     store.commit("updateSocket", socket);
-                    // }
-
-                    // socket.onmessage = msg => {
-                    //     console.log(msg);
-                    // }
-
-                    // socket.onclose = () => {
-                    //     console.log("websocket disconnected!");
-                    // }
-
                     router.push({ name: "home" });
                 },
                 error() {
@@ -100,15 +94,17 @@ export default {
                 username: "lyh",
                 password: "string",
                 success() {
-                    store.dispatch("getInfo", {
-                        success() {
-                            Object.defineProperty(document, 'referrer', { value: '' });
-                            router.push({ name: "home" });
-                        },
-                        error() {
-                            console.log("获取用户出错");
-                        }
-                    });
+                    Object.defineProperty(document, 'referrer', { value: '' });
+                    router.push({ name: "home" });
+                    // store.dispatch("getInfo", {
+                    //     success() {
+                    //         Object.defineProperty(document, 'referrer', { value: '' });
+                    //         router.push({ name: "home" });
+                    //     },
+                    //     error() {
+                    //         console.log("获取用户出错");
+                    //     }
+                    // });
 
                 }
             })
@@ -119,28 +115,15 @@ export default {
                 username: params.username,
                 password: params.password,
                 success() {
-                    store.dispatch("getInfo", {
-                        success() {
-                            // const socketUrl = `ws://101.37.246.72:9090/websocket/admin${store.state.user.telephone}`
-                            // socket = new WebSocket(socketUrl);
-                            // socket.onopen = () => {
-                            //     console.log("websocket connected!");
-                            //     store.commit("updateSocket", socket);
-                            // }
-
-                            // socket.onmessage = msg => {
-                            //     console.log(msg);
-                            // }
-
-                            // socket.onclose = () => {
-                            //     console.log("websocket disconnected!");
-                            // }
-                            router.push({ name: "home" });
-                        },
-                        error() {
-                            console.log("获取用户出错");
-                        }
-                    });
+                    router.push({ name: "home" });
+                    // store.dispatch("getInfo", {
+                    //     success() {
+                    //         router.push({ name: "home" });
+                    //     },
+                    //     error() {
+                    //         console.log("获取用户出错");
+                    //     }
+                    // });
 
                 }
             })

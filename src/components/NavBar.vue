@@ -19,7 +19,7 @@
                                 <router-link class="dropdown-item" :to="{ name: 'map_index' }">地图界面</router-link>
                             </li>
                             <li>
-                                <router-link class="dropdown-item" :to="{ name: 'bicycle_map_index' }">共享单车人员地图界面
+                                <router-link class="dropdown-item" :to="{ name: 'patrol_list_index' }">列表模式
                                 </router-link>
                                 <!-- :class="route_name == 'bicycle_map_index' ? 'nav-link active dropdown-item' : 'nav-link dropdown-item'" -->
                             </li>

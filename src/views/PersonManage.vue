@@ -1,89 +1,155 @@
 <template>
 
     <div class="container">
-        <div class="row center-block">
-            <div class="col-12">
-                <div class="card">
+        <div class="row">
 
-                    <div class="card-header" style="display: flex;">
-                        <div class="col-3" style="margin-right:30px;">
-                            <el-input v-model="queryName" placeholder="请输入人员姓名" clearable size="large">
-                                <template #append>
-                                    <el-button @click="searchPatrol()">
+            <div class="card select-box">
+                <div class="card-body">
+                    <el-row :gutter="12">
+                        <el-col :span="2" class="select-banshichu-box" @click="selectBanshichu('全部')">
+                            <el-card shadow="always"
+                                :body-style="banshichuSelected == '全部' ? banshichuSelectedStyle : banshichuNoneSelectedStyle">
+                                全部</el-card>
+                        </el-col>
+                        <el-col v-for="item in banshichu" :key="item.name" :span="2" class="select-banshichu-box"
+                            @click="selectBanshichu(item.name)">
+                            <el-card shadow="always"
+                                :body-style="banshichuSelected == item.name ? banshichuSelectedStyle : banshichuNoneSelectedStyle">
+                                {{ item.name }}</el-card>
+                        </el-col>
+
+                    </el-row>
+
+                    <div class="col-10" style="margin-right:30px; display: flex;">
+                        <el-input class="select-text-box" v-model="queryName" placeholder="请输入人员姓名" clearable
+                            size="large">
+
+                        </el-input>
+
+                        <el-input class="select-text-box" v-model="queryDepartment" placeholder="请输入部门名称" clearable
+                            size="large">
+
+                        </el-input>
+
+                        <el-input class="select-text-box" v-model="queryStreet" placeholder="请输入严管街名称" clearable
+                            size="large">
+
+                        </el-input>
+                        <el-input class="select-text-box" v-model="queryIdentity" placeholder="请输入人员类型" clearable
+                            size="large">
+
+                        </el-input>
+
+                        <!-- <el-select v-model="queryIdentity" class="m-2 select-text-box" placeholder="Select">
+                            <el-option v-for="item in selectIdentityOption" :key="item.value" :label="item.label"
+                                :value="item.value" />
+                        </el-select> -->
+
+                        <el-button type="primary" :icon="Search" size="large" @click="queryRecord">搜索</el-button>
+                    </div>
+
+                </div>
+
+
+            </div>
+
+            <div class="card">
+
+                <div class="card-header" style="display: flex;">
+                    <div class="col-3" style="margin-right:30px;">
+                        <el-input v-model="queryName" placeholder="请输入人员姓名" clearable size="large">
+                            <template #append>
+                                <el-button @click="searchPatrol()">
+                                    <el-icon>
+                                        <Search />
+                                    </el-icon>
+                                </el-button>
+
+                            </template>
+                        </el-input>
+                    </div>
+
+                    <button v-if="ifShowQueryResult" type="button" class="btn btn-outline-secondary float-end"
+                        @click="backToFirstPage()" style="margin-right:30px;">返回</button>
+
+                    <button type="button" class="btn btn-outline-primary float-end" @click="addPerson()">添加人员</button>
+                </div>
+                <div class="card-body">
+                    <el-table :data="ifShowQueryResult ? queryResultList : patrols"
+                        style="width: 100%; font-size: 1.1rem;" size="large" max-height="700"
+                        :empty-text="ifShowQueryResult ? '未找到该人员' : 'Loading...'">
+
+                        <el-table-column prop="name" label="姓名" width="140" header-align="center" align="center" />
+                        <el-table-column prop="title" label="职务" width="240" header-align="center" align="center"
+                            :show-overflow-tooltip="true" />
+
+                        <el-table-column prop="department" label="部门" width="240" header-align="center"
+                            align="center" />
+                        <el-table-column prop="telephone" label="电话" width="160" header-align="center" align="center" />
+                        <el-table-column prop="identity" label="人员类型" width="120" header-align="center"
+                            align="center" />
+                        <el-table-column prop="regionName" label="所处围栏" width="200" header-align="center" align="center"
+                            :show-overflow-tooltip="true" />
+                        <el-table-column prop="task" label="任务" width="100" header-align="center" align="center" />
+
+
+                        <el-table-column fixed="right" label="操作" width="250" header-align="center" align="center">
+                            <template #default="scope">
+                                <!-- <el-button class="allocateFench" link size="small" type="primary" plain text
+                                    style="font-size:1rem;" @click="editInfo(scope.$index)">
+                                    编辑
+                                </el-button> -->
+                                <el-tooltip class="box-item" effect="dark" content="编辑信息" placement="top"
+                                    :show-after="500">
+                                    <el-button link size="large" type="primary" plain text style="font-size: 1.2rem;">
                                         <el-icon>
-                                            <Search />
+                                            <EditPen />
                                         </el-icon>
                                     </el-button>
+                                </el-tooltip>
 
-                                </template>
-                            </el-input>
-                        </div>
-
-                        <button v-if="ifShowQueryResult" type="button" class="btn btn-outline-secondary float-end"
-                            @click="backToFirstPage()" style="margin-right:30px;">返回</button>
-
-                        <button type="button" class="btn btn-outline-primary float-end"
-                            @click="addPerson()">添加人员</button>
-                    </div>
-                    <div class="card-body">
-                        <el-table :data="ifShowQueryResult ? queryResultList : patrols"
-                            style="width: 100%; font-size: 18px;" size="large" max-height="700"
-                            :empty-text="ifShowQueryResult ? '未找到该人员' : 'Loading...'">
-                            <!-- <el-table-column prop="id" label="id" width="150" /> -->
-                            <el-table-column prop="name" label="姓名" width="140" header-align="center" align="center" />
-                            <el-table-column prop="title" label="职务" width="240" header-align="center" align="center"
-                                :show-overflow-tooltip="true" />
-
-                            <el-table-column prop="department" label="部门" width="240" header-align="center"
-                                align="center" />
-                            <el-table-column prop="telephone" label="电话" width="160" header-align="center"
-                                align="center" />
-                            <el-table-column prop="identity" label="人员类型" width="120" header-align="center"
-                                align="center" />
-                            <el-table-column prop="regionName" label="所处围栏" width="200" header-align="center"
-                                align="center" :show-overflow-tooltip="true" />
-                            <el-table-column prop="task" label="任务" width="100" header-align="center" align="center" />
-
-                            <!-- <el-table-column prop="wechat" label="微信" width="150" header-align="center"
-                                align="center" /> -->
-
-
-                            <el-table-column fixed="right" label="操作" width="250" header-align="center" align="center">
-                                <template #default="scope">
-                                    <el-button class="allocateFench" link size="small" type="primary" plain text
-                                        style="font-size:14px;" @click="editInfo(scope.$index)">
-                                        编辑信息
-                                    </el-button>
-                                    <!-- <el-button
-                                        
-          size="mini"
-          type="primary"
-          @click.prevent="editFence(scope.$index)" plain text style="font-size:20px">设置状态</el-button>
-      -->
-                                    <el-button link size="small" type="primary" plain text style="font-size:20px">
+                                <el-tooltip class="box-item" effect="dark" content="拨打电话" placement="top"
+                                    :show-after="500">
+                                    <el-button link size="large" type="primary" plain text style="font-size: 1.2rem;">
                                         <el-icon style="vertical-align: middle">
                                             <PhoneFilled />
                                         </el-icon>
                                     </el-button>
+                                </el-tooltip>
 
-                                    <el-button link size="small" type="primary" plain text style="font-size:20px"
+                                <el-tooltip class="box-item" effect="dark" content="位置跳转" placement="top"
+                                    :show-after="500">
+                                    <el-button link size="small" type="primary" plain text style="font-size: 1.2rem;"
                                         @click="personLocation(scope.row)">
                                         <el-icon style="vertical-align: middle">
                                             <Location />
                                         </el-icon>
                                     </el-button>
+                                </el-tooltip>
 
-                                    <!-- <el-button size="small" type="primary" plain text style="font-size:12px">
-                                        <el-image class="logo-icon" :src="require('@/assets/img/wx_icon.png')"
-                                            :size="35"></el-image>
-                                    </el-button> -->
-                                    <el-button class="allocationFench" link size="small" type="danger" plain text
-                                        style="font-size:14px" @click="removePerson(scope.$index)">删除
+                                <el-tooltip class="box-item" effect="dark" content="个人档案" placement="top"
+                                    :show-after="500">
+                                    <el-button link size="small" type="primary" plain text style="font-size: 1.2rem;"
+                                        @click="personDetailInfo(scope.row)">
+                                        <el-icon style="vertical-align: middle">
+                                            <Document />
+                                        </el-icon>
                                     </el-button>
-                                </template>
-                            </el-table-column>
-                        </el-table>
-                        <!-- <nav v-if="!ifShowQueryResult" aria-label="...">
+                                </el-tooltip>
+
+                                <el-tooltip class="box-item" effect="dark" content="删除" placement="top"
+                                    :show-after="500">
+                                    <el-button class="allocationFench" link size="small" type="danger" plain text
+                                        style="font-size:1rem" @click="removePerson(scope.$index)">
+                                        <el-icon>
+                                            <Delete />
+                                        </el-icon>
+                                    </el-button>
+                                </el-tooltip>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <!-- <nav v-if="!ifShowQueryResult" aria-label="...">
                             <ul class="pagination" style="float: right; margin-top: 20px;">
                                 <li class="page-item" @click="click_page(-2)">
                                     <a class="page-link" href="#">前一页</a>
@@ -98,21 +164,21 @@
                                 </li>
                             </ul>
                         </nav> -->
-                        <!-- :page-count="page_count" @size-change="size_change"
+                    <!-- :page-count="page_count" @size-change="size_change"
                             @current-change="pull_page" -->
-                        <!-- :current-page="current_page" -->
+                    <!-- :current-page="current_page" -->
 
-                        <div class="float-end" style="margin-top: 10px">
-                            <el-pagination background layout="total, prev, pager, next, jumper" :total="total_records"
-                                :current-page="current_page" @current-change="pull_page" />
-                        </div>
-
-
+                    <div class="float-end" style="margin-top: 10px">
+                        <el-pagination background layout="total, prev, pager, next, jumper" :total="total_records"
+                            :current-page="current_page" @current-change="pull_page" />
                     </div>
 
 
                 </div>
+
+
             </div>
+
         </div>
 
     </div>
@@ -120,9 +186,6 @@
     <el-dialog v-model="addPersonDialogVisible" title="添加人员" @close="exitAdd(addPersonFormRef)">
         <template #default>
             <el-form :rules="rules" ref="addPersonFormRef" :model="form" label-width="120px" style="max-width: 500px">
-                <!-- <el-form-item label="id" width="100px" prop="id">
-                    <el-input v-model="form.id" />
-                </el-form-item> -->
                 <el-form-item label="人员姓名" width="100px" :rules="rules.name" prop="name">
                     <el-input v-model="form.name" />
                 </el-form-item>
@@ -140,7 +203,6 @@
                     <el-input v-model="form.department" />
                 </el-form-item>
                 <el-form-item label="人员类型" prop="office">
-                    <!-- <el-input v-model="form.office" /> -->
                     <el-radio-group v-model="form.office" class="ml-4">
                         <el-radio label="执法人员">执法人员</el-radio>
                         <el-radio label="协管人员">协管人员</el-radio>
@@ -151,20 +213,10 @@
                 <el-form-item label="手机号" :rules="rules.tel" prop="phone">
                     <el-input v-model="form.phone" />
                 </el-form-item>
-                <!-- <el-form-item label="微信号" prop="wechat">
-                    <el-input v-model="form.wechat" />
-                </el-form-item> -->
                 <el-form-item label="任务负责" prop="task">
                     <el-input v-model="form.task" />
                 </el-form-item>
 
-
-                <!-- <el-form-item label="状态">
-      <el-radio-group v-model="form.work">
-        <el-radio label="执勤中" />
-        <el-radio label="休息中" />
-      </el-radio-group>
-    </el-form-item> -->
             </el-form>
         </template>
         <template #footer>
@@ -212,10 +264,6 @@
                     <el-input v-model="form.title" />
                 </el-form-item>
                 <el-form-item label="人员类型" prop="office">
-                    <!-- <el-select v-model="form.office" placeholder="选择职务">
-                        <el-option label="执法人员" value="执法人员" />
-                        <el-option label="协管人员" value="协管人员" />
-                    </el-select> -->
                     <el-radio-group v-model="form.office" class="ml-4">
                         <el-radio label="执法人员">执法人员</el-radio>
                         <el-radio label="协管人员">协管人员</el-radio>
@@ -227,19 +275,9 @@
                 <el-form-item label="手机号" :rules="rules.tel" prop="phone">
                     <el-input v-model="form.phone" />
                 </el-form-item>
-                <!-- <el-form-item label="微信号" prop="wechat">
-                    <el-input v-model="form.wechat" />
-                </el-form-item> -->
                 <el-form-item label="任务负责" prop="task">
                     <el-input v-model="form.task" />
                 </el-form-item>
-
-                <!-- <el-form-item label="状态">
-      <el-radio-group v-model="form.work">
-        <el-radio label="执勤中" />
-        <el-radio label="休息中" />
-      </el-radio-group>
-    </el-form-item> -->
 
             </el-form>
         </template>
@@ -258,11 +296,11 @@
 <script>
 import { reactive } from 'vue';
 import { ref } from 'vue';
-import { PhoneFilled, Search, Location } from "@element-plus/icons-vue";
-// import _ from 'lodash';
+import { PhoneFilled, Search, Location, Document, EditPen, Delete } from "@element-plus/icons-vue";
 import axios from 'axios';
 import { useStore } from 'vuex';
 import router from '@/router'
+import { banshichu } from '@/scripts/constant';
 
 export default {
     setup() {
@@ -274,6 +312,22 @@ export default {
         const addPersonFormRef = ref();
         const queryName = ref("");
         const ifShowQueryResult = ref(false);
+        const banshichuNoneSelectedStyle = ref("text-align: center; padding-top: 10px; padding-bottom:10px;");
+        const banshichuSelectedStyle = ref("text-align: center; padding-top: 10px; padding-bottom:10px; background-color: #0D6EFD; color: white;");
+        const banshichuSelected = ref("全部");
+        const queryDepartment = ref('');
+        const queryStreet = ref('');
+        const queryIdentity = ref('');
+        const selectIdentityOption = [
+            {
+                value: 'lawEnforce',
+                label: '执法人员',
+            },
+            {
+                value: 'warden',
+                label: '协管人员'
+            }
+        ]
 
         const rules = reactive({
             name: [
@@ -735,6 +789,99 @@ export default {
             router.push({ name: 'bicycle_map_index', query: { "patrol": row.id } })
         }
 
+        const personDetailInfo = row => {
+            router.push({ name: 'person_detail_index', query: { "patrol": row.id } })
+        }
+
+        const selectBanshichu = name => {
+            banshichuSelected.value = name;
+        }
+
+        let record_name = ref('');
+        let record_department = ref('');
+        let record_agency = ref('');
+        let record_identity = ref('');
+        const queryByCondition = page => {
+            let patrol = {
+                name: record_name.value,
+                agency: record_department.value,
+                department: record_agency.value,
+                identity: record_identity.value,
+                pageNum: page,
+                pageSize: 10,
+            }
+
+            Object.keys(patrolInfo).map(key => {
+                delete patrolInfo[key]
+            });
+            current_page.value = page;
+            axios({
+                url: '/api/patrol/select/conditions/',
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': store.state.user.tokenHeader + store.state.user.token,
+                },
+                data: JSON.stringify(patrol)
+            }).then(function (resp) {
+                console.log(resp);
+                patrols.value.splice(0, patrols.value.length);
+                total_records.value = parseInt(resp.data.data.total);
+                page_count = parseInt(resp.data.data.pages);
+
+
+                for (let item of resp.data.data.records) {
+                    let relatedRegion;
+                    let regionName;
+                    if (item.relatedRegion == null) {
+                        relatedRegion = "暂未分配";
+                        regionName = "暂未分配";
+                    } else {
+                        relatedRegion = item.relatedRegion;
+                        regionName = polygons[relatedRegion]["name"];
+                    }
+
+                    let task;
+                    if (item.task == null || item.task == '') {
+                        task = "暂无";
+                    } else {
+                        task = item.task;
+                    }
+
+                    let patrol = {
+                        id: item.id,
+                        name: item.name,
+                        title: item.title,
+                        department: item.department,
+                        relatedRegion: relatedRegion,
+                        regionName: regionName,
+                        telephone: item.telephone,
+                        wechat: item.wechat,
+                        identity: item.identity,
+                        task: task,
+                    }
+                    patrolInfo[item.id] = patrol;
+                    patrols.value.push(patrol);
+                }
+                // patrols.value = resp.data.data.records;
+                //update_pages();
+                ifShowQueryResult.value = false;
+            })
+        }
+
+        queryByCondition(1);
+
+        const queryRecord = () => {
+            // record_name = queryName.value.trim();
+            // record_department = queryDepartment.value.trim();
+            // record_identity = queryIdentity.value.trim();
+            // record_agency = queryStreet.value.trim();
+
+            // queryName.value = '';
+            // queryDepartment.value = '';
+            // queryIdentity.value = '';
+            // queryStreet.value = '';
+        }
 
         return {
             editInfo,
@@ -750,6 +897,10 @@ export default {
             pull_page,
             size_change,
             personLocation,
+            selectBanshichu,
+            queryByCondition,
+            queryRecord,
+            personDetailInfo,
             rules,
             form,
             dialogFormVisible,
@@ -766,20 +917,46 @@ export default {
             patrols,
             total_records,
             current_page,
-            page_count
+            page_count,
+            banshichu,
+            banshichuNoneSelectedStyle,
+            banshichuSelectedStyle,
+            banshichuSelected,
+            queryDepartment,
+            queryStreet,
+            queryIdentity,
+            selectIdentityOption,
+            Search,
         }
     },
     components: {
         PhoneFilled,
         Search,
         Location,
+        Document,
+        EditPen,
+        Delete,
     }
 }
 </script>
 
 <style scoped>
-.card {
+/* .card {
     margin-top: 8vh;
+} */
+
+.select-banshichu-box {
+    cursor: pointer;
+    margin-bottom: 1vh;
+}
+
+.select-box {
+    margin-top: 8vh;
+    margin-bottom: 2vh;
+}
+
+.select-text-box {
+    margin-right: 1vw;
 }
 
 .allocateFench:hover {

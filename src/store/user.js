@@ -44,12 +44,19 @@ export default {
                     password: data.password,
                 },
             }).then(function (resp) {
-
+                console.log(resp);
                 if (resp.status == 200) {
                     localStorage.setItem("jwt_tokenHeader", resp.data.data.tokenHead);
                     localStorage.setItem("jwt_token", resp.data.data.token);
                     context.commit('updateToken', resp.data.data.token);
                     context.commit('updateTokenHeader', resp.data.data.tokenHead);
+                    context.commit("updateUser", {
+                        id: resp.data.data.id,
+                        roleId: resp.data.data.roleId,
+                        username: resp.data.data.username,
+                        telephone: resp.data.data.telephone,
+                        is_login: true,
+                    });
                     data.success(resp);
                 } else {
                     data.error(resp);

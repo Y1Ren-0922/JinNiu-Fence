@@ -8,6 +8,8 @@ import NotFound from '../views/NotFound'
 import BicycleSharing from '../views/BicycleSharing'
 import StatisticalAnalysis from '../views/StatisticalAnalysis'
 import IssueDisposal from '../views/IssueDisposal'
+import PersonDetailInfo from '../views/PersonDetailInfo'
+import PatrolList from '../views/PatrolList'
 import store from '@/store'
 
 const routes = [
@@ -71,6 +73,22 @@ const routes = [
     path: '/issue-disposal/',
     name: 'issue_index',
     component: IssueDisposal,
+    meta: {
+      requestAuth: true,
+    }
+  },
+  {
+    path: '/person-detail/',
+    name: 'person_detail_index',
+    component: PersonDetailInfo,
+    meta: {
+      requestAuth: true,
+    }
+  },
+  {
+    path: '/patrol-list/',
+    name: 'patrol_list_index',
+    component: PatrolList,
     meta: {
       requestAuth: true,
     }

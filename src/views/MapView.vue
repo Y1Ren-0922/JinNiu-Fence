@@ -1,13 +1,19 @@
 <template>
     <MapContent />
 
-    <div class="map" id="olMap" v-if="$route.path == '/map/'"></div>
+    <div class="map-container" style="background-image: url(/images/bg.png);">
+        <div class="map-header">
+            <div class="map-header-title">成都市金牛区综合执法指挥调度平台</div>
+        </div>
+        <div class="map" id="olMap" v-if="$route.path == '/map/'"></div>
+    </div>
+
     <div id="popup" class="ol-popup">
         <a href="#" id="popup-closer" class="ol-popup-closer"></a>
         <div id="popup-content"></div>
     </div>
 
-    <el-dialog v-model="ifShowWorkStatistics" width="40%">
+    <el-dialog v-model="ifShowWorkStatistics" width="45%">
         <div>
             <div class="dialog-title">个人信息</div>
             <el-table :data="patrolWorkStatistics">
@@ -16,6 +22,11 @@
                 <el-table-column property="identity" label="人员类别" header-align="center" align="center" />
                 <el-table-column property="telephone" label="联系电话" header-align="center" align="center" />
                 <el-table-column property="isInOwnRing" label="是否在本人辖区" header-align="center" align="center" />
+                <el-table-column fixed="right" label="">
+                    <template #default>
+                        <el-button link type="primary" size="default" @click="personDetailInfo">详细信息</el-button>
+                    </template>
+                </el-table-column>
             </el-table>
         </div>
 
@@ -86,6 +97,7 @@ import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import { ElMessage } from 'element-plus';
 import { useStore } from 'vuex';
 import { defaults as defaultControls } from 'ol/control'
+import router from "@/router";
 
 
 export default {
@@ -126,8 +138,8 @@ export default {
                 target: "olMap",
                 view: new View({
                     // center: [104.04396204, 30.71499549],
-                    center: [104.05632020955566, 30.753519881818795],
-                    zoom: 12.5,
+                    center: [104.05632020955566, 30.739519881818795],
+                    zoom: 12,
                     projection: "EPSG:4326",
                 }),
                 controls: defaultControls({
@@ -189,14 +201,17 @@ export default {
             terLayer.on("prerender", function (evt) {
 
                 const context = evt.context;
-                context.filter = "grayscale(5%) invert(100%) opacity(50%)";
-                context.fillStyle = "rgba(255, 250, 250, 0.0)";
+                // context.filter = "grayscale(5%) invert(100%) opacity(50%)";
+                // context.fillStyle = "rgba(255, 250, 250, 0.0)";
+                context.filter = "grayscale(1) invert(100%) opacity(10%)";
+                context.fillStyle = "rgba(255, 255, 255, 0.0)";
             })
 
             CTAlayer.on("prerender", function (evt) {
                 const context = evt.context;
-                context.filter = "grayscale(50%) invert(100%) opacity(80%)";
-                context.fillStyle = "rgba(255, 165, 0, 0.05)";
+                // context.filter = "grayscale(50%) invert(100%) opacity(80%)";
+                context.fillStyle = "rgba(255, 250, 250, 0.0)";
+                context.filter = "grayscale(1) invert(100%) opacity(30%)";
             })
             // 去除双击地图缩放
             const dblClickInteraction = map
@@ -524,6 +539,7 @@ export default {
                 department: feature.get('department'),
                 identity: feature.get('identity'),
                 telephone: feature.get('telephone'),
+                id: feature.get('patrolId'),
                 isInOwnRing: feature.get('isInOwnRing') == true ? '是' : '否'
             })
 
@@ -598,6 +614,10 @@ export default {
             }
         }
 
+        const personDetailInfo = () => {
+            router.push({ name: 'person_detail_index', query: { "patrol": patrolWorkStatistics[0].id } })
+        }
+
         onMounted(() => {
             initMap();
         });
@@ -607,6 +627,7 @@ export default {
             disabledDate,
             dateChange,
             sendDerective,
+            personDetailInfo,
             ifShowWorkStatistics,
             derectiveInfo,
             patrolWorkStatistics,
@@ -621,17 +642,40 @@ export default {
   
 <style scoped>
 .dialog-title {
-    font-size: 18px;
+    font-size: 1rem;
     font-weight: 1000;
     color: "#303133";
     margin-bottom: 1vh;
-    margin-left: 16vw;
+    margin-left: 20vw;
+}
+
+.map-container {
+    width: 100vw;
+    height: 100vh;
+}
+
+.map-header {
+    width: 100vw;
+    height: 8vh;
+    margin: auto;
+    background-image: url("@/assets/img/map-header2.png");
+    background-size: 100% 100%;
+    margin-bottom: 14vh;
+}
+
+.map-header-title {
+    color: #FFFFFF;
+    font-family: Alibaba PuHuiTi;
+    font-size: 2.1rem;
+    margin: auto;
+    text-align: center;
 }
 
 .map {
-    width: 100vw;
-    height: 100vh;
-    /* margin: auto; */
+    width: 50vw;
+    /* height: 78vh; */
+    height: 50vh;
+    margin: auto;
     background-color: rgba(43, 51, 73, 0.82);
     background-image: radial-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.3), #000);
 }
