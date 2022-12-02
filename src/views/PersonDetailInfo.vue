@@ -13,7 +13,7 @@
                     <div class="card-header">个人信息</div>
                     <div class="card-body info-box">
                         <el-form :model="detail_info" label-position="right" label-width="6vw" id="info-form"
-                            disabled="true" size="large">
+                            :disabled="true" size="large">
                             <el-form-item label="姓名">
                                 <el-input style="cursor: text;" class="info-input" v-model="detail_info.name">
                                 </el-input>
@@ -53,7 +53,8 @@
                             <div class="case-box-header">
                                 <span>巡查交办（累计巡查交办的问题数量）</span>
                                 <div class="case-box-header-search">
-                                    <el-select v-model="patrol_problem_select_way" class="m-2" placeholder="选择查询方式">
+                                    <el-select v-model="patrol_problem_select_way" class="m-2" placeholder="选择查询方式"
+                                        clearable>
                                         <el-option v-for="item in patrol_problem_option" :key="item.value"
                                             :label="item.label" :value="item.value" />
                                     </el-select>
@@ -73,7 +74,7 @@
                                 </div>
                             </div>
                             <div class="case-box-body">
-                                <el-input disabled="true" v-model="detail_info.patrol_problem_num" />
+                                <el-input :disabled="true" v-model="detail_info.patrol_problem_num" />
                             </div>
                         </div>
 
@@ -82,7 +83,8 @@
                             <div class="case-box-header">
                                 <span>执法办案（累计的办案数量）</span>
                                 <div class="case-box-header-search">
-                                    <el-select v-model="law_enforce_select_way" class="m-2" placeholder="选择查询方式">
+                                    <el-select v-model="law_enforce_select_way" class="m-2" placeholder="选择查询方式"
+                                        clearable>
                                         <el-option v-for="item in patrol_problem_option" :key="item.value"
                                             :label="item.label" :value="item.value" />
                                     </el-select>
@@ -229,6 +231,10 @@ getPersonInfo();
 
 
 <style scoped>
+.container {
+    margin-left: 16vw;
+}
+
 .person-basic-info {
     margin-top: 8vh;
 }

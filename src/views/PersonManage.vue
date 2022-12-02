@@ -5,49 +5,72 @@
 
             <div class="card select-box">
                 <div class="card-body">
-                    <el-row :gutter="12">
+                    <!-- <el-row :gutter="12">
                         <el-col :span="2" class="select-banshichu-box" @click="selectBanshichu('全部')">
                             <el-card shadow="always"
                                 :body-style="banshichuSelected == '全部' ? banshichuSelectedStyle : banshichuNoneSelectedStyle">
                                 全部</el-card>
                         </el-col>
-                        <el-col v-for="item in banshichu" :key="item.name" :span="2" class="select-banshichu-box"
-                            @click="selectBanshichu(item.name)">
+                        <el-col v-for="item in banshichu_list" :key="item" :span="2" class="select-banshichu-box"
+                            @click="selectBanshichu(item)">
                             <el-card shadow="always"
-                                :body-style="banshichuSelected == item.name ? banshichuSelectedStyle : banshichuNoneSelectedStyle">
-                                {{ item.name }}</el-card>
+                                :body-style="banshichuSelected == item ? banshichuSelectedStyle : banshichuNoneSelectedStyle">
+                                <span>{{ item }}</span>
+
+                            </el-card>
                         </el-col>
 
-                    </el-row>
+                    </el-row> -->
 
-                    <div class="col-10" style="margin-right:30px; display: flex;">
-                        <el-input class="select-text-box" v-model="queryName" placeholder="请输入人员姓名" clearable
-                            size="large">
-
-                        </el-input>
-
-                        <el-input class="select-text-box" v-model="queryDepartment" placeholder="请输入部门名称" clearable
-                            size="large">
+                    <div class="col-12" style="margin-right:30px; display: flex;">
+                        <el-input style="width: 18%" class="select-text-box" v-model="queryName" placeholder="请输入人员姓名"
+                            clearable size="large">
 
                         </el-input>
 
-                        <el-input class="select-text-box" v-model="queryStreet" placeholder="请输入严管街名称" clearable
-                            size="large">
-
-                        </el-input>
-                        <el-input class="select-text-box" v-model="queryIdentity" placeholder="请输入人员类型" clearable
-                            size="large">
+                        <el-input style="width: 22%" class="select-text-box" v-model="queryDepartment"
+                            placeholder="请输入部门名称" clearable size="large">
 
                         </el-input>
 
-                        <!-- <el-select v-model="queryIdentity" class="m-2 select-text-box" placeholder="Select">
+
+                        <!-- <el-select v-model="queryStreet" placeholder="选择围栏" size="large" style="width: 20%;"
+                            class="select-text-box" clearable>
+                            <el-option v-for="polygon in polygons" :key="polygon.id" :label="polygon.name"
+                                :value="polygon.name" />
+                        </el-select> -->
+
+                        <el-input style="width: 20%" id="select-street-box" class="select-text-box"
+                            ref="selectStreetInput" v-model="queryRegion" placeholder="请输入街道" clearable size="large"
+                            @click="selectStreet">
+
+                        </el-input>
+
+
+                        <el-select v-model="queryIdentity" class="select-text-box" placeholder="选择人员类型" size="large"
+                            style="width: 15%" clearable>
                             <el-option v-for="item in selectIdentityOption" :key="item.value" :label="item.label"
                                 :value="item.value" />
-                        </el-select> -->
+                        </el-select>
 
                         <el-button type="primary" :icon="Search" size="large" @click="queryRecord">搜索</el-button>
                     </div>
 
+                    <hr>
+
+                    <el-row :gutter="12">
+                        <el-col v-for="(item, idx) in person_state" :key="idx" :span="2.5" class="select-state-box"
+                            @click="selectPersonState(item)">
+                            <el-card shadow="always"
+                                :body-style="personStateSelected == item ? banshichuSelectedStyle : banshichuNoneSelectedStyle">
+                                <span>{{ item }}</span>
+                                <div class="state-number">20</div>
+                            </el-card>
+                        </el-col>
+
+                    </el-row>
+                    <el-date-picker v-model="record_date" type="date" placeholder="默认查询当天" size="large"
+                        :disabled-date="disabledDate" style="margin-top: 1vh;" />
                 </div>
 
 
@@ -56,7 +79,7 @@
             <div class="card">
 
                 <div class="card-header" style="display: flex;">
-                    <div class="col-3" style="margin-right:30px;">
+                    <!-- <div class="col-3" style="margin-right:30px;">
                         <el-input v-model="queryName" placeholder="请输入人员姓名" clearable size="large">
                             <template #append>
                                 <el-button @click="searchPatrol()">
@@ -67,17 +90,14 @@
 
                             </template>
                         </el-input>
-                    </div>
+                    </div> -->
 
-                    <button v-if="ifShowQueryResult" type="button" class="btn btn-outline-secondary float-end"
-                        @click="backToFirstPage()" style="margin-right:30px;">返回</button>
 
                     <button type="button" class="btn btn-outline-primary float-end" @click="addPerson()">添加人员</button>
                 </div>
                 <div class="card-body">
-                    <el-table :data="ifShowQueryResult ? queryResultList : patrols"
-                        style="width: 100%; font-size: 1.1rem;" size="large" max-height="700"
-                        :empty-text="ifShowQueryResult ? '未找到该人员' : 'Loading...'">
+                    <el-table :data="patrols" style="width: 100%; font-size: 1.1rem;" size="large" max-height="700"
+                        :empty-text="emptyText">
 
                         <el-table-column prop="name" label="姓名" width="140" header-align="center" align="center" />
                         <el-table-column prop="title" label="职务" width="240" header-align="center" align="center"
@@ -101,7 +121,8 @@
                                 </el-button> -->
                                 <el-tooltip class="box-item" effect="dark" content="编辑信息" placement="top"
                                     :show-after="500">
-                                    <el-button link size="large" type="primary" plain text style="font-size: 1.2rem;">
+                                    <el-button link size="large" type="primary" plain text style="font-size: 1.2rem;"
+                                        @click="editInfo(scope.$index)">
                                         <el-icon>
                                             <EditPen />
                                         </el-icon>
@@ -149,28 +170,13 @@
                             </template>
                         </el-table-column>
                     </el-table>
-                    <!-- <nav v-if="!ifShowQueryResult" aria-label="...">
-                            <ul class="pagination" style="float: right; margin-top: 20px;">
-                                <li class="page-item" @click="click_page(-2)">
-                                    <a class="page-link" href="#">前一页</a>
-                                </li>
-                                <li :class="'page-item ' + page.is_active" v-for="page in pages" :key="page.number"
-                                    @click="click_page(page.number)">
-                                    <a class="page-link" href="#">{{ page.number }}</a>
-                                </li>
-
-                                <li class="page-item" @click="click_page(-1)">
-                                    <a class="page-link" href="#">后一页</a>
-                                </li>
-                            </ul>
-                        </nav> -->
-                    <!-- :page-count="page_count" @size-change="size_change"
-                            @current-change="pull_page" -->
-                    <!-- :current-page="current_page" -->
 
                     <div class="float-end" style="margin-top: 10px">
-                        <el-pagination background layout="total, prev, pager, next, jumper" :total="total_records"
-                            :current-page="current_page" @current-change="pull_page" />
+                        <el-pagination v-if="checkState == false" background layout="total, prev, pager, next, jumper"
+                            :total="total_records" :current-page="current_page" @current-change="queryByCondition" />
+                        <el-pagination v-else background layout="total, prev, pager, next, jumper"
+                            :total="total_records" :current-page="current_page"
+                            @current-change="queryStateByCondition" />
                     </div>
 
 
@@ -290,17 +296,36 @@
     </el-dialog>
 
 
+    <el-dialog v-model="selectStreetVisiable" title="选择街道" width="30%" :before-close="selectStreethandleClose">
+        <el-select v-model="banshichuSelected" class="m-2" placeholder="请选择办事处" size="large" @change="agencySelected"
+            clearable>
+            <el-option v-for="item in banshichu_list" :key="item" :label="item" :value="item" />
+        </el-select>
+
+        <el-select v-model="queryStreet" class="m-2" placeholder="请选择严管街" size="large" clearable>
+            <el-option v-for="item in regionList" :key="item.name" :label="item.name" :value="item.name" />
+        </el-select>
+        <template #footer>
+            <span class="dialog-footer">
+
+                <el-button type="primary" @click="selectStreetConfirm">
+                    确定
+                </el-button>
+                <el-button @click="selectStreethandleClose">取消</el-button>
+            </span>
+        </template>
+    </el-dialog>
+
 
 </template>
 
 <script>
 import { reactive } from 'vue';
-import { ref } from 'vue';
+import { ref, nextTick } from 'vue';
 import { PhoneFilled, Search, Location, Document, EditPen, Delete } from "@element-plus/icons-vue";
 import axios from 'axios';
 import { useStore } from 'vuex';
 import router from '@/router'
-import { banshichu } from '@/scripts/constant';
 
 export default {
     setup() {
@@ -311,20 +336,23 @@ export default {
         const ruleFormRef = ref();
         const addPersonFormRef = ref();
         const queryName = ref("");
-        const ifShowQueryResult = ref(false);
         const banshichuNoneSelectedStyle = ref("text-align: center; padding-top: 10px; padding-bottom:10px;");
         const banshichuSelectedStyle = ref("text-align: center; padding-top: 10px; padding-bottom:10px; background-color: #0D6EFD; color: white;");
-        const banshichuSelected = ref("全部");
+        const banshichuSelected = ref("");
         const queryDepartment = ref('');
         const queryStreet = ref('');
         const queryIdentity = ref('');
+        const person_state = ["全部", "在岗在位", "抽调", "补休", "请假"];
+        const personStateSelected = ref('全部');
+        const selectStreetVisiable = ref(false);
+
         const selectIdentityOption = [
             {
-                value: 'lawEnforce',
+                value: '执法人员',
                 label: '执法人员',
             },
             {
-                value: 'warden',
+                value: '协管人员',
                 label: '协管人员'
             }
         ]
@@ -415,63 +443,13 @@ export default {
                         }
                     }
                 }
-                pull_page(current_page.value)
-                //getPatrolList();
+                queryByCondition(current_page.value)
             })
         }
         initPatrolListAndPullPage();
 
         let patrolInfo = reactive({});
         let patrolList = reactive([]);
-        // const getPatrolList = () => {
-
-        //     Object.keys(patrolInfo).map(key => {
-        //         delete patrolInfo[key]
-        //     });
-        //     patrolList.splice(0, patrolList.length);
-
-        //     axios({
-        //         url: '/api/patrol',
-        //         method: 'get'
-        //     }).then(function (resp) {
-
-        //         if (resp.status == 200) {
-        //             for (let item of resp.data.data) {
-        //                 let relatedRegion;
-        //                 let regionName;
-
-        //                 if (item.relatedRegion == null) {
-        //                     relatedRegion = "暂未分配";
-        //                     regionName = "暂未分配";
-        //                 } else {
-        //                     relatedRegion = item.relatedRegion;
-        //                     regionName = polygons[relatedRegion]["name"];
-        //                 }
-
-        //                 let task;
-        //                 if (item.task == null) {
-        //                     task = "暂无";
-        //                 } else {
-        //                     task = item.task;
-        //                 }
-
-        //                 let patrol = {
-        //                     id: item.id,
-        //                     name: item.name,
-        //                     department: item.department,
-        //                     relatedRegion: relatedRegion,
-        //                     regionName: regionName,
-        //                     telephone: item.telephone,
-        //                     wechat: item.wechat,
-        //                     identity: item.identity,
-        //                     task: task,
-        //                 }
-        //                 patrolInfo[item.id] = patrol;
-        //                 patrolList.push(patrol);
-        //             }
-        //         }
-        //     })
-        // }
 
         const addPerson = () => {
             addPersonDialogVisible.value = true;
@@ -501,7 +479,6 @@ export default {
 
                     }).then(function () {
                         initPatrolListAndPullPage();
-                        // pull_page(current_page.value);
                     })
 
                 }
@@ -516,13 +493,10 @@ export default {
         let editIndex;
         const editInfo = (index) => {
             let editId
-            if (ifShowQueryResult.value == true) {
-                editId = queryResultList[index].id;
-                editIndex = index;
-            } else {
-                editId = patrols.value[index].id;
-                editIndex = index;
-            }
+
+            editId = patrols.value[index].id;
+            editIndex = index;
+
             form.id = patrolInfo[editId].id;
             form.name = patrolInfo[editId].name;
             form.phone = patrolInfo[editId].telephone;
@@ -594,12 +568,9 @@ export default {
         }
 
         const removePerson = (index) => {
-            let removeId;
-            if (ifShowQueryResult.value == true) {
-                removeId = queryResultList[index].id;
-            } else {
-                removeId = patrols.value[index].id;
-            }
+
+            let removeId = patrols.value[index].id;
+
 
             axios({
                 url: '/api/patrol/' + removeId,
@@ -618,174 +589,80 @@ export default {
 
         }
 
-        let queryResultList = reactive([])
-        const searchPatrol = () => {
-            Object.keys(patrolInfo).map(key => {
-                delete patrolInfo[key]
-            });
-            queryResultList.splice(0, queryResultList.length);
-
-            queryName.value = queryName.value.trim();
-            if (queryName.value != "") {
-                axios({
-                    url: '/api/patrol/name/' + queryName.value,
-                    method: 'get',
-                    headers: {
-                        Authorization: store.state.user.tokenHeader + store.state.user.token,
-                    },
-                    params: {
-                        name: queryName.value
-                    }
-                }).then(function (resp) {
-                    if (resp.status == 200) {
-                        for (let item of resp.data.data) {
-
-                            let relatedRegion;
-                            let regionName;
-
-                            if (item.relatedRegion == null) {
-                                relatedRegion = "暂未分配";
-                                regionName = "暂未分配";
-                            } else {
-                                relatedRegion = item.relatedRegion;
-                                regionName = polygons[relatedRegion]["name"];
-                            }
-
-                            let task;
-                            if (item.task == null || item.task == '') {
-                                task = "暂无";
-                            } else {
-                                task = item.task;
-                            }
-
-                            let patrol = {
-                                id: item.id,
-                                name: item.name,
-                                title: item.title,
-                                department: item.department,
-                                relatedRegion: relatedRegion,
-                                regionName: regionName,
-                                telephone: item.telephone,
-                                wechat: item.wechat,
-                                identity: item.identity,
-                                task: task,
-                            }
-
-                            queryResultList.push(patrol);
-                            patrolInfo[item.id] = patrol;
-                        }
-                    }
-                    ifShowQueryResult.value = true;
-                    queryName.value = "";
-                })
-            }
-
-        }
-
         const backToFirstPage = () => {
-            ifShowQueryResult.value = false;
-            // initPatrolListAndPullPage();
-            pull_page(current_page.value);
+            queryByCondition(current_page.value);
         }
 
         let total_records = ref(0);
         let current_page = ref(1);
         let pages = ref([]);
         let patrols = ref([]);
-        let pageNum = 10;
         let page_count = 0;
-        const pull_page = page => {
+        // const pull_page = page => {
 
-            Object.keys(patrolInfo).map(key => {
-                delete patrolInfo[key]
-            });
-            current_page.value = page;
-            axios({
-                url: '/api/patrol/page',
-                method: 'get',
-                headers: {
-                    Authorization: store.state.user.tokenHeader + store.state.user.token,
-                },
-                params: {
-                    pageNum: page,
-                    pageSize: pageNum,
-                }
-            }).then(function (resp) {
-
-                patrols.value.splice(0, patrols.value.length);
-                total_records.value = parseInt(resp.data.data.total);
-                page_count = parseInt(resp.data.data.pages);
-
-
-                for (let item of resp.data.data.records) {
-                    let relatedRegion;
-                    let regionName;
-                    if (item.relatedRegion == null) {
-                        relatedRegion = "暂未分配";
-                        regionName = "暂未分配";
-                    } else {
-                        relatedRegion = item.relatedRegion;
-                        regionName = polygons[relatedRegion]["name"];
-                    }
-
-                    let task;
-                    if (item.task == null || item.task == '') {
-                        task = "暂无";
-                    } else {
-                        task = item.task;
-                    }
-
-                    let patrol = {
-                        id: item.id,
-                        name: item.name,
-                        title: item.title,
-                        department: item.department,
-                        relatedRegion: relatedRegion,
-                        regionName: regionName,
-                        telephone: item.telephone,
-                        wechat: item.wechat,
-                        identity: item.identity,
-                        task: task,
-                    }
-                    patrolInfo[item.id] = patrol;
-                    patrols.value.push(patrol);
-                }
-                // patrols.value = resp.data.data.records;
-                //update_pages();
-                ifShowQueryResult.value = false;
-            })
-        }
-
-        // const update_pages = () => {
-        //     let max_pages = parseInt(Math.ceil(total_records / pageNum));
-        //     let new_pages = [];
-        //     for (let i = current_page - 2; i <= current_page + 2; i++) {
-        //         if (i >= 1 && i <= max_pages) {
-        //             new_pages.push({
-        //                 number: i,
-        //                 is_active: i === current_page ? "active" : "",
-        //             });
+        //     Object.keys(patrolInfo).map(key => {
+        //         delete patrolInfo[key]
+        //     });
+        //     current_page.value = page;
+        //     axios({
+        //         url: '/api/patrol/page',
+        //         method: 'get',
+        //         headers: {
+        //             Authorization: store.state.user.tokenHeader + store.state.user.token,
+        //         },
+        //         params: {
+        //             pageNum: page,
+        //             pageSize: pageNum,
         //         }
-        //     }
-        //     pages.value = new_pages;
-        // }
+        //     }).then(function (resp) {
 
-        // const click_page = page => {
-        //     if (page === -2) page = current_page - 1;
-        //     else if (page === -1) page = current_page + 1;
-        //     let max_pages = parseInt(Math.ceil(total_records / pageNum));
+        //         patrols.value.splice(0, patrols.value.length);
+        //         total_records.value = parseInt(resp.data.data.total);
+        //         page_count = parseInt(resp.data.data.pages);
 
-        //     if (page >= 1 && page <= max_pages) {
-        //         pull_page(page);
-        //     }
+
+        //         for (let item of resp.data.data.records) {
+        //             let relatedRegion;
+        //             let regionName;
+        //             if (item.relatedRegion == null) {
+        //                 relatedRegion = "暂未分配";
+        //                 regionName = "暂未分配";
+        //             } else {
+        //                 relatedRegion = item.relatedRegion;
+        //                 regionName = polygons[relatedRegion]["name"];
+        //             }
+
+        //             let task;
+        //             if (item.task == null || item.task == '') {
+        //                 task = "暂无";
+        //             } else {
+        //                 task = item.task;
+        //             }
+
+        //             let patrol = {
+        //                 id: item.id,
+        //                 name: item.name,
+        //                 title: item.title,
+        //                 department: item.department,
+        //                 relatedRegion: relatedRegion,
+        //                 regionName: regionName,
+        //                 telephone: item.telephone,
+        //                 wechat: item.wechat,
+        //                 identity: item.identity,
+        //                 task: task,
+        //             }
+        //             patrolInfo[item.id] = patrol;
+        //             patrols.value.push(patrol);
+        //         }
+
+        //     })
         // }
 
         const size_change = page => {
             console.log(page);
         }
-        // pull_page(current_page.value);
+
         const personLocation = row => {
-            console.log(row)
             router.push({ name: 'bicycle_map_index', query: { "patrol": row.id } })
         }
 
@@ -795,18 +672,28 @@ export default {
 
         const selectBanshichu = name => {
             banshichuSelected.value = name;
+            if (name == '全部') {
+                record_agency.value = '';
+            } else {
+                record_agency.value = name;
+            }
+            //queryByCondition(1);
         }
 
         let record_name = ref('');
         let record_department = ref('');
         let record_agency = ref('');
         let record_identity = ref('');
+        let record_street = ref('');
+        let record_person_state = ref('');
+
         const queryByCondition = page => {
             let patrol = {
                 name: record_name.value,
-                agency: record_department.value,
-                department: record_agency.value,
+                agency: record_agency.value,
+                department: record_department.value,
                 identity: record_identity.value,
+                region: record_street.value,
                 pageNum: page,
                 pageSize: 10,
             }
@@ -824,11 +711,16 @@ export default {
                 },
                 data: JSON.stringify(patrol)
             }).then(function (resp) {
-                console.log(resp);
+
                 patrols.value.splice(0, patrols.value.length);
                 total_records.value = parseInt(resp.data.data.total);
                 page_count = parseInt(resp.data.data.pages);
 
+                if (resp.data.data.records.length == 0) {
+                    emptyText.value = '暂无数据';
+                } else {
+                    emptyText.value = 'loading...'
+                }
 
                 for (let item of resp.data.data.records) {
                     let relatedRegion;
@@ -863,24 +755,199 @@ export default {
                     patrolInfo[item.id] = patrol;
                     patrols.value.push(patrol);
                 }
-                // patrols.value = resp.data.data.records;
-                //update_pages();
-                ifShowQueryResult.value = false;
             })
         }
 
-        queryByCondition(1);
+        const get_now_date = () => {
+            let date = new Date();
+            return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+        }
+        let record_date = ref(get_now_date());
+        const emptyText = ref('loading...');
+        const queryStateByCondition = page => {
+            let onWork = false, vacation = false, vacationDefer = false;
+            if (personStateSelected.value == '在岗在位') {
+                onWork = true;
+            } else if (personStateSelected.value == '请假') {
+                vacation = true;
+            } else if (personStateSelected.value == '补休') {
+                vacationDefer = true;
+            }
 
+            let patrol = {
+                name: record_name.value,
+                agency: record_agency.value,
+                department: record_department.value,
+                identity: record_identity.value,
+                region: record_street.value,
+                date: record_date.value,
+                onWork: onWork,
+                vacation: vacation,
+                vacationDefer: vacationDefer,
+                pageNum: page,
+                pageSize: 10,
+            }
+
+            Object.keys(patrolInfo).map(key => {
+                delete patrolInfo[key]
+            });
+            current_page.value = page;
+            axios({
+                url: '/api/patrol-whole-info/select/conditions/',
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': store.state.user.tokenHeader + store.state.user.token,
+                },
+                data: JSON.stringify(patrol)
+            }).then(function (resp) {
+                console.log(resp);
+                patrols.value.splice(0, patrols.value.length);
+                total_records.value = parseInt(resp.data.data.total);
+                page_count = parseInt(resp.data.data.pages);
+
+                if (resp.data.data.records.length == 0) {
+                    emptyText.value = '暂无数据';
+                } else {
+                    emptyText.value = 'loading...'
+                }
+                for (let item of resp.data.data.records) {
+                    let relatedRegion;
+                    let regionName;
+                    if (item.relatedRegion == null) {
+                        relatedRegion = "暂未分配";
+                        regionName = "暂未分配";
+                    } else {
+                        relatedRegion = item.relatedRegion;
+                        regionName = polygons[relatedRegion]["name"];
+                    }
+
+                    let task;
+                    if (item.task == null || item.task == '') {
+                        task = "暂无";
+                    } else {
+                        task = item.task;
+                    }
+
+                    let patrol = {
+                        id: item.id,
+                        name: item.name,
+                        title: item.title,
+                        department: item.department,
+                        relatedRegion: relatedRegion,
+                        regionName: regionName,
+                        telephone: item.telephone,
+                        wechat: item.wechat,
+                        identity: item.identity,
+                        task: task,
+                    }
+                    patrolInfo[item.id] = patrol;
+                    patrols.value.push(patrol);
+                }
+            })
+        }
+
+        const checkState = ref(false);
         const queryRecord = () => {
-            // record_name = queryName.value.trim();
-            // record_department = queryDepartment.value.trim();
-            // record_identity = queryIdentity.value.trim();
-            // record_agency = queryStreet.value.trim();
+            record_name.value = queryName.value.trim();
+            record_department.value = queryDepartment.value.trim();
+            record_identity.value = queryIdentity.value.trim();
+            record_street.value = queryStreet.value;
+            record_agency.value = banshichuSelected.value;
 
-            // queryName.value = '';
-            // queryDepartment.value = '';
-            // queryIdentity.value = '';
-            // queryStreet.value = '';
+            if (personStateSelected.value == '全部' && record_name.value == '' && record_department.value == '' &&
+                record_identity.value == '' && record_street.value == '' && record_agency.value == '') {
+                checkState.value = false;
+                queryByCondition(1);
+
+            } else {
+                checkState.value = true;
+                queryStateByCondition(1);
+            }
+
+        }
+
+        const selectPersonState = name => {
+            personStateSelected.value = name;
+            if (name == '全部' && record_name.value == '' && record_department.value == '' &&
+                record_identity.value == '' && record_street.value == '' && record_agency.value == '') {
+                record_person_state.value = '';
+                checkState.value = false;
+                queryByCondition(1);
+            } else {
+                record_person_state.value = name;
+                checkState.value = true;
+                queryStateByCondition(1);
+            }
+        }
+
+        const agency_region_relation = reactive({});
+        const banshichu_list = reactive([]);
+        const getAgencyRegionRelation = () => {
+            axios({
+                url: '/api/region/get_relation/',
+                method: 'get',
+                headers: {
+                    Authorization: store.state.user.tokenHeader + store.state.user.token,
+                },
+            }).then(function (resp) {
+                if (resp.status == 200) {
+                    for (let key in resp.data.data) {
+                        banshichu_list.push(key);
+                        agency_region_relation[key] = resp.data.data[key];
+
+                    }
+                }
+            })
+        }
+
+        getAgencyRegionRelation();
+
+        const selectStreethandleClose = () => {
+            banshichuSelected.value = '';
+            queryStreet.value = '';
+            selectStreetVisiable.value = false;
+            nextTick(() => {
+                selectStreetInput.value.blur();
+            })
+        }
+
+        const selectStreet = () => {
+            banshichuSelected.value = '';
+            regionList.splice(0, regionList.length);
+            queryStreet.value = '';
+            selectStreetVisiable.value = true;
+        }
+
+        const regionList = reactive([]);
+        const agencySelected = () => {
+            regionList.splice(0, regionList.length);
+            // banshichuSelected.value = '';
+            if (banshichuSelected.value != '') {
+                regionList.push(...agency_region_relation[banshichuSelected.value])
+            }
+
+        }
+
+        const queryRegion = ref('');
+        const selectStreetInput = ref(null)
+        function selectStreetConfirm() {
+            if (queryStreet.value == '' && banshichuSelected.value != '') {
+                queryRegion.value = banshichuSelected.value;
+            } else if (queryStreet.value != '') {
+                queryRegion.value = queryStreet.value;
+            } else if (banshichuSelected.value == '') {
+                queryRegion.value = '';
+            }
+
+            nextTick(() => {
+                selectStreetInput.value.blur();
+            })
+            selectStreetVisiable.value = false;
+        }
+
+        const disabledDate = time => {
+            return time.getTime() > Date.now()
         }
 
         return {
@@ -891,16 +958,20 @@ export default {
             exitAdd,
             addPerson,
             removePerson,
-            searchPatrol,
             backToFirstPage,
-            //click_page,
-            pull_page,
             size_change,
             personLocation,
             selectBanshichu,
             queryByCondition,
             queryRecord,
             personDetailInfo,
+            selectPersonState,
+            selectStreethandleClose,
+            selectStreet,
+            agencySelected,
+            selectStreetConfirm,
+            queryStateByCondition,
+            disabledDate,
             rules,
             form,
             dialogFormVisible,
@@ -911,14 +982,11 @@ export default {
             polygons,
             patrolList,
             queryName,
-            ifShowQueryResult,
-            queryResultList,
             pages,
             patrols,
             total_records,
             current_page,
             page_count,
-            banshichu,
             banshichuNoneSelectedStyle,
             banshichuSelectedStyle,
             banshichuSelected,
@@ -926,12 +994,22 @@ export default {
             queryStreet,
             queryIdentity,
             selectIdentityOption,
+            person_state,
+            personStateSelected,
+            selectStreetVisiable,
+            banshichu_list,
+            regionList,
+            queryRegion,
+            selectStreetInput,
+            record_date,
+            emptyText,
+            checkState,
             Search,
         }
     },
     components: {
         PhoneFilled,
-        Search,
+
         Location,
         Document,
         EditPen,
@@ -950,9 +1028,17 @@ export default {
     margin-bottom: 1vh;
 }
 
+.container {
+    margin-left: 16vw;
+}
+
 .select-box {
     margin-top: 8vh;
     margin-bottom: 2vh;
+}
+
+.select-state-box {
+    cursor: pointer;
 }
 
 .select-text-box {

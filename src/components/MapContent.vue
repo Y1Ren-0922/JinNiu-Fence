@@ -4,60 +4,21 @@
     <div class="content-l">
         <div class="content-l-top">
             <div class="container">
-                <!-- <div class="card text-white bg-primary mb-3 " style="max-width: 18rem; min-width: 18vw;"
-                    @click="lawEnforceOfficers">
-                    <div class="card-header">执法人员实时情况</div>
-                    <div class="card-body">
-                        <div>在编：1人</div>
-                        <div>抽调：1人</div>
-                        <p></p>
-                        <div>补休：1人</div>
-                        <div>在岗在位：1人</div>
-                        <div>未按时打卡人员：1人</div>
-                    </div>
-                </div> -->
-                <border-box-7 style="height: 27vh; margin-bottom: 2vh; width: 21vw; padding-top: 1vh;">
+
+                <border-box-7 v-show="$route.path != '/bicycle-map/'"
+                    style="height: 27vh; margin-bottom: 2vh; width: 21vw; padding-top: 1vh;">
                     <div>
                         <div id="law-enforce-officers" style="height: 27vh; width: 20vw;"></div>
                     </div>
                 </border-box-7>
 
-
-
-                <!-- <div class="card text-dark bg-info mb-3 " style="max-width: 18rem; min-width: 18vw;"
-                    @click="wardenOfficers">
-                    <div class="card-header">协管人员实时情况(含服务外包人员)</div>
-                    <div class="card-body">
-                        <div>在编：1人</div>
-                        <div>抽调：1人</div>
-                        <p></p>
-                        <div>补休：1人</div>
-                        <div>在岗在位：1人</div>
-                        <div>未按时打卡人员：1人</div>
-                    </div>
-
-                </div> -->
-                <border-box-7 style="height: 27vh; margin-bottom: 2vh; width: 21vw; padding-top: 1vh;">
+                <border-box-7 v-show="$route.path != '/bicycle-map/'"
+                    style="height: 27vh; margin-bottom: 2vh; width: 21vw; padding-top: 1vh;">
                     <div>
                         <div id="warden-officers" style="height: 27vh; width: 20vw;"></div>
                     </div>
                 </border-box-7>
 
-                <!-- <div class="card text-white bg-success mb-3 " style="max-width: 18rem; min-width: 18vw;">
-                    <div class="card-header">共享单车人员</div>
-                    <div class="card-body">
-                        <div>美团</div>
-                        <div>应到：10人, 实到：5人</div>
-                        <br>
-                        <div>青桔</div>
-                        <div>应到：10人, 实到：5人</div>
-                        <br>
-                        <div>哈罗</div>
-                        <div>应到：10人, 实到：5人</div>
-                    </div>
-
-
-                </div> -->
                 <border-box-7 style="height: 30vh; margin-bottom: 1vh; width: 21vw; padding-top: 1vh;">
                     <div>
                         <div id="bicycle-data" style="height: 27vh; width: 20vw;"></div>
@@ -134,7 +95,7 @@
 
 
     </div>
-    <div class="content-mid-bottom">
+    <div class="content-mid-bottom" v-show="$route.path != '/bicycle-map/'">
         <div id="case-data" style="height: 27vh; width: 56vw;"></div>
     </div>
     <div class="content-r">
@@ -205,7 +166,7 @@
             <div class="leave-map">
                 <router-link :to="{ name: 'person_index' }"><img src="../assets/img/leave.png" alt=""></router-link>
             </div>
-            <div class="card text-white bg-primary mb-3 ">
+            <div class="card text-white bg-primary mb-3 " v-show="$route.path != '/bicycle-map/'">
                 <div class="card-header">市容秩序严管街</div>
                 <div class="card-body">
                     <div>严管街</div>
@@ -221,7 +182,7 @@
                 </div>
 
             </div>
-            <border-box-7 style="height: 27vh; margin-bottom: 1vh;">
+            <border-box-7 style="height: 27vh; margin-bottom: 1vh;" v-show="$route.path != '/bicycle-map/'">
                 <div>
                     <div class="problem-title">事件办理</div>
                     <capsule-chart :config="problemConfig" style="height: 25vh;" />

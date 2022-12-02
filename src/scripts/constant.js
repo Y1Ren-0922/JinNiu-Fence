@@ -154,7 +154,7 @@ const banshichu = [
     }),
 
     reactive({
-        name: '天回镇',
+        name: '天回',
         color: 'rgba(192,192,192, 0.5)',
         fillColor: "#00FFFF",
         position: [104.03214916, 30.70473032],
