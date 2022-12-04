@@ -29,8 +29,50 @@
         </div>
     </div>
     <div class="content-mid">
+        <border-box-7 class="mid-head-show" v-if="$route.path != '/bicycle-map/'">
+            <div class="mid-box">
+                <div class="mid-head-left">
+                    <h4>在岗在位</h4>
+                    <div class="mid-head-left-num">{{ onWork }}人</div>
+                </div>
+                <div class="mid-head-left-right">
+                    <div class="mid-head-left-right-top">
+                        <div class="mid-head-left-right-title">执法人员</div>
+                        <div class="mid-head-left-right-num">{{ law_enforce_num }}人</div>
+                    </div>
+                    <div class="mid-head-left-right-bottom">
+                        <div class="mid-head-left-right-title">协管人员</div>
+                        <div class="mid-head-left-right-num">{{ warden }}人</div>
+                    </div>
+                </div>
 
-        <div class="card text-white bg-primary mb-3 person-box " v-if="$route.path == '/map/'">
+            </div>
+
+        </border-box-7>
+
+
+        <border-box-7 class="mid-head-show" style="margin-left: 2vw;" v-if="$route.path != '/bicycle-map/'">
+            <div class="mid-box">
+                <div class="mid-head-left">
+                    <h4>定位异常</h4>
+                    <div class="mid-head-left-num" style="color: #E95547;">{{ locationException }}人</div>
+                </div>
+                <div class="mid-head-left-right">
+                    <div class="mid-head-left-right-top">
+                        <div class="mid-head-left-right-title">执法人员</div>
+                        <div class="mid-head-left-right-num" style="color: #E95547;">{{ law_enforce_le }}人</div>
+                    </div>
+                    <div class="mid-head-left-right-bottom">
+                        <div class="mid-head-left-right-title">协管人员</div>
+                        <div class="mid-head-left-right-num" style="color: #E95547;">{{ warden_le }}人</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </border-box-7>
+
+        <!-- <div class="card text-white bg-primary mb-3 person-box " v-if="$route.path == '/map/'">
             <div class="card-body">
                 <h5 class="card-title">编制总数</h5>
                 <DigitalFlop :config="memberNumber" />
@@ -70,7 +112,7 @@
                 <h5 class="card-title">定位异常</h5>
                 <DigitalFlop :config="positionException" />
             </div>
-        </div>
+        </div> -->
 
         <div class="card text-white bg-primary mb-3 bicycle-box" v-if="$route.path == '/bicycle-map/'">
             <div class="card-body">
@@ -95,9 +137,13 @@
 
 
     </div>
-    <div class="content-mid-bottom" v-show="$route.path != '/bicycle-map/'">
-        <div id="case-data" style="height: 27vh; width: 56vw;"></div>
-    </div>
+    <border-box-7 class="content-mid-bottom" v-show="$route.path != '/bicycle-map/'">
+        <div>
+            <div id="case-data" style="width: 50vw;height: 25vh;"></div>
+
+        </div>
+    </border-box-7>
+
     <div class="content-r">
         <div class="container">
             <!-- <div class="card text-white bg-primary mb-3 " style="max-width: 18rem; margin-left: auto;">
@@ -368,6 +414,13 @@ import { onMounted } from 'vue';
 
 const store = useStore();
 let derectiveSelect = ref("first");
+const onWork = ref('100');
+const law_enforce_num = ref('80');
+const warden = ref('20');
+const locationException = ref('100');
+const law_enforce_le = ref('75');
+const warden_le = ref('25');
+
 let problemConfig = reactive({
     data: [
         {
@@ -524,58 +577,58 @@ let locationExceptionData = reactive([
     }
 ])
 
-let digitConfig = reactive({
-    number: [100],
-    content: '{nt}人',
-    style: {
-        fontSize: 32,
-    }
-});
+// let digitConfig = reactive({
+//     number: [100],
+//     content: '{nt}人',
+//     style: {
+//         fontSize: 32,
+//     }
+// });
 
-let memberNumber = reactive({
-    number: [100],
-    content: '{nt}人',
-    style: {
-        fontSize: 32,
-        fill: '#5CA1D8',
-    }
-});
+// let memberNumber = reactive({
+//     number: [100],
+//     content: '{nt}人',
+//     style: {
+//         fontSize: 32,
+//         fill: '#5CA1D8',
+//     }
+// });
 
-let deployed = reactive({
-    number: [100],
-    content: '{nt}人',
-    style: {
-        fontSize: 32,
-        fill: '#708090',
-    }
-});
+// let deployed = reactive({
+//     number: [100],
+//     content: '{nt}人',
+//     style: {
+//         fontSize: 32,
+//         fill: '#708090',
+//     }
+// });
 
-let excused = reactive({
-    number: [100],
-    content: '{nt}人',
-    style: {
-        fontSize: 32,
-        fill: '#E1B95A',
-    }
-});
+// let excused = reactive({
+//     number: [100],
+//     content: '{nt}人',
+//     style: {
+//         fontSize: 32,
+//         fill: '#E1B95A',
+//     }
+// });
 
-let situ = reactive({
-    number: [100],
-    content: '{nt}人',
-    style: {
-        fontSize: 32,
-        fill: '#97C151',
-    }
-});
+// let situ = reactive({
+//     number: [100],
+//     content: '{nt}人',
+//     style: {
+//         fontSize: 32,
+//         fill: '#97C151',
+//     }
+// });
 
-let positionException = reactive({
-    number: [1000],
-    content: '{nt}人',
-    style: {
-        fontSize: 32,
-        fill: '#E95547',
-    }
-})
+// let positionException = reactive({
+//     number: [1000],
+//     content: '{nt}人',
+//     style: {
+//         fontSize: 32,
+//         fill: '#E95547',
+//     }
+// })
 
 let meituanConfig = reactive({
     number: [100],
@@ -897,6 +950,14 @@ let agencyList = ["抚琴", "西安路", "荷花池", "驷马桥", "凤凰山", 
 
 //             })
 // }
+
+const fontSizeSwitch = (res) => {
+    let clientWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    if (!clientWidth) return;
+    let fontSize = 100 * (clientWidth / 1707);
+    return res * fontSize;
+}
+
 let law_enforce_chart = null;
 
 const create_law_enforce_data = () => {
@@ -919,7 +980,6 @@ const create_law_enforce_data = () => {
         // },
         series: [
             {
-                name: 'Access From',
                 type: 'pie',
                 radius: '50%',
                 data: [
@@ -930,7 +990,8 @@ const create_law_enforce_data = () => {
                 ],
                 label: {
                     color: "white",
-                    formatter: '{b}: {c}'
+                    formatter: '{b}: {c}',
+                    fontSize: fontSizeSwitch(0.15),
                 },
                 emphasis: {
                     itemStyle: {
@@ -968,7 +1029,6 @@ const create_warden_data = () => {
         // },
         series: [
             {
-                name: 'Access From',
                 type: 'pie',
                 radius: '50%',
                 data: [
@@ -979,7 +1039,8 @@ const create_warden_data = () => {
                 ],
                 label: {
                     color: "white",
-                    formatter: '{b}: {c}'
+                    formatter: '{b}: {c}',
+                    fontSize: fontSizeSwitch(0.15),
                 },
                 emphasis: {
                     itemStyle: {
@@ -1032,6 +1093,10 @@ const show_bicycle_data = () => {
         xAxis: {
             type: 'value',
             boundaryGap: [0, 0.01],
+
+            axisLabel: {
+                fontSize: fontSizeSwitch(0.15),
+            },
             axisLine: {
                 lineStyle: {
                     color: "rgba(255, 255, 255, 1)"
@@ -1041,11 +1106,16 @@ const show_bicycle_data = () => {
         yAxis: {
             type: 'category',
             data: ['美团', '青桔', '哈罗'],
+
+            axisLabel: {
+                fontSize: fontSizeSwitch(0.15),
+            },
             axisLine: {
                 lineStyle: {
                     color: "rgba(255, 255, 255, 1)"
                 }
-            }
+            },
+
         },
         series: [
             {
@@ -1114,7 +1184,10 @@ const create_case_data = () => {
                     lineStyle: {
                         color: "rgba(255, 255, 255, 1)"
                     }
-                }
+                },
+                axisLabel: {
+                    fontSize: fontSizeSwitch(0.12),
+                },
             }
         ],
         yAxis: [
@@ -1127,7 +1200,10 @@ const create_case_data = () => {
                     lineStyle: {
                         color: "rgba(255, 255, 255, 1)"
                     }
-                }
+                },
+                axisLabel: {
+                    fontSize: fontSizeSwitch(0.12),
+                },
             },
             {
                 type: 'value',
@@ -1137,7 +1213,10 @@ const create_case_data = () => {
                     lineStyle: {
                         color: "rgba(255, 255, 255, 1)"
                     }
-                }
+                },
+                axisLabel: {
+                    fontSize: fontSizeSwitch(0.12),
+                },
             }
         ],
         series: [
@@ -1149,7 +1228,8 @@ const create_case_data = () => {
                 ],
                 alignTicks: true,
                 label: {
-                    show: true
+                    show: true,
+                    fontSize: fontSizeSwitch(0.12),
                 }
                 // markPoint: {
                 //     data: [
@@ -1171,6 +1251,7 @@ const create_case_data = () => {
                 label: {
                     show: true,
                     color: 'white',
+                    fontSize: fontSizeSwitch(0.12),
                 }
                 // markPoint: {
                 //     data: [
@@ -1310,17 +1391,18 @@ onBeforeUnmount(() => {
 }
 
 .content-mid-bottom {
-    left: 22vw;
+    left: 25vw;
     bottom: 2vh;
     height: 25vh;
-    width: 56vw;
+    width: 50vw;
     position: absolute;
     z-index: 20;
+    background: linear-gradient(to top right, rgba(26, 16, 51, 0.6), rgba(42, 48, 127, 0.6));
 }
 
 .case-data {
-    width: 50vw;
-    height: 25vh;
+    width: 40vw;
+    height: 24vh;
 }
 
 .content-r {
@@ -1351,6 +1433,62 @@ onBeforeUnmount(() => {
     height: 12vh;
     --bs-bg-opacity: .6;
     font-size: 10px;
+}
+
+.mid-head-show {
+    height: 12vh;
+    width: 24vw;
+}
+
+.mid-head-left {
+    width: 10vw;
+    height: 100%;
+    color: white;
+    font-size: 1.5rem;
+    text-align: center;
+    padding-top: 1.2vh;
+}
+
+.mid-head-left-num {
+    margin: auto;
+    color: #5CA1D8;
+}
+
+.mid-head-left-right-top {
+    width: 15vw;
+    height: 4vh;
+    margin-top: 1vh;
+    color: white;
+    display: flex;
+}
+
+.mid-head-left-right {
+    display: flex;
+    flex-direction: column;
+}
+
+.mid-box {
+    display: flex;
+}
+
+.mid-head-left-right-title {
+    color: white;
+    font-size: 1.3rem;
+    width: 6vw;
+    height: 4vh;
+}
+
+.mid-head-left-right-bottom {
+    width: 15vw;
+    height: 4vh;
+    display: flex;
+    margin-top: 1vh;
+}
+
+.mid-head-left-right-num {
+    color: #5CA1D8;
+    font-size: 1.3rem;
+
 }
 
 .bicycle-box {

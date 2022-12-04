@@ -88,7 +88,7 @@
         </div>
     </nav>
 
-    <el-menu class="el-menu-vertical-demo" :router="true" :default-active="$route.path">
+    <el-menu class="el-menu-vertical-demo" :router="true" :default-active="$route.path" :unique-opened="true">
         <el-sub-menu index="1">
             <template #title>
                 <el-icon>
@@ -134,12 +134,17 @@
             </el-icon>
             <span>问题处置</span>
         </el-menu-item>
-        <el-menu-item index="/statistical-analysis/">
-            <el-icon>
-                <histogram />
-            </el-icon>
-            <span>统计分析</span>
-        </el-menu-item>
+        <el-sub-menu index="5">
+            <template #title>
+                <el-icon>
+                    <histogram />
+                </el-icon>
+                <span>统计分析</span>
+            </template>
+            <el-menu-item index="/person-analysis/">
+                <span>人员统计</span>
+            </el-menu-item>
+        </el-sub-menu>
     </el-menu>
 </template>
 
@@ -190,7 +195,7 @@ img.navbar-icon {
 }
 
 nav {
-    position: absolute;
+    position: fixed;
     z-index: 100;
     width: 100vw;
     height: 7vh;
@@ -200,10 +205,19 @@ nav {
 
 .el-menu-vertical-demo {
     width: 15vw;
-    position: absolute;
+    position: fixed;
     z-index: 99;
     padding-top: 8vh;
     height: 100vh;
+}
+
+
+.el-menu-item {
+    font-size: 1rem;
+}
+
+:deep(.el-sub-menu__title) {
+    font-size: 1rem;
 }
 
 .glyphicon-bell:before {

@@ -10,6 +10,7 @@ import StatisticalAnalysis from '../views/StatisticalAnalysis'
 import IssueDisposal from '../views/IssueDisposal'
 import PersonDetailInfo from '../views/PersonDetailInfo'
 import PatrolList from '../views/PatrolList'
+import PersonAnalysis from '../views/PersonAnalysis'
 import store from '@/store'
 
 const routes = [
@@ -81,6 +82,14 @@ const routes = [
     path: '/person-detail/',
     name: 'person_detail_index',
     component: PersonDetailInfo,
+    meta: {
+      requestAuth: true,
+    }
+  },
+  {
+    path: '/person-analysis/',
+    name: 'person_analysis_index',
+    component: PersonAnalysis,
     meta: {
       requestAuth: true,
     }

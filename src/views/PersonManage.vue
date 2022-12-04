@@ -321,7 +321,7 @@
 
 <script>
 import { reactive } from 'vue';
-import { ref, nextTick } from 'vue';
+import { ref, nextTick, watch } from 'vue';
 import { PhoneFilled, Search, Location, Document, EditPen, Delete } from "@element-plus/icons-vue";
 import axios from 'axios';
 import { useStore } from 'vuex';
@@ -342,7 +342,7 @@ export default {
         const queryDepartment = ref('');
         const queryStreet = ref('');
         const queryIdentity = ref('');
-        const person_state = ["全部", "在岗在位", "抽调", "补休", "请假"];
+        const person_state = ["全部", "在岗在位", "请假", "补休", "未打卡"];
         const personStateSelected = ref('全部');
         const selectStreetVisiable = ref(false);
 
@@ -765,13 +765,15 @@ export default {
         let record_date = ref(get_now_date());
         const emptyText = ref('loading...');
         const queryStateByCondition = page => {
-            let onWork = false, vacation = false, vacationDefer = false;
+            let status = '';
             if (personStateSelected.value == '在岗在位') {
-                onWork = true;
+                status = '1';
             } else if (personStateSelected.value == '请假') {
-                vacation = true;
+                status = '3';
             } else if (personStateSelected.value == '补休') {
-                vacationDefer = true;
+                status = '2';
+            } else if (personStateSelected.value == '未打卡') {
+                status = '0';
             }
 
             let patrol = {
@@ -781,9 +783,7 @@ export default {
                 identity: record_identity.value,
                 region: record_street.value,
                 date: record_date.value,
-                onWork: onWork,
-                vacation: vacation,
-                vacationDefer: vacationDefer,
+                status: status,
                 pageNum: page,
                 pageSize: 10,
             }
@@ -793,7 +793,7 @@ export default {
             });
             current_page.value = page;
             axios({
-                url: '/api/patrol-whole-info/select/conditions/',
+                url: '/api/patrol-whole-info/select/conditions',
                 method: 'post',
                 headers: {
                     'Content-Type': 'application/json',
@@ -801,7 +801,6 @@ export default {
                 },
                 data: JSON.stringify(patrol)
             }).then(function (resp) {
-                console.log(resp);
                 patrols.value.splice(0, patrols.value.length);
                 total_records.value = parseInt(resp.data.data.total);
                 page_count = parseInt(resp.data.data.pages);
@@ -885,7 +884,7 @@ export default {
         const banshichu_list = reactive([]);
         const getAgencyRegionRelation = () => {
             axios({
-                url: '/api/region/get_relation/',
+                url: '/api/region/get_relation',
                 method: 'get',
                 headers: {
                     Authorization: store.state.user.tokenHeader + store.state.user.token,
@@ -931,7 +930,7 @@ export default {
 
         const queryRegion = ref('');
         const selectStreetInput = ref(null)
-        function selectStreetConfirm() {
+        const selectStreetConfirm = () => {
             if (queryStreet.value == '' && banshichuSelected.value != '') {
                 queryRegion.value = banshichuSelected.value;
             } else if (queryStreet.value != '') {
@@ -949,6 +948,13 @@ export default {
         const disabledDate = time => {
             return time.getTime() > Date.now()
         }
+
+        watch(queryRegion, (newValue) => {
+            if (newValue == '') {
+                banshichuSelected.value = '';
+                queryStreet.value = '';
+            }
+        })
 
         return {
             editInfo,
