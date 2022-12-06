@@ -100,9 +100,9 @@
             <el-menu-item index="/map/">
                 <template #title>地图模式</template>
             </el-menu-item>
-            <el-menu-item index="/patrol-list/">
+            <!-- <el-menu-item index="/patrol-list/">
                 <template #title>列表模式</template>
-            </el-menu-item>
+            </el-menu-item> -->
         </el-sub-menu>
         <el-menu-item index="/person/">
             <el-icon><user-filled /></el-icon>
@@ -121,8 +121,8 @@
                 </el-icon>
                 <span>共享单车管理</span>
             </template>
-            <el-menu-item index="/bicycle-map/">
-                <template #title>共享单车管理</template>
+            <el-menu-item index="/bicycle-manage/">
+                <template #title>共享单车人员管理</template>
             </el-menu-item>
             <el-menu-item index="/bicycle-map/">
                 <template #title>共享单车人员地图界面</template>
@@ -143,6 +143,12 @@
             </template>
             <el-menu-item index="/person-analysis/">
                 <span>人员统计</span>
+            </el-menu-item>
+            <el-menu-item index="/patrol-analysis/">
+                <span>巡查统计</span>
+            </el-menu-item>
+            <el-menu-item index="/rectify-date-analysis/">
+                <span>交办周期统计</span>
             </el-menu-item>
         </el-sub-menu>
     </el-menu>

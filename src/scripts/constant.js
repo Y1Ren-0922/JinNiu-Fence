@@ -3,11 +3,9 @@ export {
     jinNiuFencePath1,
     jinNiuFencePath2,
     banshichu,
-    case_category,
 }
 import { reactive } from "vue"
 
-const case_category = ["全部", "市容秩序", "共享单车", "占用城市道路", "扬尘", "违法建设"]
 
 const banshichu = [
     reactive({

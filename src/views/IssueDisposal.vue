@@ -30,13 +30,16 @@
                             </el-input>
 
                             <el-select v-model="stateSelected" class="select-text-box " placeholder="请选择问题状态"
-                                size="large" style="margin-right: 1vw; width: 15%;">
+                                size="large" style="margin-right: 1vw; width: 15%;" clearable>
                                 <el-option v-for="item in stateOption" :key="item.value" :label="item.label"
                                     :value="item.value" />
                             </el-select>
 
-                            <el-date-picker v-model="record_date" type="date" placeholder="默认查询当天" size="large"
-                                :disabled-date="disabledDate" style=" width: 20%; margin-right: 1vw;" />
+                            <!-- <el-date-picker v-model="record_date" type="date" placeholder="默认查询当天" size="large"
+                                :disabled-date="disabledDate" style=" width: 20%; margin-right: 1vw;" /> -->
+                            <el-date-picker v-model="record_date" type="datetimerange" :shortcuts="date_shortcuts"
+                                range-separator="-" start-placeholder="请选择时间区间" size="large"
+                                value-format="YYYY-MM-DD HH:mm:ss" style="margin-right: 1vw;" />
 
                             <el-button type="primary" :icon="Search" size="large" @click="queryRecord">搜索</el-button>
                         </el-row>
@@ -53,23 +56,32 @@
                                 align="center" />
                             <el-table-column prop="state" label="流程状态" width="120" header-align="center"
                                 align="center" />
-                            <el-table-column prop="term" label="流程期限" width="120" header-align="center"
-                                align="center" />
-                            <el-table-column prop="countdown" label="倒计时" width="120" header-align="center"
-                                align="center" />
+                            <!-- <el-table-column prop="term" label="流程期限" width="120" header-align="center"
+                                align="center" /> -->
                             <el-table-column prop="createTime" label="生成时间" width="150" header-align="center"
-                                align="center" />
-                            <el-table-column prop="handler" label="处理人" width="150" header-align="center"
+                                align="center" :show-overflow-tooltip="true" />
+                            <el-table-column prop="deadline" label="时限" width="150" header-align="center" align="center"
+                                :show-overflow-tooltip="true" />
+
+                            <el-table-column prop="handler" label="处理人" width="120" header-align="center"
                                 align="center" />
                             <el-table-column fixed="right" label="操作" width="150" header-align="center" align="center">
-                                <template #default>
-                                    <el-button link size="small" type="primary" plain text style="font-size:1rem;">
+                                <template #default="scope">
+                                    <el-button link size="small" type="primary" plain text style="font-size:1rem;"
+                                        @click="checkDetail(scope.row)">
                                         详情
                                     </el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
+
+                        <div class="float-end" style="margin-top: 1vh">
+                            <el-pagination background layout="total, prev, pager, next, jumper" :total="total_records"
+                                :current-page="current_page" @current-change="getIssueList" />
+                        </div>
                     </div>
+
+
                 </div>
             </div>
         </div>
@@ -82,7 +94,7 @@
         </el-select>
 
         <el-select v-model="queryStreet" class="m-2" placeholder="请选择严管街" size="large" clearable>
-            <el-option v-for="item in regionList" :key="item.name" :label="item.name" :value="item.name" />
+            <el-option v-for="item in regionList" :key="item" :label="item" :value="item" />
         </el-select>
         <template #footer>
             <span class="dialog-footer">
@@ -98,10 +110,10 @@
 
 <script setup>
 import { reactive, ref, nextTick, watch } from 'vue'
-import { case_category } from '@/scripts/constant';
 import axios from 'axios';
 import { useStore } from 'vuex';
 import { Search } from "@element-plus/icons-vue";
+import router from '@/router';
 
 const store = useStore();
 const categorySelected = ref('全部');
@@ -113,34 +125,141 @@ const queryStreet = ref('');
 const queryRegion = ref('');
 const selectStreetInput = ref(null);
 const stateSelected = ref('');
+const current_page = ref(1);
+const total_records = ref(0);
+const case_category = reactive(['全部'])
+
 const stateOption = [
     {
-        value: '执法查处',
-        label: '执法查处',
+        value: '未接收',
+        label: '未接收',
     },
     {
-        value: '首次整改',
-        label: '首次整改',
+        value: '未处理',
+        label: '未处理',
     },
     {
-        value: '二次整改',
-        label: '二次整改',
+        value: '处理中',
+        label: '处理中',
+    },
+    {
+        value: '整改完成',
+        label: '整改完成',
     },
 
 ]
 
-let issueInfoList = reactive([
+const date_shortcuts = [
     {
-        id: 1,
-        region: "抚琴",
-        category: '市容秩序',
-        state: '现场核查',
-        term: 15,
-        countdown: '剩余10天',
-        createTime: '2022-11-30',
-        handler: '机器人1'
-    }
+        text: '当天',
+        value: () => {
+            const end = get_now_date() + ' 23:59:59';
+            const start = get_now_date() + ' 00:00:00';
+            return [start, end]
+        }
+    },
+    {
+        text: '过去一周',
+        value: () => {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+            return [start, end]
+        },
+    },
+    {
+        text: '过去一月',
+        value: () => {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+            return [start, end]
+        },
+    },
+    {
+        text: '过去三个月',
+        value: () => {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+            return [start, end]
+        },
+    },
+]
+
+let issueInfoList = reactive([
 ]);
+
+const switchTime = time => {
+    return time.replace('T', ' ')
+}
+
+const issueList = reactive({});
+let record_date = ref(['', '']);
+const getIssueList = page => {
+    issueInfoList.splice(0, issueInfoList.length);
+    Object.keys(issueList).map(key => {
+        delete issueList[key]
+    });
+
+    let agency = banshichuSelected.value;
+    let region = queryStreet.value;
+    let category = categorySelected.value;
+    if (region != '') {
+        agency = '';
+    }
+
+    if (category == '全部') {
+        category = '';
+    }
+    if (record_date.value == null) {
+        record_date.value = ['', '']
+    }
+    let issue_request = {
+        patrol: '',
+        category: category,
+        subCategory: '',
+        region: region,
+        agency: agency,
+        rectifyStatus: stateSelected.value,
+        startRectifyDate: '',
+        endRectifyDate: '',
+        startPostDate: record_date.value[0],
+        endPostDate: record_date.value[1],
+        pageSize: 10,
+        pageNum: page,
+    }
+    axios({
+        url: '/api/problem/select/conditions',
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: store.state.user.tokenHeader + store.state.user.token,
+        },
+        data: JSON.stringify(issue_request)
+    }).then(function (resp) {
+        if (resp.status == 200) {
+            total_records.value = resp.data.data.total;
+
+            for (const item of resp.data.data.records) {
+                let issue = {
+                    id: item.id,
+                    region: item.agency,
+                    category: item.category,
+                    handler: item.patrolName,
+                    state: item.rectifyStatus,
+                    createTime: switchTime(item.postDate),
+                    deadline: switchTime(item.rectifyDate),
+                }
+
+                issueList[item.id] = issue;
+                issueInfoList.push(issue);
+            }
+        }
+    })
+}
+
+getIssueList(1);
 
 const selectStreethandleClose = () => {
     banshichuSelected.value = '';
@@ -184,9 +303,10 @@ const getAgencyRegionRelation = () => {
         },
     }).then(function (resp) {
         if (resp.status == 200) {
-            for (let key in resp.data.data) {
-                banshichu_list.push(key);
-                agency_region_relation[key] = resp.data.data[key];
+            for (const item of resp.data.data) {
+
+                banshichu_list.push(item.agency);
+                agency_region_relation[item.agency] = item.regions;
 
             }
         }
@@ -206,20 +326,42 @@ const agencySelected = () => {
 
 const selectCategory = category => {
     categorySelected.value = category;
+    getIssueList(1);
 }
 
 const get_now_date = () => {
     let date = new Date();
     return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
 }
-let record_date = ref(get_now_date());
 
-const disabledDate = time => {
-    return time.getTime() > Date.now()
-}
+
+// const disabledDate = time => {
+//     return time.getTime() > Date.now()
+// }
 
 const queryRecord = () => {
+    getIssueList(1);
+}
 
+const getCategory = () => {
+    axios({
+        url: '/api/problem-category/get_category',
+        method: 'get',
+        headers: {
+            Authorization: store.state.user.tokenHeader + store.state.user.token,
+        },
+    }).then(function (resp) {
+        if (resp.data.code == 2000) {
+            for (const item of resp.data.data) {
+                case_category.push(item.type);
+            }
+        }
+    })
+}
+getCategory();
+
+const checkDetail = row => {
+    router.push({ name: 'problem_detail_index', query: { 'problem_id': row.id } })
 }
 
 watch(queryRegion, (newValue) => {
@@ -242,5 +384,9 @@ watch(queryRegion, (newValue) => {
 
 .select-text-box {
     margin-right: 1vw;
+}
+
+:deep(.el-date-editor.el-input__wrapper) {
+    flex-grow: 0;
 }
 </style>

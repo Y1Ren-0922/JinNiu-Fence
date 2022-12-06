@@ -9,8 +9,11 @@ import BicycleSharing from '../views/BicycleSharing'
 import StatisticalAnalysis from '../views/StatisticalAnalysis'
 import IssueDisposal from '../views/IssueDisposal'
 import PersonDetailInfo from '../views/PersonDetailInfo'
-import PatrolList from '../views/PatrolList'
 import PersonAnalysis from '../views/PersonAnalysis'
+import PatrolAnalysis from '../views/PatrolAnalysis'
+import RectifyDateAnalysis from '../views/RectifyDateAnalysis'
+import BicyclePersonManage from '../views/BicyclePersonManage'
+import ProblemDetail from '../components/ProblemDetail'
 import store from '@/store'
 
 const routes = [
@@ -87,6 +90,23 @@ const routes = [
     }
   },
   {
+    path: '/problem-detail/',
+    name: 'problem_detail_index',
+    component: ProblemDetail,
+    meta: {
+      requestAuth: true,
+    }
+  },
+
+  {
+    path: '/bicycle-manage/',
+    name: 'bicycle_person_manage',
+    component: BicyclePersonManage,
+    meta: {
+      requestAuth: true,
+    }
+  },
+  {
     path: '/person-analysis/',
     name: 'person_analysis_index',
     component: PersonAnalysis,
@@ -95,13 +115,22 @@ const routes = [
     }
   },
   {
-    path: '/patrol-list/',
-    name: 'patrol_list_index',
-    component: PatrolList,
+    path: '/patrol-analysis/',
+    name: 'patrol_analysis_index',
+    component: PatrolAnalysis,
     meta: {
       requestAuth: true,
     }
   },
+  {
+    path: '/rectify-date-analysis/',
+    name: 'rectify_date_analysis_index',
+    component: RectifyDateAnalysis,
+    meta: {
+      requestAuth: true,
+    }
+  },
+
   {
     path: '/checkin/',
     name: 'checkin_index',

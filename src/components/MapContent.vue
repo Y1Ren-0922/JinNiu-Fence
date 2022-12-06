@@ -577,59 +577,6 @@ let locationExceptionData = reactive([
     }
 ])
 
-// let digitConfig = reactive({
-//     number: [100],
-//     content: '{nt}人',
-//     style: {
-//         fontSize: 32,
-//     }
-// });
-
-// let memberNumber = reactive({
-//     number: [100],
-//     content: '{nt}人',
-//     style: {
-//         fontSize: 32,
-//         fill: '#5CA1D8',
-//     }
-// });
-
-// let deployed = reactive({
-//     number: [100],
-//     content: '{nt}人',
-//     style: {
-//         fontSize: 32,
-//         fill: '#708090',
-//     }
-// });
-
-// let excused = reactive({
-//     number: [100],
-//     content: '{nt}人',
-//     style: {
-//         fontSize: 32,
-//         fill: '#E1B95A',
-//     }
-// });
-
-// let situ = reactive({
-//     number: [100],
-//     content: '{nt}人',
-//     style: {
-//         fontSize: 32,
-//         fill: '#97C151',
-//     }
-// });
-
-// let positionException = reactive({
-//     number: [1000],
-//     content: '{nt}人',
-//     style: {
-//         fontSize: 32,
-//         fill: '#E95547',
-//     }
-// })
-
 let meituanConfig = reactive({
     number: [100],
     content: '{nt}人',
