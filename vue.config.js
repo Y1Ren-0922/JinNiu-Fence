@@ -4,6 +4,18 @@ const Components = require('unplugin-vue-components/webpack')
 const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
 
 module.exports = defineConfig({
+  // css: {
+  //   loaderOptions: {
+  //     css: {},
+  //     postcss: {
+  //       plugins: [
+  //         require("postcss-px2rem")({
+  //           remUnit: 170///设计图宽度/10
+  //         })
+  //       ]
+  //     }
+  //   }
+  // },
   transpileDependencies: true,
   configureWebpack: {
     plugins: [

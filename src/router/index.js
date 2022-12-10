@@ -14,6 +14,7 @@ import PatrolAnalysis from '../views/PatrolAnalysis'
 import RectifyDateAnalysis from '../views/RectifyDateAnalysis'
 import BicyclePersonManage from '../views/BicyclePersonManage'
 import ProblemDetail from '../components/ProblemDetail'
+import RegionListManage from '../views/RegionListManage'
 import store from '@/store'
 
 const routes = [
@@ -126,6 +127,14 @@ const routes = [
     path: '/rectify-date-analysis/',
     name: 'rectify_date_analysis_index',
     component: RectifyDateAnalysis,
+    meta: {
+      requestAuth: true,
+    }
+  },
+  {
+    path: '/region-list/',
+    name: 'region_list_index',
+    component: RegionListManage,
     meta: {
       requestAuth: true,
     }

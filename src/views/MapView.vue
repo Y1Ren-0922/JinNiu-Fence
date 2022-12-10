@@ -139,7 +139,7 @@ export default {
                 view: new View({
                     // center: [104.04396204, 30.71499549],
                     center: [104.05632020955566, 30.739519881818795],
-                    zoom: 12,
+                    zoom: 12.5,
                     projection: "EPSG:4326",
                 }),
                 controls: defaultControls({
@@ -261,6 +261,7 @@ export default {
             }).then(function (resp) {
                 num = 0;
                 for (const item of resp.data.data) {
+
                     let pointList = stringToList(item.pointList);
                     if (pointList.length < 3) continue;
 
@@ -429,9 +430,9 @@ export default {
         const createPolygonLayer = () => {
             polygonSource = new SourceVec();
             fenceStyle = new Style({
-                fill: new Fill({
-                    color: "rgba(255, 255, 255, 0.2)"
-                }),
+                // fill: new Fill({
+                //     color: "rgba(255, 255, 255, 0.2)"
+                // }),
                 stroke: new Stroke({
                     color: "#ffcc33",
                     width: 5
@@ -594,11 +595,9 @@ export default {
             const socket = store.state.user.socket;
             if (derectiveInfo.value != "") {
                 socket.send(JSON.stringify({
-                    type: "custom",
                     // patrolTelephone: sendObject,
-                    patrolTelephone: "12345678912",
-                    identity: [],
-                    regions: [],
+                    type: 1,
+                    patrolTelephone: "13708028101",
                     message: derectiveInfo.value,
                 }))
                 ElMessage({
@@ -674,7 +673,7 @@ export default {
 .map {
     width: 50vw;
     /* height: 78vh; */
-    height: 50vh;
+    height: 76vh;
     margin: auto;
     background-color: rgba(43, 51, 73, 0.82);
     background-image: radial-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.3), #000);

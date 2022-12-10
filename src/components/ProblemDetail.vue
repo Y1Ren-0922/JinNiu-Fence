@@ -69,8 +69,12 @@
 </template>
 
 <script setup>
+import router from '@/router';
+import axios from 'axios';
 import { ref } from 'vue';
+import { useStore } from 'vuex';
 
+const store = useStore();
 const postDate = ref('2022-08-11 00:00:00');
 const rectifyDate = ref('2022-09-01 00:00:00');
 const postPatrol = ref('张三');
@@ -82,6 +86,27 @@ const imageUrl = ref('https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c2594
 const imageUrl1 = ref('https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg');
 const imageFit = 'scale-down';
 const handler = ref('李四');
+
+const getProblemInfo = () => {
+    if (router.currentRoute.value.query.problem_id) {
+        let problem = {
+            problemId: router.currentRoute.value.query.problem_id,
+        }
+        axios({
+            url: '/api/problem-status/details',
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: store.state.user.tokenHeader + store.state.user.token,
+            },
+            data: JSON.stringify(problem)
+        }).then(function (resp) {
+            console.log(resp);
+        })
+    }
+}
+
+getProblemInfo();
 
 </script>
 

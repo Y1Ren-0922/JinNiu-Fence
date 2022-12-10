@@ -33,16 +33,23 @@
             <div class="mid-box">
                 <div class="mid-head-left">
                     <h4>在岗在位</h4>
-                    <div class="mid-head-left-num">{{ onWork }}人</div>
+                    <div class="mid-head-left-num" @click="toOnWorkDetail('')" style="cursor:pointer;">{{
+                            patrolOnWorkTotal
+                    }}人
+                    </div>
                 </div>
                 <div class="mid-head-left-right">
                     <div class="mid-head-left-right-top">
                         <div class="mid-head-left-right-title">执法人员</div>
-                        <div class="mid-head-left-right-num">{{ law_enforce_num }}人</div>
+                        <div class="mid-head-left-right-num" @click="toOnWorkDetail('执法人员')" style="cursor:pointer;">{{
+                                lawEnforceOnWork
+                        }}人</div>
                     </div>
                     <div class="mid-head-left-right-bottom">
                         <div class="mid-head-left-right-title">协管人员</div>
-                        <div class="mid-head-left-right-num">{{ warden }}人</div>
+                        <div class="mid-head-left-right-num" @click="toOnWorkDetail('协管人员')" style="cursor:pointer;"> {{
+                                wardenOnWork
+                        }}人</div>
                     </div>
                 </div>
 
@@ -72,48 +79,6 @@
 
         </border-box-7>
 
-        <!-- <div class="card text-white bg-primary mb-3 person-box " v-if="$route.path == '/map/'">
-            <div class="card-body">
-                <h5 class="card-title">编制总数</h5>
-                <DigitalFlop :config="memberNumber" />
-            </div>
-        </div>
-
-        <div class="card text-white bg-primary mb-3 person-box " v-if="$route.path == '/map/'">
-            <div class="card-body">
-                <h5 class="card-title">抽调</h5>
-                <DigitalFlop :config="deployed" />
-            </div>
-        </div>
-
-        <div class="card text-white bg-primary mb-3 person-box" v-if="$route.path == '/map/'">
-            <div class="card-body">
-                <h5 class="card-title">补休</h5>
-                <DigitalFlop :config="digitConfig" />
-            </div>
-        </div>
-
-        <div class="card text-white bg-primary mb-3 person-box" v-if="$route.path == '/map/'">
-            <div class="card-body">
-                <h5 class="card-title">请假</h5>
-                <DigitalFlop :config="excused" />
-            </div>
-        </div>
-
-        <div class="card text-white bg-primary mb-3 person-box" v-if="$route.path == '/map/'">
-            <div class="card-body">
-                <h5 class="card-title">在岗在位</h5>
-                <DigitalFlop :config="situ" />
-            </div>
-        </div>
-
-        <div class="card text-white bg-primary mb-3 person-box" v-if="$route.path == '/map/'">
-            <div class="card-body">
-                <h5 class="card-title">定位异常</h5>
-                <DigitalFlop :config="positionException" />
-            </div>
-        </div> -->
-
         <div class="card text-white bg-primary mb-3 bicycle-box" v-if="$route.path == '/bicycle-map/'">
             <div class="card-body">
                 <h5 class="card-title">美团</h5>
@@ -137,122 +102,67 @@
 
 
     </div>
-    <border-box-7 class="content-mid-bottom" v-show="$route.path != '/bicycle-map/'">
-        <div>
-            <div id="case-data" style="width: 50vw;height: 25vh;"></div>
+    <!-- <border-box-7 class="content-mid-bottom" v-show="$route.path != '/bicycle-map/'"> -->
+    <div class="content-mid-bottom">
+        <div id="case-data" style="width: 50vw;height: 25vh;"></div>
 
-        </div>
-    </border-box-7>
+    </div>
+    <!-- </border-box-7> -->
 
     <div class="content-r">
         <div class="container">
-            <!-- <div class="card text-white bg-primary mb-3 " style="max-width: 18rem; margin-left: auto;">
-                <div class="card-header">综合执法指令发布
-                    <el-badge :value="12" class="item float-end">
-                        <button type="button" class="btn btn-outline-warning float-end"
-                            @click="issueDirective">指令发布</button>
-                    </el-badge>
-
-                </div>
-                <div class="card-body">
-                    <div style="color: red">中队长/副队长</div>
-                    <div>已查收7 未查收6 查收率90%</div>
-                    <div style="color: red">执法人员</div>
-                    <div>已查收7 未查收6 查收率90%</div>
-                    <div style="color: red">协管人员</div>
-                    <div>已查收7 未查收6 查收率90%</div>
-                </div>
-            </div>
-
-
-
-            <div class="card text-dark bg-light mb-3 " style="max-width: 18rem;margin-left: auto;">
-                <div class="card-header">
-                    <ul class="nav nav-tabs" id="myTab" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="park-tab" data-bs-toggle="tab" data-bs-target="#park"
-                                type="button" role="tab" aria-controls="park" aria-selected="true"
-                                @click="parkClick">公园办人员</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="bicycle-tab" data-bs-toggle="tab" data-bs-target="#bicycle"
-                                type="button" role="tab" aria-controls="bicycle" aria-selected="false"
-                                @click="bicycleClick">共享单车人员</button>
-                        </li>
-                    </ul>
-                </div>
-                <div class="card-body">
-
-                    <div class="tab-pane fade show active" id="park" role="tabpanel" aria-labelledby="park-tab"
-                        v-if="isShowParkSituation == true">
-                        <div>在编：1人</div>
-                        <div>补休：1人</div>
-                        <div>请假：1人</div>
-                        <div>越线人员：1人</div>
-                    </div>
-                    <div class="tab-pane fade show" id="bicycle" role="tabpanel" aria-labelledby="bicycle-tab" v-else>
-                        <div>美团：1人</div>
-                        <div>青桔：1人</div>
-                        <div>哈罗：1人</div>
-                    </div>
-
-                </div>
-            </div> -->
-
-            <!-- <div class="card text-white bg-secondary mb-3 " style="max-width: 18rem;margin-left: auto;"
-                v-if="$route.path == '/bicycle-map/'">
-                <div class="card-header">共享单车运维人员调度
-                </div>
-                <div class="card-body">
-                    <div>美团：1人</div>
-                    <div>青桔：1人</div>
-                    <div>哈罗：1人</div>
-                </div>
-            </div> -->
             <div class="leave-map">
                 <router-link :to="{ name: 'person_index' }"><img src="../assets/img/leave.png" alt=""></router-link>
             </div>
-            <div class="card text-white bg-primary mb-3 " v-show="$route.path != '/bicycle-map/'">
-                <div class="card-header">市容秩序严管街</div>
-                <div class="card-body">
-                    <div>严管街</div>
-                    <div>数量: 77条 人数: 243人</div>
-                    <div>人员达标 数量：1条</div>
-                    <div>人员不达标 数量：1条</div>
-                    <p></p>
-                    <!-- <ScrollBoard :config="problemCount" style="width:20vw;height: 25vh;" @click="scrollBoardClick" /> -->
-                    <div>不达标路段报警提示：</div>
-                    <div>xx街道xx路：应到10人，实到10人</div>
-                    <div>xx街道xx路：应到10人，实到10人</div>
-                    <div>xx街道xx路：应到10人，实到10人</div>
-                </div>
 
-            </div>
-            <border-box-7 style="height: 27vh; margin-bottom: 1vh;" v-show="$route.path != '/bicycle-map/'">
-                <div>
-                    <div class="problem-title">事件办理</div>
-                    <capsule-chart :config="problemConfig" style="height: 25vh;" />
+            <border-box-7 style="height: 33vh; width: 22vw;   margin-bottom: 1vh;"
+                v-show="$route.path != '/bicycle-map/'">
+                <div class="card text-white bg-primary bg-opacity-10 mb-3 "
+                    style="width: 22vw; font-size:2rem; height: 33vh;">
+                    <div class="card-header">市容秩序严管街</div>
+                    <div class="card-body">
+                        <div>严管街</div>
+                        <div>数量: 77条 人数: 243人</div>
+                        <div>人员达标 数量：1条</div>
+                        <div>人员不达标 数量：1条</div>
+                        <p></p>
+                        <!-- <ScrollBoard :config="problemCount" style="width:20vw;height: 25vh;" @click="scrollBoardClick" /> -->
+                        <div>不达标路段报警提示：</div>
+                        <div>xx街道xx路：应到10人，实到10人</div>
+                        <div>xx街道xx路：应到10人，实到10人</div>
+                        <div>xx街道xx路：应到10人，实到10人</div>
+                    </div>
+
+                </div>
+            </border-box-7>
+            <border-box-7 style="height: 27vh; width: 22vw; margin-bottom: 1vh;"
+                v-show="$route.path != '/bicycle-map/'">
+                <div id="problem-disposal" style="height: 27vh; width: 22vw; ">
+                    <!-- <div class="problem-title">事件办理</div>
+                    <capsule-chart :config="problemConfig" style="height: 25vh;" /> -->
                 </div>
             </border-box-7>
 
-            <div class="card text-white bg-primary mb-3 " style="max-width: 18rem; margin-left: auto; min-width: 22vw;">
-                <div class="card-header">综合执法指令发布
-                    <el-badge :value="12" class="item float-end">
-                        <button type="button" class="btn btn-outline-warning float-end"
-                            @click="issueDirective">指令发布</button>
-                    </el-badge>
+            <border-box-7 style="height: 28.5vh; width: 22vw; margin-bottom: 1vh;">
+                <div class="card text-white bg-primary mb-3 "
+                    style=" margin-left: auto;  width: 22vw; height: 28.5vh; --bs-bg-opacity: .15;">
+                    <div class="card-header">综合执法指令发布
+                        <el-badge :value="unReadNum" class="item float-end" :hidden="isShowBadge">
+                            <button type="button" class="btn btn-outline-warning float-end"
+                                @click="issueDirective">指令发布</button>
+                        </el-badge>
 
+                    </div>
+                    <div class="card-body">
+                        <div style="color: red">中队长/副队长</div>
+                        <div>已查收7 未查收6 查收率90%</div>
+                        <div style="color: red">执法人员</div>
+                        <div>已查收7 未查收6 查收率90%</div>
+                        <div style="color: red">协管人员</div>
+                        <div>已查收7 未查收6 查收率90%</div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div style="color: red">中队长/副队长</div>
-                    <div>已查收7 未查收6 查收率90%</div>
-                    <div style="color: red">执法人员</div>
-                    <div>已查收7 未查收6 查收率90%</div>
-                    <div style="color: red">协管人员</div>
-                    <div>已查收7 未查收6 查收率90%</div>
-                </div>
-            </div>
-
+            </border-box-7>
         </div>
 
     </div>
@@ -321,13 +231,39 @@
 
                 <div style="width: 100%; height: 5vh;"></div>
             </el-tab-pane>
-            <el-tab-pane label="确认消息" name="second">
+            <el-tab-pane label="未读消息" name="second">
                 <el-button type="danger" plain>删除全部消息</el-button>
                 <hr>
                 <el-scrollbar max-height="450px">
                     <div v-for="(backMessage, idx) in getBackMessage.data" :key="idx" @mouseenter="is_read(idx)">
                         <div v-if="backMessage.isRead == false" class="is-read-word">[未读]</div>
                         <div v-if="backMessage.isRead == true">[已读]</div>
+                        <el-descriptions>
+                            <el-descriptions-item label="姓名">{{ backMessage.name }}</el-descriptions-item>
+                            <el-descriptions-item label="电话号码">{{ backMessage.telephone }}</el-descriptions-item>
+                            <el-descriptions-item>
+                                <el-button type="danger" :icon="Delete" circle />
+                            </el-descriptions-item>
+
+                            <el-descriptions-item label="消息" :span="3" class-name="read-message"
+                                style="font-weight:900;">{{
+                                        backMessage.message
+                                }}</el-descriptions-item>
+
+                            <el-descriptions-item label="回复时间">{{ backMessage.backTime }}</el-descriptions-item>
+                        </el-descriptions>
+                        <hr>
+                    </div>
+                </el-scrollbar>
+
+
+            </el-tab-pane>
+            <el-tab-pane label="已读消息" name="third">
+                <el-button type="danger" plain>删除全部消息</el-button>
+                <hr>
+                <el-scrollbar max-height="450px">
+                    <div v-for="(backMessage, idx) in readedMessage.data" :key="idx">
+                        <div>[已读]</div>
                         <el-descriptions>
                             <el-descriptions-item label="姓名">{{ backMessage.name }}</el-descriptions-item>
                             <el-descriptions-item label="电话号码">{{ backMessage.telephone }}</el-descriptions-item>
@@ -401,7 +337,7 @@
 
 <script setup>
 import { onBeforeUnmount, reactive, ref } from 'vue';
-import { DigitalFlop, CapsuleChart, BorderBox7 } from '@kjgl77/datav-vue3'
+import { BorderBox7, DigitalFlop } from '@kjgl77/datav-vue3'
 import { useStore } from 'vuex';
 import {
     Delete,
@@ -411,92 +347,13 @@ import { ElMessage } from 'element-plus';
 // import router from '@/router';
 import * as echarts from 'echarts';
 import { onMounted } from 'vue';
+import router from '@/router';
 
 const store = useStore();
 let derectiveSelect = ref("first");
-const onWork = ref('100');
-const law_enforce_num = ref('80');
-const warden = ref('20');
 const locationException = ref('100');
 const law_enforce_le = ref('75');
 const warden_le = ref('25');
-
-let problemConfig = reactive({
-    data: [
-        {
-            name: '市容',
-            value: 167
-        },
-        {
-            name: '单车',
-            value: 123
-        },
-        {
-            name: '扬尘',
-            value: 98
-        },
-        {
-            name: '违建',
-            value: 75
-        },
-        {
-            name: '占道',
-            value: 66
-        },
-    ],
-
-    unit: '件',
-    showValue: true
-})
-
-// let config = reactive({
-//     header: ['街道', '应到', '实到'],
-//     headerHeight: 25,
-//     data: [
-//         ['抚琴', '1', '1'],
-//         ['西华', '1', '1'],
-//         ['街道1', '1', '1'],
-//         ['街道2', '1', '1'],
-//         ['街道3', '1', '1'],
-//         ['街道4', '1', '1'],
-//         ['街道5', '1', '1'],
-//         ['街道6', '1', '1'],
-//         ['街道7', '1', '1'],
-//         ['街道8', '1', '1'],
-//     ],
-//     align: ['center'],
-//     rowNum: 3,
-//     columnWidth: [140, 60, 60],
-//     headerBGC: '#006400',
-//     oddRowBGC: '#3CB371',
-//     evenRowBGC: '#8FBC8F',
-// });
-
-// let problemCount = reactive({
-//     header: ['街道', '打卡问题', '严管街道到位问题', '定位异常', '信息接收'],
-//     data: [
-//         ['抚琴', '1', '1', '问题', '问题'],
-//         ['西华', '1', '1', '问题', '问题'],
-//         ['街道1', '1', '1', '问题', '问题'],
-//         ['街道2', '1', '1', '问题', '问题'],
-//         ['街道3', '1', '1', '问题', '问题'],
-//         ['街道4', '1', '1', '问题', '问题'],
-//         ['街道5', '1', '1', '问题', '问题'],
-//         ['街道6', '1', '1', '问题', '问题'],
-//         ['街道7', '1', '1', '问题', '问题'],
-//         ['街道8', '1', '1', '问题', '问题'],
-//     ],
-//     align: ['center'],
-//     headerBGC: '#006400',
-//     oddRowBGC: '#3CB371',
-//     evenRowBGC: '#8FBC8F',
-// })
-
-// const tableHeader = ({ column }) => {
-//     console.log(column);
-//     column.minWith
-// }
-
 
 let peopleData = reactive([{
     street: "抚琴",
@@ -625,24 +482,14 @@ let locationExceptionInfoTitle = ref("");
 
 let socket = null;
 let getBackMessage = reactive({
-    data: [
-        {
-            name: "张三",
-            telephone: "12345678912",
-            message: "已确认收到",
-            backTime: "2022-11-06 08:43",
-            isRead: false,
-        },
-        {
-            name: "李四",
-            telephone: "12345678912",
-            message: "No.1188, Wuzhong Avenue, Wuzhong District, Suzhou, Jiangsu Province",
-            backTime: "2022-11-06 08:43",
-            isRead: false,
-        },
-    ]
+    data: []
+})
+let readedMessage = reactive({
+    data: []
 })
 
+const unReadNum = ref(0);
+const isShowBadge = ref(false);
 const websocketConnect = () => {
     if (store.state.user.socket == null) {
         const socketUrl = `ws://101.37.246.72:9090/websocket/admin${store.state.user.telephone}`;
@@ -655,38 +502,30 @@ const websocketConnect = () => {
 
         socket.onmessage = msg => {
             const data = JSON.parse(msg.data);
-            let li = getBackMessage.data
 
-            if (data instanceof Array) {
+            getBackMessage.data.splice(0, getBackMessage.data.length);
+            for (let i = 0; i <= data.msgs.length - 1; i++) {
+                if (data.msgs[i].message != "Heartbeat") {
 
-                for (let i = 0; i <= data.length - 1; i++) {
-                    if (data[i].message != "Heartbeat") {
-                        let newBackMessage = {
-                            id: data[i].id,
-                            name: data[i].patrolTelephone,
-                            telephone: data[i].patrolTelephone,
-                            message: data[i].message,
-                            backTime: parseTime(data[i].createTime),
-                            isRead: data[i].isRead,
-                        }
-                        li.unshift(newBackMessage)
+                    let newBackMessage = {
+                        id: data.msgs[i].id,
+                        name: data.msgs[i].patrolTelephone,
+                        telephone: data.msgs[i].patrolTelephone,
+                        message: data.msgs[i].message,
+                        backTime: parseTime(data.msgs[i].createTime),
+                        isRead: data.msgs[i].isRead,
                     }
-
+                    if (data.msgs[i].isRead == false) {
+                        getBackMessage.data.unshift(newBackMessage);
+                    } else {
+                        readedMessage.data.unshift(newBackMessage);
+                    }
                 }
-
-            } else if (data instanceof Object) {
-                let newBackMessage = {
-                    id: data.id,
-                    name: data.patrolTelephone,
-                    telephone: data.patrolTelephone,
-                    message: data.message,
-                    backTime: parseTime(data.createTime),
-                    isRead: data.isRead,
-                }
-                li.unshift(newBackMessage)
             }
-
-            getBackMessage.data = li
+            unReadNum.value = getBackMessage.data.length;
+            if (getBackMessage.data.length == 0) {
+                isShowBadge.value = true;
+            }
         }
 
         socket.onclose = () => {
@@ -707,6 +546,45 @@ websocketConnect();
 window.onbeforeunload = function () {
     socket.close();
 }
+
+const getAllUnReadMessage = () => {
+
+    axios({
+        url: '/api/ws-message/get_stranded_web',
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: store.state.user.tokenHeader + store.state.user.token,
+        },
+        data: JSON.stringify({
+            phone: 'admin' + store.state.user.telephone
+        })
+    }).then(function (resp) {
+        console.log(resp);
+        getBackMessage.data.splice(0, getBackMessage.data.length);
+        readedMessage.data.splice(0, readedMessage.data.length);
+        for (const item of resp.data.data) {
+            let newBackMessage = {
+                id: item.id,
+                name: item.patrolTelephone,
+                telephone: item.patrolTelephone,
+                message: item.message,
+                backTime: parseTime(item.createTime),
+                isRead: item.isRead,
+            }
+            if (item.isRead == false) {
+                getBackMessage.data.unshift(newBackMessage);
+            } else {
+                readedMessage.data.unshift(newBackMessage);
+            }
+        }
+        unReadNum.value = getBackMessage.data.length;
+        if (getBackMessage.data.length == 0) {
+            isShowBadge.value = true;
+        }
+    })
+}
+
 
 // const reConnect = () => {
 //     if (isConnect) return
@@ -745,18 +623,6 @@ const parseTime = time => {
     return time.replace("T", " ");
 }
 
-// const lawEnforceOfficers = () => {
-//     router.push({ name: 'person_index' });
-//     // personnelDetailsTitle.value = "执法人员实时情况";
-//     // lawEnforceOfficerVisiable.value = true;
-// }
-
-// const wardenOfficers = () => {
-//     router.push({ name: 'person_index' });
-//     // personnelDetailsTitle.value = "协管人员实时情况";
-//     // lawEnforceOfficerVisiable.value = true;
-// }
-
 const streetDetails = (row, column) => {
     if (column.label != "街道" && column.label != "在岗在位率") {
         streetDetailsTitle.value = row.street + "街道" + column.label + "人员明细表";
@@ -794,14 +660,9 @@ const issueDirective = () => {
     if (socket == null) {
         websocketConnect();
     }
+    getAllUnReadMessage();
 }
 
-// const scrollBoardClick = (data) => {
-//     if (data.columnIndex === 3) {
-//         locationExceptionInfoVisiable.value = true;
-//         locationExceptionInfoTitle.value = "当日人员定位异常统计表（当日出现连续30分钟定位未发生移动）";
-//     }
-// }
 
 
 const sendDerective = () => {
@@ -825,10 +686,9 @@ const sendDerective = () => {
     if (derectiveInfo.value != "") {
 
         socket.send(JSON.stringify({
-            type: "group",
-            patrolTelephone: "",
-            identity: Object.values(peopleCheckList.value),
-            regions: Object.values(streetCheckList.value),
+            type: 2,
+            identity: Object.values(peopleCheckList.value)[0],
+            agency: Object.values(streetCheckList.value)[0],
             message: derectiveInfo.value,
         }))
         ElMessage({
@@ -853,26 +713,20 @@ const sendDerective = () => {
 
 }
 
-// let isShowParkSituation = ref(true)
-// const parkClick = () => {
-//     isShowParkSituation.value = true;
-// }
-
-// const bicycleClick = () => {
-//     isShowParkSituation.value = false;
-// }
-
 const is_read = idx => {
     getBackMessage.data[idx].isRead = true
     axios({
-        url: "/api/stranded-msg/update_read/" + getBackMessage.data[idx].id,
-        method: "get",
+        url: "/api/ws-message/update_read",
+        method: "post",
         headers: {
+            'Content-Type': 'application/json',
             Authorization: store.state.user.tokenHeader + store.state.user.token,
         },
-        params: {
+        data: JSON.stringify({
             id: getBackMessage.data[idx].id
-        }
+        })
+    }).then(function (resp) {
+        console.log(resp);
     })
 }
 
@@ -906,185 +760,195 @@ const fontSizeSwitch = (res) => {
 }
 
 let law_enforce_chart = null;
+let law_enforce_option = {
+    title: {
+        text: '执法人员实时监管',
+        left: 'center',
+        textStyle: {
+            color: 'white',
+        }
+    },
+    tooltip: {
+        trigger: 'item'
+    },
+    // legend: {
+    //     orient: 'vertical',
+    //     left: 'left'
+    // },
+    series: [
+        {
+            type: 'pie',
+            radius: '50%',
+            data: [
+                { value: 0, name: '在岗' },
+                { value: 0, name: '补休' },
+                { value: 0, name: '请假' },
+            ],
+            label: {
+                color: "white",
+                formatter: '{b}: {c}',
+                fontSize: fontSizeSwitch(0.15),
+            },
+            emphasis: {
+                itemStyle: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)',
+                }
+            }
+        }
+    ]
+}
 
 const create_law_enforce_data = () => {
     let chartDom = document.getElementById("law-enforce-officers");
     law_enforce_chart = echarts.init(chartDom);
-    let option = {
-        title: {
-            text: '执法人员实时监管',
-            left: 'center',
-            textStyle: {
-                color: 'white',
-            }
-        },
-        tooltip: {
-            trigger: 'item'
-        },
-        // legend: {
-        //     orient: 'vertical',
-        //     left: 'left'
-        // },
-        series: [
-            {
-                type: 'pie',
-                radius: '50%',
-                data: [
-                    { value: 1048, name: '在岗在位' },
-                    { value: 735, name: '请假' },
-                    { value: 580, name: '补休' },
-                    { value: 484, name: '抽调' },
-                ],
-                label: {
-                    color: "white",
-                    formatter: '{b}: {c}',
-                    fontSize: fontSizeSwitch(0.15),
-                },
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)',
-                    }
-                }
-            }
-        ]
-    }
 
-    option && law_enforce_chart.setOption(option);
+
+    //law_enforce_option && law_enforce_chart.setOption(law_enforce_option);
+    law_enforce_chart.on('click', (params) => {
+
+        router.push({ name: 'person_index', query: { status: parseInt(patrolStatusMap[params.data.name]) + 1, range: '执法人员' } })
+    })
     window.addEventListener("resize", law_enforce_chart.resize);
 }
 
 let warden_chart = null;
+let warden_option = reactive({
+    title: {
+        text: '协管人员实时监管',
+        left: 'center',
+        textStyle: {
+            color: 'white',
+        }
+    },
+    tooltip: {
+        trigger: 'item'
+    },
+    // legend: {
+    //     orient: 'vertical',
+    //     left: 'left'
+    // },
+    series: [
+        {
+            type: 'pie',
+            radius: '50%',
+            data: [
+                { value: 0, name: '在岗' },
+                { value: 0, name: '补休' },
+                { value: 0, name: '请假' },
+
+            ],
+            label: {
+                color: "white",
+                formatter: '{b}: {c}',
+                fontSize: fontSizeSwitch(0.15),
+            },
+            emphasis: {
+                itemStyle: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)',
+                }
+            }
+        }
+    ]
+})
 const create_warden_data = () => {
     let chartDom = document.getElementById("warden-officers");
     warden_chart = echarts.init(chartDom);
-    let option = {
-        title: {
-            text: '协管人员实时监管',
-            left: 'center',
-            textStyle: {
-                color: 'white',
-            }
-        },
-        tooltip: {
-            trigger: 'item'
-        },
-        // legend: {
-        //     orient: 'vertical',
-        //     left: 'left'
-        // },
-        series: [
-            {
-                type: 'pie',
-                radius: '50%',
-                data: [
-                    { value: 1048, name: '在岗在位' },
-                    { value: 735, name: '请假' },
-                    { value: 580, name: '补休' },
-                    { value: 484, name: '抽调' },
-                ],
-                label: {
-                    color: "white",
-                    formatter: '{b}: {c}',
-                    fontSize: fontSizeSwitch(0.15),
-                },
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)',
-                    }
-                }
-            }
-        ]
-    }
 
-    option && warden_chart.setOption(option);
+    // warden_chart.setOption(warden_option);
+    warden_chart.on('click', (params) => {
+
+        router.push({ name: 'person_index', query: { status: parseInt(patrolStatusMap[params.data.name]) + 1, range: '协管人员' } })
+    })
+    getPatrolStatusCount();
     window.addEventListener("resize", warden_chart.resize);
 }
 
 let bicycle_chart = null;
+let bicycle_option = {
+    title: {
+        text: '共享单车运维实时监管',
+        left: 'center',
+        textStyle: {
+            color: 'white',
+        }
+    },
+    tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+            type: 'shadow'
+        }
+    },
+    legend: {
+        top: '10%',
+        textStyle: {
+            color: 'white',
+        }
+    },
+    grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+    },
+    xAxis: {
+        type: 'value',
+        boundaryGap: [0, 0.01],
+
+        axisLabel: {
+            fontSize: fontSizeSwitch(0.15),
+        },
+        axisLine: {
+            lineStyle: {
+                color: "rgba(255, 255, 255, 1)"
+            }
+        }
+    },
+    yAxis: {
+        type: 'category',
+        data: ['美团', '青桔', '哈罗'],
+
+        axisLabel: {
+            fontSize: fontSizeSwitch(0.15),
+        },
+        axisLine: {
+            lineStyle: {
+                color: "rgba(255, 255, 255, 1)"
+            }
+        },
+
+    },
+    series: [
+        {
+            name: '应到',
+            type: 'bar',
+            data: [100, 90, 80],
+            label: {
+                show: true,
+            }
+        },
+        {
+            name: '实到',
+            type: 'bar',
+            data: [70, 40, 50],
+            label: {
+                show: true
+            }
+        }
+    ]
+}
 const show_bicycle_data = () => {
 
     var chartDom = document.getElementById('bicycle-data');
     bicycle_chart = echarts.init(chartDom);
-    var option;
 
-    option = {
-        title: {
-            text: '共享单车运维实时监管',
-            left: 'center',
-            textStyle: {
-                color: 'white',
-            }
-        },
-        tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-                type: 'shadow'
-            }
-        },
-        legend: {
-            top: '10%',
-            textStyle: {
-                color: 'white',
-            }
-        },
-        grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true
-        },
-        xAxis: {
-            type: 'value',
-            boundaryGap: [0, 0.01],
-
-            axisLabel: {
-                fontSize: fontSizeSwitch(0.15),
-            },
-            axisLine: {
-                lineStyle: {
-                    color: "rgba(255, 255, 255, 1)"
-                }
-            }
-        },
-        yAxis: {
-            type: 'category',
-            data: ['美团', '青桔', '哈罗'],
-
-            axisLabel: {
-                fontSize: fontSizeSwitch(0.15),
-            },
-            axisLine: {
-                lineStyle: {
-                    color: "rgba(255, 255, 255, 1)"
-                }
-            },
-
-        },
-        series: [
-            {
-                name: '应到',
-                type: 'bar',
-                data: [100, 90, 80],
-                label: {
-                    show: true,
-                }
-            },
-            {
-                name: '实到',
-                type: 'bar',
-                data: [70, 40, 50],
-                label: {
-                    show: true
-                }
-            }
-        ]
-    };
-
-    option && bicycle_chart.setOption(option);
+    bicycle_option && bicycle_chart.setOption(bicycle_option);
+    bicycle_chart.on('click', () => {
+        router.push({ name: 'bicycle_person_manage' })
+    })
     window.addEventListener("resize", bicycle_chart.resize);
 }
 
@@ -1112,15 +976,6 @@ const create_case_data = () => {
                 color: 'white',
             }
         },
-        // toolbox: {
-        //     show: true,
-        //     feature: {
-        //         dataView: { show: true, readOnly: false },
-        //         magicType: { show: true, type: ['line', 'bar'] },
-        //         restore: { show: true },
-        //         saveAsImage: { show: true }
-        //     }
-        // },
 
         xAxis: [
             {
@@ -1178,15 +1033,7 @@ const create_case_data = () => {
                     show: true,
                     fontSize: fontSizeSwitch(0.12),
                 }
-                // markPoint: {
-                //     data: [
-                //         { type: 'max', name: 'Max' },
-                //         { type: 'min', name: 'Min' }
-                //     ]
-                // },
-                // markLine: {
-                //     data: [{ type: 'average', name: 'Avg' }]
-                // }
+
             },
             {
                 name: '罚款',
@@ -1217,14 +1064,26 @@ const create_case_data = () => {
     window.addEventListener("resize", case_chart.resize);
 }
 
+let getPatrolStatusCountInterval = null;
 onMounted(() => {
     create_law_enforce_data();
     show_bicycle_data();
     create_warden_data();
+
+    //setInterval(getPatrolStatusCount, 5000)
     create_case_data();
+    create_problem_data();
+    getPatrolStatusCountInterval = setInterval(getPatrolStatusCount, 60000);
+    setInterval(getProblemCount, 60000);
 })
 
+
 onBeforeUnmount(() => {
+    window.removeEventListener('resize', law_enforce_chart.resize);
+    window.removeEventListener('resize', warden_chart.resize);
+    window.removeEventListener('resize', bicycle_chart.resize);
+    window.removeEventListener('resize', case_chart.resize);
+    window.removeEventListener('resize', problem_chart.resize);
     if (law_enforce_chart) {
         law_enforce_chart.dispose();
         law_enforce_chart = null;
@@ -1244,8 +1103,210 @@ onBeforeUnmount(() => {
         case_chart.dispose();
         case_chart = null;
     }
+    if (problem_chart) {
+        problem_chart.dispose();
+        problem_chart = null;
+    }
+
+    clearInterval(getPatrolStatusCountInterval);
+    getPatrolStatusCountInterval = null;
 })
 
+
+
+let problemConfig = reactive({
+    data: [
+        {
+            name: '市容',
+            value: 0,
+        },
+        {
+            name: '占道',
+            value: 0,
+        },
+        {
+            name: '扬尘',
+            value: 0,
+        },
+        {
+            name: '违建',
+            value: 0,
+        },
+        {
+            name: '单车',
+            value: 0,
+        },
+    ],
+
+    unit: '件',
+    showValue: true
+})
+
+const problemConfigMap = {
+    '市容秩序': { idx: 0 },
+    '占用城市道路': { idx: 1 },
+    '扬尘': { idx: 2 },
+    '违建': { idx: 3 },
+    '共享单车': { idx: 4 },
+}
+
+const patrolStatusMap = {
+    '在岗': 0,
+    '补休': 1,
+    '请假': 2,
+
+}
+
+const patrolOnWorkTotal = ref(0);
+const lawEnforceOnWork = ref(0);
+const wardenOnWork = ref(0);
+const getPatrolStatusCount = () => {
+    axios({
+        url: '/api/patrol/count_by_status',
+        method: 'get',
+        headers: {
+            Authorization: store.state.user.tokenHeader + store.state.user.token,
+        },
+    }).then(function (resp) {
+        if (resp.status == 200) {
+
+            for (const item of warden_option.series[0].data) {
+                item.value = 0;
+            }
+
+            for (const item of resp.data.data) {
+                if (item.identity == '协管人员' && item.status != '未打卡') {
+                    warden_option.series[0].data[patrolStatusMap[item.status]].value = item.count;
+                    if (item.status == '在岗') {
+                        wardenOnWork.value = item.count;
+                    }
+                }
+                if (item.identity == '执法人员' && item.status != '未打卡') {
+                    law_enforce_option.series[0].data[patrolStatusMap[item.status]].value = item.count;
+                    if (item.status == '在岗') {
+                        lawEnforceOnWork.value = item.count;
+                    }
+                }
+            }
+
+            patrolOnWorkTotal.value = wardenOnWork.value + lawEnforceOnWork.value;
+            law_enforce_chart.setOption(law_enforce_option);
+            warden_chart.setOption(warden_option);
+        }
+    })
+}
+
+const toOnWorkDetail = identity => {
+    router.push({ name: 'person_index', query: { status: '1', range: identity } })
+}
+
+const problem_option = reactive({
+    title: {
+        text: '事件办理',
+        left: 'center',
+        textStyle: {
+            color: 'white',
+        }
+    },
+    tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+            type: 'shadow'
+        }
+    },
+    grid: {
+
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+    },
+    xAxis: [
+        {
+            type: 'category',
+            data: ['市容', '占道', '扬尘', '违建', '单车'],
+            // axisTick: {
+            //     alignWithLabel: true
+            // },
+            axisLine: {
+                lineStyle: {
+                    color: "rgba(255, 255, 255, 1)"
+                }
+            },
+            axisLabel: {
+                fontSize: fontSizeSwitch(0.12),
+            },
+        }
+    ],
+    yAxis: [
+        {
+            type: 'value',
+            axisLine: {
+                lineStyle: {
+                    color: "rgba(255, 255, 255, 1)"
+                }
+            },
+            axisLabel: {
+                fontSize: fontSizeSwitch(0.12),
+            },
+            minInterval: 1
+        }
+    ],
+    series: [
+        {
+            name: '数量',
+            type: 'bar',
+            barWidth: '60%',
+            data: [0, 0, 0, 0, 0]
+        }
+    ]
+})
+
+let problem_chart = null;
+const create_problem_data = () => {
+    let chartDom = document.getElementById("problem-disposal");
+    problem_chart = echarts.init(chartDom);
+
+    // warden_chart.setOption(warden_option);
+    problem_chart.on('click', (params) => {
+        router.push({ name: 'issue_index', query: { name: params.name } })
+    })
+    getProblemCount();
+    window.addEventListener("resize", problem_chart.resize);
+}
+
+const getProblemCount = () => {
+    axios({
+        url: '/api/problem/count_by_category',
+        method: 'get',
+        headers: {
+            Authorization: store.state.user.tokenHeader + store.state.user.token,
+        },
+    }).then(function (resp) {
+        if (resp.status == 200) {
+            for (const item of problemConfig.data) {
+                item.value = 0;
+            }
+
+            for (const item of resp.data.data) {
+                if (item.category != '') {
+                    problem_option.series[0].data[problemConfigMap[item.category].idx] = item.count;
+                }
+            }
+
+            problem_chart.setOption(problem_option);
+
+
+        }
+    })
+}
+// getProblemCount();
+// setInterval(getProblemCount, 60000);
+
+
+// watch(() => warden_option.series, () => {
+//     warden_chart.setOption(warden_option);
+// })
 
 
 </script>
@@ -1344,7 +1405,7 @@ onBeforeUnmount(() => {
     width: 50vw;
     position: absolute;
     z-index: 20;
-    background: linear-gradient(to top right, rgba(26, 16, 51, 0.6), rgba(42, 48, 127, 0.6));
+    /* background: linear-gradient(to top right, rgba(26, 16, 51, 0.6), rgba(42, 48, 127, 0.6)); */
 }
 
 .case-data {

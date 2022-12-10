@@ -37,15 +37,15 @@ export default {
     actions: {
         login(context, data) {
             axios({
-                url: '/api/auth/login',
+                url: '/api/auth/loginV2',
                 method: 'post',
                 data: {
-                    name: data.username,
+                    name: data.name,
                     password: data.password,
                 },
             }).then(function (resp) {
-                console.log(resp);
                 if (resp.status == 200) {
+
                     localStorage.setItem("jwt_tokenHeader", resp.data.data.tokenHead);
                     localStorage.setItem("jwt_token", resp.data.data.token);
                     context.commit('updateToken', resp.data.data.token);
@@ -89,7 +89,7 @@ export default {
         logout(context) {
             localStorage.removeItem("jwt_token");
             localStorage.removeItem("jwt_tokenHeader");
-            context.state.socket.close();
+
             context.commit("logout");
             context.commit("updateSocket", null);
         },

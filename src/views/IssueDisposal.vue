@@ -17,12 +17,14 @@
                                 style="height:8vh;" @click="selectCategory(item)">
                                 <el-card shadow="always" class="select-card"
                                     :body-style="categorySelected == item ? categorySelectedStyle : categoryNoneSelectedStyle">
-                                    {{ item }}</el-card>
+                                    <span>{{ item }}</span>
+                                    <div class="state-number">20</div>
+                                </el-card>
                             </el-col>
 
                         </el-row>
 
-                        <el-row :gutter="12">
+                        <el-row :gutter="12" class="text-select">
                             <el-input style="width: 20%" id="select-street-box" class="select-text-box"
                                 ref="selectStreetInput" v-model="queryRegion" placeholder="请选择区域" clearable size="large"
                                 @click="selectStreet">
@@ -63,7 +65,7 @@
                             <el-table-column prop="deadline" label="时限" width="150" header-align="center" align="center"
                                 :show-overflow-tooltip="true" />
 
-                            <el-table-column prop="handler" label="处理人" width="120" header-align="center"
+                            <el-table-column prop="handler" label="发布人" width="120" header-align="center"
                                 align="center" />
                             <el-table-column fixed="right" label="操作" width="150" header-align="center" align="center">
                                 <template #default="scope">
@@ -239,6 +241,11 @@ const getIssueList = page => {
         data: JSON.stringify(issue_request)
     }).then(function (resp) {
         if (resp.status == 200) {
+            issueInfoList.splice(0, issueInfoList.length);
+            Object.keys(issueList).map(key => {
+                delete issueList[key]
+            });
+
             total_records.value = resp.data.data.total;
 
             for (const item of resp.data.data.records) {
@@ -259,7 +266,22 @@ const getIssueList = page => {
     })
 }
 
-getIssueList(1);
+const isRoutePushHere = () => {
+    if (router.currentRoute.value.query.name) {
+        let category = router.currentRoute.value.query.name;
+        if (category == '市容') {
+            category = '市容秩序';
+        } else if (category == '占道') {
+            category = '占用城市道路';
+        } else if (category == '单车') {
+            category = '共享单车';
+        }
+        categorySelected.value = category;
+    }
+    getIssueList(1);
+}
+isRoutePushHere();
+
 
 const selectStreethandleClose = () => {
     banshichuSelected.value = '';
@@ -384,6 +406,10 @@ watch(queryRegion, (newValue) => {
 
 .select-text-box {
     margin-right: 1vw;
+}
+
+.text-select {
+    margin-top: 2vh;
 }
 
 :deep(.el-date-editor.el-input__wrapper) {

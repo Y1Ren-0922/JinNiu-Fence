@@ -129,7 +129,9 @@ import axios from 'axios';
 import { reactive, ref } from 'vue'
 import { Search } from "@element-plus/icons-vue";
 import { ElMessage } from 'element-plus'
+import { useStore } from 'vuex';
 
+const store = useStore();
 let patrol_problem_select_way = ref('');
 let patrol_problem_select_value = ref('');
 
@@ -175,7 +177,10 @@ const getPersonInfo = () => {
             method: 'get',
             params: {
                 id: router.currentRoute.value.query.patrol
-            }
+            },
+            headers: {
+                Authorization: store.state.user.tokenHeader + store.state.user.token,
+            },
         }).then(function (response) {
             if (response.status === 200) {
                 let patrol = response.data.data;

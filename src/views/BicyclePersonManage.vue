@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="row">
-            <div class="col-7">
+            <div class="col-8">
                 <div class="card select-box">
                     <div class="card-body">
                         <el-input style="width: 20%" class="select-text-box" v-model="queryName" placeholder="请输入人员姓名"
@@ -19,21 +19,21 @@
                 </div>
             </div>
 
-            <div class="col-7">
+            <div class="col-8">
                 <div class="card person-list">
                     <div class="card-body">
 
-                        <el-table :data="bicyclePersonList" style="width: 100%;">
+                        <el-table :data="bicyclePersonList" style="width: 100%;font-size: 1.1rem;">
                             <el-table-column fixed prop="name" label="姓名" width="120" header-align="center"
                                 align="center" />
                             <el-table-column prop="company" label="所属公司" width="120" header-align="center"
                                 align="center" />
                             <el-table-column prop="state" label="状态" width="120" header-align="center" align="center" />
-                            <el-table-column prop="clockTime" label="打卡时间" width="170" header-align="center"
+                            <el-table-column prop="clockTime" label="打卡时间" width="200" header-align="center"
                                 align="center" />
                             <el-table-column fixed="right" label="操作" width="120" header-align="center" align="center">
                                 <template #default>
-                                    <el-button link type="primary" size="small">详情</el-button>
+                                    <el-button link type="primary" size="small" style="font-size:1rem;">详情</el-button>
                                 </template>
                             </el-table-column>
                         </el-table>

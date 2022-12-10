@@ -69,10 +69,26 @@
 -->
                 <ul class="navbar-nav">
                     <li class="nav-item">
+                        <router-link class="nav-link" :to="{ name: 'map_index' }">大屏</router-link>
+                    </li>
+                    <!-- <li class="nav-item">
                         <a class="nav-link" href="#">{{ $store.state.user.username }}</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#" @click="logout">登出</a>
+                    </li> -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ $store.state.user.username }}
+                        </a>
+
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li>
+                                <a class="dropdown-item" href="#" @click="logout">登出</a>
+                            </li>
+
+                        </ul>
                     </li>
                 </ul>
 
@@ -108,12 +124,20 @@
             <el-icon><user-filled /></el-icon>
             <span>人员管理</span>
         </el-menu-item>
-        <el-menu-item index="/fench/">
-            <el-icon>
-                <icon-menu />
-            </el-icon>
-            <span>严管街管理</span>
-        </el-menu-item>
+        <el-sub-menu index="3">
+            <template #title>
+                <el-icon>
+                    <icon-menu />
+                </el-icon>
+                <span>严管街管理</span>
+            </template>
+            <el-menu-item index="/fench/">
+                <template #title>地图模式</template>
+            </el-menu-item>
+            <el-menu-item index="/region-list/">
+                <template #title>列表模式</template>
+            </el-menu-item>
+        </el-sub-menu>
         <el-sub-menu index="4">
             <template #title>
                 <el-icon>

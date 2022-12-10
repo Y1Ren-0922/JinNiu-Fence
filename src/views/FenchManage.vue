@@ -129,6 +129,7 @@ import axios from 'axios'
 import { stringToList, getStandardTime, getTTime } from '../scripts/utils'
 import { banshichu } from '../scripts/constant'
 import { useStore } from 'vuex';
+import router from "@/router";
 
 export default {
 
@@ -258,7 +259,7 @@ export default {
                 polygonSource.addFeature(oltarget);
             }
 
-            refresh_polygonInfo();
+            // refresh_polygonInfo();
             createOverlayClick();
         }
 
@@ -305,6 +306,54 @@ export default {
                 }
             })
         }
+
+        const getSingleRegion = id => {
+            axios({
+                url: '/api/region/' + id,
+                method: 'get',
+                headers: {
+                    Authorization: store.state.user.tokenHeader + store.state.user.token,
+                },
+                params: {
+                    id: id
+                }
+            }).then(function (resp) {
+                if (resp.status == 200) {
+                    Object.keys(polygonInfo).map(key => {
+                        polygonSource.removeFeature(polygonInfo[key].feature);
+                        delete polygonInfo[key]
+                    });
+                    const item = resp.data.data;
+                    let pointList = stringToList(item.pointList);
+                    if (pointList.length >= 3) {
+                        let polygonFeature = createPolygonFeature(pointList);
+                        polygonFeature.set('name', item.id);
+                        polygonSource.addFeature(polygonFeature);
+
+                        polygonInfo[item.id] = {
+                            id: item.id,
+                            name: item.name,
+                            agency: item.agency,
+                            operator: item.creator,
+                            editTime: getStandardTime(item.createTime),
+                            markList: pointList,
+                            feature: polygonFeature
+                        }
+                    }
+
+
+                }
+            })
+        }
+
+        const getRegion = () => {
+            if (router.currentRoute.value.query.region_id) {
+                getSingleRegion(router.currentRoute.value.query.region_id);
+            } else {
+                refresh_polygonInfo();
+            }
+        }
+        getRegion();
 
         const createIconLayer = () => {
             iconSource = new SourceVec();

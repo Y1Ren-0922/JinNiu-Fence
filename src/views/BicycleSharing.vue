@@ -32,7 +32,7 @@ let map = null;
 const store = useStore();
 
 const initBicyleMap = () => {
-    console.log(router.currentRoute.value.query)
+
     let terMap = new Map({
         target: "olMap",
         view: new View({

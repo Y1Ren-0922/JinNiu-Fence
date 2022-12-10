@@ -52,7 +52,6 @@ export default {
 
     setup() {
 
-        console.log(document.referrer);
         const store = useStore();
         const seen = ref(true)
         //   const Base64 = require("js-base64").Base64
@@ -77,7 +76,7 @@ export default {
             //     }
             // })
             store.dispatch("login", {
-                username: 'lyh',
+                name: 'lyh',
                 password: 'string',
                 success() {
                     router.push({ name: "home" });
@@ -91,7 +90,7 @@ export default {
 
         const loginFromGuanJia = () => {
             store.dispatch("login", {
-                username: "lyh",
+                name: "lyh",
                 password: "string",
                 success() {
                     Object.defineProperty(document, 'referrer', { value: '' });
@@ -112,7 +111,7 @@ export default {
 
         const login = () => {
             store.dispatch("login", {
-                username: params.username,
+                name: params.username,
                 password: params.password,
                 success() {
                     router.push({ name: "home" });

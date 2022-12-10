@@ -172,11 +172,15 @@
                     </el-table>
 
                     <div class="float-end" style="margin-top: 10px">
-                        <el-pagination v-if="checkState == false" background layout="total, prev, pager, next, jumper"
-                            :total="total_records" :current-page="current_page" @current-change="queryByCondition" />
-                        <el-pagination v-else background layout="total, prev, pager, next, jumper"
-                            :total="total_records" :current-page="current_page"
-                            @current-change="queryStateByCondition" />
+                        <el-pagination v-if="(checkState == false && isSelectRealTime == false)" background
+                            layout="total, prev, pager, next, jumper" :total="total_records"
+                            :current-page="current_page" @current-change="queryByCondition" />
+                        <el-pagination v-else-if="(checkState == true)" background
+                            layout="total, prev, pager, next, jumper" :total="total_records"
+                            :current-page="current_page" @current-change="queryStateByCondition" />
+                        <el-pagination v-else-if="(isSelectRealTime == true)" background
+                            layout="total, prev, pager, next, jumper" :total="total_records"
+                            :current-page="current_page" @current-change="getRealTimeOnWork" />
                     </div>
 
 
@@ -443,10 +447,19 @@ export default {
                         }
                     }
                 }
-                queryByCondition(current_page.value)
+
+
+                if (checkState.value == false && isSelectRealTime.value == false) {
+                    queryByCondition(current_page.value);
+                } else if (checkState.value == true) {
+                    queryStateByCondition(current_page.value);
+                } else if (isSelectRealTime.value == true) {
+                    getRealTimeOnWork(current_page.value);
+                }
+
             })
         }
-        initPatrolListAndPullPage();
+        //initPatrolListAndPullPage();
 
         let patrolInfo = reactive({});
         let patrolList = reactive([]);
@@ -763,7 +776,7 @@ export default {
             return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
         }
         let record_date = ref(get_now_date());
-        const emptyText = ref('loading...');
+        const emptyText = ref('暂无数据');
         const queryStateByCondition = page => {
             let status = '';
             if (personStateSelected.value == '在岗在位') {
@@ -804,6 +817,7 @@ export default {
                 patrols.value.splice(0, patrols.value.length);
                 total_records.value = parseInt(resp.data.data.total);
                 page_count = parseInt(resp.data.data.pages);
+
 
                 if (resp.data.data.records.length == 0) {
                     emptyText.value = '暂无数据';
@@ -846,6 +860,101 @@ export default {
             })
         }
 
+        const getRealTimeIdentity = ref('');
+        const getRealTimeStatus = ref('');
+        const isSelectRealTime = ref(false);
+        const getRealTimeOnWork = page => {
+            let patrol = {
+                name: record_name.value,
+                agency: record_agency.value,
+                department: record_department.value,
+                identity: getRealTimeIdentity.value,
+                region: record_street.value,
+                date: record_date.value,
+                status: getRealTimeStatus.value,
+                pageNum: page,
+                pageSize: 10,
+            }
+
+            Object.keys(patrolInfo).map(key => {
+                delete patrolInfo[key]
+            });
+            current_page.value = page;
+            axios({
+                url: '/api/patrol-whole-info/select/conditions',
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': store.state.user.tokenHeader + store.state.user.token,
+                },
+                data: JSON.stringify(patrol)
+            }).then(function (resp) {
+                patrols.value.splice(0, patrols.value.length);
+                total_records.value = parseInt(resp.data.data.total);
+                page_count = parseInt(resp.data.data.pages);
+                isSelectRealTime.value = true;
+
+                if (resp.data.data.records.length == 0) {
+                    emptyText.value = '暂无数据';
+                } else {
+                    emptyText.value = 'loading...'
+                }
+                for (let item of resp.data.data.records) {
+                    let relatedRegion;
+                    let regionName;
+                    if (item.relatedRegion == null) {
+                        relatedRegion = "暂未分配";
+                        regionName = "暂未分配";
+                    } else {
+                        relatedRegion = item.relatedRegion;
+                        regionName = polygons[relatedRegion]["name"];
+                    }
+
+                    let task;
+                    if (item.task == null || item.task == '') {
+                        task = "暂无";
+                    } else {
+                        task = item.task;
+                    }
+
+                    let patrol = {
+                        id: item.id,
+                        name: item.name,
+                        title: item.title,
+                        department: item.department,
+                        relatedRegion: relatedRegion,
+                        regionName: regionName,
+                        telephone: item.telephone,
+                        wechat: item.wechat,
+                        identity: item.identity,
+                        task: task,
+                    }
+                    patrolInfo[item.id] = patrol;
+                    patrols.value.push(patrol);
+                }
+            })
+        }
+
+        const checkMode = () => {
+            if (router.currentRoute.value.query.status) {
+                isSelectRealTime.value = true;
+                getRealTimeIdentity.value = router.currentRoute.value.query.range;
+                getRealTimeStatus.value = router.currentRoute.value.query.status;
+                if (getRealTimeStatus.value == '1') {
+                    personStateSelected.value = '在岗在位';
+                } else if (getRealTimeStatus.value == '2') {
+                    personStateSelected.value = '补休';
+                } else if (getRealTimeStatus.value == '3') {
+                    personStateSelected.value = '请假';
+                }
+                queryIdentity.value = getRealTimeIdentity.value;
+                record_identity.value = getRealTimeIdentity.value;
+
+            }
+            initPatrolListAndPullPage();
+        }
+        checkMode();
+
         const checkState = ref(false);
         const queryRecord = () => {
             record_name.value = queryName.value.trim();
@@ -857,10 +966,12 @@ export default {
             if (personStateSelected.value == '全部' && record_name.value == '' && record_department.value == '' &&
                 record_identity.value == '' && record_street.value == '' && record_agency.value == '') {
                 checkState.value = false;
+                isSelectRealTime.value = false;
                 queryByCondition(1);
 
             } else {
                 checkState.value = true;
+                isSelectRealTime.value = false;
                 queryStateByCondition(1);
             }
 
@@ -872,10 +983,12 @@ export default {
                 record_identity.value == '' && record_street.value == '' && record_agency.value == '') {
                 record_person_state.value = '';
                 checkState.value = false;
+                isSelectRealTime.value = false;
                 queryByCondition(1);
             } else {
                 record_person_state.value = name;
                 checkState.value = true;
+                isSelectRealTime.value = false;
                 queryStateByCondition(1);
             }
         }
@@ -978,6 +1091,7 @@ export default {
             selectStreetConfirm,
             queryStateByCondition,
             disabledDate,
+            getRealTimeOnWork,
             rules,
             form,
             dialogFormVisible,
@@ -1010,6 +1124,7 @@ export default {
             record_date,
             emptyText,
             checkState,
+            isSelectRealTime,
             Search,
         }
     },

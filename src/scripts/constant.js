@@ -11,9 +11,9 @@ const banshichu = [
     reactive({
         name: "西安路",
         // color: 'rgba(245,255,250, 0.5)',
-        color: 'rgba(119, 136, 153, 0.5)',
+        color: 'rgba(119, 136, 153, 0.1)',
         position: [104.040017, 30.67669],
-        fillColor: "	#00FF00",
+        fillColor: "#00FF00",
         strokeColor: "#F08080",
         visible: true,
         strokeStyle: "dashed",
@@ -153,7 +153,7 @@ const banshichu = [
 
     reactive({
         name: '天回',
-        color: 'rgba(192,192,192, 0.5)',
+        color: 'rgba(192,192,192, 0.1)',
         fillColor: "#00FFFF",
         position: [104.03214916, 30.70473032],
         strokeColor: "#F08080",
