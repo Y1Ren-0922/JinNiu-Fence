@@ -113,7 +113,7 @@
                 <span>指挥调度</span>
             </template>
 
-            <el-menu-item index="/map/">
+            <el-menu-item index="/map-mode/">
                 <template #title>地图模式</template>
             </el-menu-item>
             <!-- <el-menu-item index="/patrol-list/">

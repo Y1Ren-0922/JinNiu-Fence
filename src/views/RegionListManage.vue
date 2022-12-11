@@ -2,7 +2,7 @@
 
     <div class="container">
         <div class="row">
-            <div class="col-9">
+            <div class="col-10">
                 <div class="card select-box">
                     <div class="card-body">
                         <div class="query-input-box">
@@ -19,11 +19,22 @@
 
                 <div class="card">
                     <div class="card-body">
-                        <el-table :data="regionList" style="width: 100%; font-size: 1.1rem;" size="large">
+                        <el-table :data="regionList" style="width: 100%; font-size: 1.1rem;" size="large"
+                            @cell-dblclick="changeShouldArrive">
 
                             <el-table-column prop="name" label="名称" width="300" header-align="center" align="center"
                                 :show-overflow-tooltip="true" />
                             <el-table-column prop="agency" label="所属办事处" width="120" header-align="center"
+                                align="center" />
+                            <el-table-column label="应到" width="120" header-align="center" align="center">
+                                <template #default="scope">
+                                    <el-input ref="shouldArriveInput" @blur="changeFinished"
+                                        v-model="scope.row.shouldArrive"
+                                        v-if="scope.row.name === rowName && scope.column.label === '应到'" />
+                                    <span v-else>{{ scope.row.shouldArrive }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="actualArrive" label="实到" width="120" header-align="center"
                                 align="center" />
                             <el-table-column prop="createTime" label="生成时间" width="200" header-align="center"
                                 align="center" :show-overflow-tooltip="true" />
@@ -31,9 +42,9 @@
                                 align="center" />
                             <el-table-column fixed="right" label="操作" width="150" header-align="center" align="center">
                                 <template #default="scope">
-                                    <el-button link size="small" type="primary" plain text style="font-size:1rem;">
+                                    <!-- <el-button link size="small" type="primary" plain text style="font-size:1rem;">
                                         详情
-                                    </el-button>
+                                    </el-button> -->
 
                                     <el-tooltip class="box-item" effect="dark" content="位置跳转" placement="top"
                                         :show-after="500">
@@ -61,7 +72,7 @@
 
 <script setup>
 import axios from 'axios';
-import { reactive, ref } from 'vue';
+import { reactive, ref, nextTick } from 'vue';
 import { useStore } from 'vuex';
 import { Location } from '@element-plus/icons-vue';
 import router from '@/router'
@@ -90,8 +101,11 @@ const getRegionList = page => {
             regionList.splice(0, regionList.length);
             total_records.value = resp.data.data.total;
             current_page.value = page;
+
             for (const item of resp.data.data.records) {
                 item.createTime = switchTime(item.createTime);
+                item.shouldArrive = 10;
+                item.actualArrive = 10;
                 regionList.push(item);
             }
         }
@@ -106,6 +120,22 @@ const switchTime = time => {
 const regionLocation = row => {
     router.push({ name: 'fench_index', query: { 'region_id': row.id } })
 }
+
+const rowName = ref(-1);
+const shouldArriveInput = ref(null);
+const changeShouldArrive = (row, column) => {
+    if (column.label == '应到') {
+        rowName.value = row.name;
+        nextTick(() => {
+            shouldArriveInput.value.focus();
+        })
+    }
+}
+const changeFinished = () => {
+    rowName.value = -1;
+}
+
+
 </script>
 
 <style scoped>

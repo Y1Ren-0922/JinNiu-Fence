@@ -154,9 +154,9 @@ export default {
         let overlayClick;
         let content;
         let popup;
-
+        let terMap;
         const initMap = () => {
-            let terMap = new Map({
+            terMap = new Map({
                 target: "olMap",
                 view: new View({
                     center: [104.05396204, 30.74499549],
@@ -165,6 +165,7 @@ export default {
                 }),
             });
             map = terMap;
+
             //   添加地图
             let Tersource = new XYZ({
                 url: "http://t4.tianditu.com/DataServer?T=vec_w&tk=b523e4ded27f524672a488e758227070&x={x}&y={y}&l={z}",
@@ -307,6 +308,7 @@ export default {
             })
         }
 
+
         const getSingleRegion = id => {
             axios({
                 url: '/api/region/' + id,
@@ -326,6 +328,7 @@ export default {
                     const item = resp.data.data;
                     let pointList = stringToList(item.pointList);
                     if (pointList.length >= 3) {
+
                         let polygonFeature = createPolygonFeature(pointList);
                         polygonFeature.set('name', item.id);
                         polygonSource.addFeature(polygonFeature);
@@ -339,6 +342,12 @@ export default {
                             markList: pointList,
                             feature: polygonFeature
                         }
+
+                        terMap.getView().animate({
+                            center: pointList[0],
+                            zoom: 15,
+                            projection: "EPSG:4326",
+                        })
                     }
 
 
@@ -349,11 +358,12 @@ export default {
         const getRegion = () => {
             if (router.currentRoute.value.query.region_id) {
                 getSingleRegion(router.currentRoute.value.query.region_id);
+
             } else {
                 refresh_polygonInfo();
             }
         }
-        getRegion();
+
 
         const createIconLayer = () => {
             iconSource = new SourceVec();
@@ -781,6 +791,7 @@ export default {
 
         onMounted(() => {
             initMap();
+            getRegion();
         });
 
         let beforePreview = null;

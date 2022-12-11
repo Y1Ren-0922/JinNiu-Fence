@@ -163,7 +163,6 @@ const getBikePersonnelLocation = () => {
             Authorization: store.state.user.tokenHeader + store.state.user.token,
         },
     }).then(function (response) {
-        console.log(response)
         if (response.status == 200) {
             for (const item of response.data.data) {
                 if (item.company != null && item.location != null && item.location != "") {

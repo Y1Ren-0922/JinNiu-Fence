@@ -15,6 +15,7 @@ import RectifyDateAnalysis from '../views/RectifyDateAnalysis'
 import BicyclePersonManage from '../views/BicyclePersonManage'
 import ProblemDetail from '../components/ProblemDetail'
 import RegionListManage from '../views/RegionListManage'
+import MapMode from '../views/MapMode'
 import store from '@/store'
 
 const routes = [
@@ -103,6 +104,14 @@ const routes = [
     path: '/bicycle-manage/',
     name: 'bicycle_person_manage',
     component: BicyclePersonManage,
+    meta: {
+      requestAuth: true,
+    }
+  },
+  {
+    path: '/map-mode/',
+    name: 'map_mode_index',
+    component: MapMode,
     meta: {
       requestAuth: true,
     }

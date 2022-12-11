@@ -1,7 +1,7 @@
 <template>
 
 
-    <div class="content-l">
+    <div class="content-l" v-show="$route.path != '/map-mode/'">
         <div class="content-l-top">
             <div class="container">
 
@@ -103,13 +103,13 @@
 
     </div>
     <!-- <border-box-7 class="content-mid-bottom" v-show="$route.path != '/bicycle-map/'"> -->
-    <div class="content-mid-bottom">
+    <div class="content-mid-bottom" v-show="$route.path == '/map/'">
         <div id="case-data" style="width: 50vw;height: 25vh;"></div>
 
     </div>
     <!-- </border-box-7> -->
 
-    <div class="content-r">
+    <div class="content-r" v-show="$route.path != '/map-mode/'">
         <div class="container">
             <div class="leave-map">
                 <router-link :to="{ name: 'person_index' }"><img src="../assets/img/leave.png" alt=""></router-link>
