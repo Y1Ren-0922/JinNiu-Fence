@@ -143,7 +143,8 @@
                 </div>
             </border-box-7>
 
-            <border-box-7 style="height: 28.5vh; width: 22vw; margin-bottom: 1vh;">
+            <border-box-7 style="height: 28.5vh; width: 22vw; margin-bottom: 1vh;"
+                v-show="$route.path != '/bicycle-map/'">
                 <div class="card text-white bg-primary mb-3 "
                     style=" margin-left: auto;  width: 22vw; height: 28.5vh; --bs-bg-opacity: .15;">
                     <div class="card-header">综合执法指令发布

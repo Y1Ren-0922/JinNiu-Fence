@@ -16,6 +16,10 @@ import BicyclePersonManage from '../views/BicyclePersonManage'
 import ProblemDetail from '../components/ProblemDetail'
 import RegionListManage from '../views/RegionListManage'
 import MapMode from '../views/MapMode'
+import WardenManage from '../views/WardenManage'
+import RegionArriveRate from '../views/RegionArriveRate'
+import CaseHandling from '../views/CaseHandling'
+import CaseAnalysis from '../views/CaseAnalysis'
 import store from '@/store'
 
 const routes = [
@@ -68,6 +72,14 @@ const routes = [
     }
   },
   {
+    path: '/warden-manage/',
+    name: 'warden_index',
+    component: WardenManage,
+    meta: {
+      requestAuth: true,
+    }
+  },
+  {
     path: '/statistical-analysis/',
     name: 'statistical_index',
     component: StatisticalAnalysis,
@@ -99,11 +111,35 @@ const routes = [
       requestAuth: true,
     }
   },
+  {
+    path: '/case-handling/',
+    name: 'case_handling_index',
+    component: CaseHandling,
+    meta: {
+      requestAuth: true,
+    }
+  },
+  {
+    path: '/case-analysis/',
+    name: 'case_analysis_index',
+    component: CaseAnalysis,
+    meta: {
+      requestAuth: true,
+    }
+  },
 
   {
     path: '/bicycle-manage/',
     name: 'bicycle_person_manage',
     component: BicyclePersonManage,
+    meta: {
+      requestAuth: true,
+    }
+  },
+  {
+    path: '/arrive-rate/',
+    name: 'region_arrive_rate',
+    component: RegionArriveRate,
     meta: {
       requestAuth: true,
     }

@@ -2,9 +2,22 @@
 
     <div class="container">
         <div class="row">
-            <div class="col-10">
+            <div class="col-11">
                 <div class="card select-box">
                     <div class="card-body">
+                        <el-row :gutter="12">
+                            <el-col v-for="(item, idx) in banshichu_list" :key="idx" :span="2.5"
+                                class="select-state-box">
+                                <el-card shadow="always" style="margin-bottom: 1vh;" @click="agencySelect(item)"
+                                    :body-style="banshichuSelected == item ? banshichuSelectedStyle : banshichuNoneSelectedStyle">
+                                    <span>{{ item }}</span>
+                                    <div class="state-number">20</div>
+                                </el-card>
+                            </el-col>
+
+                        </el-row>
+
+                        <hr>
                         <div class="query-input-box">
                             <el-input style="width: 18%" class="select-text-box" v-model="queryName"
                                 placeholder="请输入严管街名称" clearable size="large">
@@ -22,11 +35,13 @@
                         <el-table :data="regionList" style="width: 100%; font-size: 1.1rem;" size="large"
                             @cell-dblclick="changeShouldArrive">
 
-                            <el-table-column prop="name" label="名称" width="300" header-align="center" align="center"
+                            <el-table-column prop="name" label="名称" width="350" header-align="center" align="center"
                                 :show-overflow-tooltip="true" />
-                            <el-table-column prop="agency" label="所属办事处" width="120" header-align="center"
+                            <el-table-column prop="agency" label="办事处" width="140" header-align="center"
                                 align="center" />
-                            <el-table-column label="应到" width="120" header-align="center" align="center">
+                            <el-table-column prop="regionLength" label="街道长度" width="120" header-align="center"
+                                align="center" :show-overflow-tooltip="true" />
+                            <el-table-column label="定岗人数" width="120" header-align="center" align="center">
                                 <template #default="scope">
                                     <el-input ref="shouldArriveInput" @blur="changeFinished"
                                         v-model="scope.row.shouldArrive"
@@ -34,12 +49,12 @@
                                     <span v-else>{{ scope.row.shouldArrive }}</span>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="actualArrive" label="实到" width="120" header-align="center"
+                            <el-table-column prop="actualArrive" label="实到人数" width="120" header-align="center"
                                 align="center" />
-                            <el-table-column prop="createTime" label="生成时间" width="200" header-align="center"
+                            <el-table-column prop="arriveRate" label="实时到岗率" width="120" header-align="center"
                                 align="center" :show-overflow-tooltip="true" />
-                            <el-table-column prop="creator" label="操作人" width="120" header-align="center"
-                                align="center" />
+                            <!-- <el-table-column prop="creator" label="操作人" width="120" header-align="center"
+                                align="center" /> -->
                             <el-table-column fixed="right" label="操作" width="150" header-align="center" align="center">
                                 <template #default="scope">
                                     <!-- <el-button link size="small" type="primary" plain text style="font-size:1rem;">
@@ -83,6 +98,10 @@ const current_page = ref(1);
 const total_records = ref(0);
 const queryName = ref('');
 const queryAgency = ref('');
+const banshichuSelected = ref('全部');
+
+const banshichuNoneSelectedStyle = ref("text-align: center; padding-top: 10px; padding-bottom:10px; ");
+const banshichuSelectedStyle = ref("text-align: center; padding-top: 10px; padding-bottom:10px; background-color: #0D6EFD; color: white;");
 
 const getRegionList = page => {
     axios({
@@ -106,6 +125,8 @@ const getRegionList = page => {
                 item.createTime = switchTime(item.createTime);
                 item.shouldArrive = 10;
                 item.actualArrive = 10;
+                item.regionLength = 200;
+                item.arriveRate = '90%';
                 regionList.push(item);
             }
         }
@@ -135,6 +156,38 @@ const changeFinished = () => {
     rowName.value = -1;
 }
 
+const banshichu_list = reactive([]);
+const getAgencyRegionRelation = () => {
+    axios({
+        url: '/api/region/get_relation',
+        method: 'get',
+        headers: {
+            Authorization: store.state.user.tokenHeader + store.state.user.token,
+        },
+    }).then(function (resp) {
+        if (resp.status == 200) {
+
+            for (let key of resp.data.data) {
+                banshichu_list.push(key.agency);
+
+
+            }
+            banshichu_list.unshift('全部');
+        }
+    })
+}
+getAgencyRegionRelation();
+
+const record_agency = ref('');
+const agencySelect = agency => {
+    banshichuSelected.value = agency;
+    if (agency == '全部') {
+        record_agency.value = '';
+    } else {
+        record_agency.value = agency;
+    }
+
+}
 
 </script>
 
@@ -155,5 +208,9 @@ const changeFinished = () => {
 
 .select-text-box {
     margin-right: 1vw;
+}
+
+.select-state-box {
+    cursor: pointer;
 }
 </style>

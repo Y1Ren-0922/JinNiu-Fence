@@ -120,10 +120,21 @@
                 <template #title>列表模式</template>
             </el-menu-item> -->
         </el-sub-menu>
-        <el-menu-item index="/person/">
-            <el-icon><user-filled /></el-icon>
-            <span>人员管理</span>
-        </el-menu-item>
+        <el-sub-menu index="2">
+            <template #title>
+                <el-icon><user-filled /></el-icon>
+                <span>人员管理</span>
+            </template>
+            <el-menu-item index="/person/">
+
+                <template #title>执法人员</template>
+            </el-menu-item>
+            <el-menu-item index="/warden-manage/">
+
+                <template #title>协管人员</template>
+            </el-menu-item>
+        </el-sub-menu>
+
         <el-sub-menu index="3">
             <template #title>
                 <el-icon>
@@ -131,12 +142,16 @@
                 </el-icon>
                 <span>严管街管理</span>
             </template>
-            <el-menu-item index="/fench/">
-                <template #title>地图模式</template>
-            </el-menu-item>
             <el-menu-item index="/region-list/">
                 <template #title>列表模式</template>
             </el-menu-item>
+            <el-menu-item index="/fench/">
+                <template #title>地图模式</template>
+            </el-menu-item>
+            <el-menu-item index="/arrive-rate/">
+                <template #title>到岗率</template>
+            </el-menu-item>
+
         </el-sub-menu>
         <el-sub-menu index="4">
             <template #title>
@@ -159,6 +174,20 @@
             <span>问题处置</span>
         </el-menu-item>
         <el-sub-menu index="5">
+            <template #title>
+                <el-icon>
+                    <List />
+                </el-icon>
+                <span>执法办案</span>
+            </template>
+            <el-menu-item index="/case-handling/">
+                <span>案件办理</span>
+            </el-menu-item>
+            <el-menu-item index="/case-analysis/">
+                <span>案件统计</span>
+            </el-menu-item>
+        </el-sub-menu>
+        <el-sub-menu index="6">
             <template #title>
                 <el-icon>
                     <histogram />
@@ -188,7 +217,8 @@ import {
     Location,
     UserFilled,
     Histogram,
-    Bicycle
+    Bicycle,
+    List
 } from '@element-plus/icons-vue'
 
 export default {
@@ -212,7 +242,8 @@ export default {
         IconMenu,
         UserFilled,
         Histogram,
-        Bicycle
+        Bicycle,
+        List,
     }
 }
 

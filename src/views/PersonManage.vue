@@ -21,43 +21,6 @@
                         </el-col>
 
                     </el-row> -->
-
-                    <div class="col-12" style="margin-right:30px; display: flex;">
-                        <el-input style="width: 18%" class="select-text-box" v-model="queryName" placeholder="请输入人员姓名"
-                            clearable size="large">
-
-                        </el-input>
-
-                        <el-input style="width: 22%" class="select-text-box" v-model="queryDepartment"
-                            placeholder="请输入部门名称" clearable size="large">
-
-                        </el-input>
-
-
-                        <!-- <el-select v-model="queryStreet" placeholder="选择围栏" size="large" style="width: 20%;"
-                            class="select-text-box" clearable>
-                            <el-option v-for="polygon in polygons" :key="polygon.id" :label="polygon.name"
-                                :value="polygon.name" />
-                        </el-select> -->
-
-                        <el-input style="width: 20%" id="select-street-box" class="select-text-box"
-                            ref="selectStreetInput" v-model="queryRegion" placeholder="请输入街道" clearable size="large"
-                            @click="selectStreet">
-
-                        </el-input>
-
-
-                        <el-select v-model="queryIdentity" class="select-text-box" placeholder="选择人员类型" size="large"
-                            style="width: 15%" clearable>
-                            <el-option v-for="item in selectIdentityOption" :key="item.value" :label="item.label"
-                                :value="item.value" />
-                        </el-select>
-
-                        <el-button type="primary" :icon="Search" size="large" @click="queryRecord">搜索</el-button>
-                    </div>
-
-                    <hr>
-
                     <el-row :gutter="12">
                         <el-col v-for="(item, idx) in person_state" :key="idx" :span="2.5" class="select-state-box"
                             @click="selectPersonState(item)">
@@ -69,8 +32,58 @@
                         </el-col>
 
                     </el-row>
-                    <el-date-picker v-model="record_date" type="date" placeholder="默认查询当天" size="large"
-                        :disabled-date="disabledDate" style="margin-top: 1vh;" />
+                    <hr>
+
+                    <el-row :gutter="12">
+                        <el-col v-for="(item, idx) in banshichu_list" :key="idx" :span="2.5" class="select-state-box"
+                            @click="selectAgency(item)">
+                            <el-card shadow="always" style="margin-bottom: 1vh;"
+                                :body-style="banshichuSelected == item ? agencySelectedStyle : banshichuNoneSelectedStyle">
+                                <span>{{ item }}</span>
+                                <div class="state-number">20</div>
+                            </el-card>
+                        </el-col>
+
+                    </el-row>
+
+                    <hr>
+
+                    <div class="col-12" style="margin-right:30px; display: flex;">
+                        <el-input style="width: 18%" class="select-text-box" v-model="queryName" placeholder="请输入人员姓名"
+                            clearable size="large">
+
+                        </el-input>
+
+                        <el-input style="width: 22%" class="select-text-box" v-model="queryDepartment"
+                            placeholder="请输入中队名称" clearable size="large">
+
+                        </el-input>
+
+
+                        <!-- <el-select v-model="queryStreet" placeholder="选择围栏" size="large" style="width: 20%;"
+                            class="select-text-box" clearable>
+                            <el-option v-for="polygon in polygons" :key="polygon.id" :label="polygon.name"
+                                :value="polygon.name" />
+                        </el-select> -->
+
+                        <!-- <el-input style="width: 20%" id="select-street-box" class="select-text-box"
+                            ref="selectStreetInput" v-model="queryRegion" placeholder="请输入街道" clearable size="large"
+                            @click="selectStreet">
+
+                        </el-input> -->
+
+
+                        <!-- <el-select v-model="queryIdentity" class="select-text-box" placeholder="选择人员类型" size="large"
+                            style="width: 15%" clearable>
+                            <el-option v-for="item in selectIdentityOption" :key="item.value" :label="item.label"
+                                :value="item.value" />
+                        </el-select> -->
+                        <el-date-picker class="select-text-box" v-model="record_date" type="date" placeholder="默认查询当天"
+                            size="large" :disabled-date="disabledDate" style="width: 15%; margin-right: 1vw;" />
+
+                        <el-button type="primary" :icon="Search" size="large" @click="queryRecord">搜索</el-button>
+                    </div>
+
                 </div>
 
 
@@ -99,18 +112,18 @@
                     <el-table :data="patrols" style="width: 100%; font-size: 1.1rem;" size="large" max-height="700"
                         :empty-text="emptyText">
 
-                        <el-table-column prop="name" label="姓名" width="140" header-align="center" align="center" />
-                        <el-table-column prop="title" label="职务" width="240" header-align="center" align="center"
+                        <el-table-column prop="name" label="姓名" width="180" header-align="center" align="center" />
+                        <el-table-column prop="title" label="职务" width="320" header-align="center" align="center"
                             :show-overflow-tooltip="true" />
 
-                        <el-table-column prop="department" label="部门" width="240" header-align="center"
+                        <el-table-column prop="department" label="中队" width="350" header-align="center"
                             align="center" />
                         <el-table-column prop="telephone" label="电话" width="160" header-align="center" align="center" />
-                        <el-table-column prop="identity" label="人员类型" width="120" header-align="center"
+                        <!-- <el-table-column prop="identity" label="人员类型" width="120" header-align="center"
                             align="center" />
                         <el-table-column prop="regionName" label="所处围栏" width="200" header-align="center" align="center"
                             :show-overflow-tooltip="true" />
-                        <el-table-column prop="task" label="任务" width="100" header-align="center" align="center" />
+                        <el-table-column prop="task" label="任务" width="100" header-align="center" align="center" /> -->
 
 
                         <el-table-column fixed="right" label="操作" width="250" header-align="center" align="center">
@@ -307,7 +320,7 @@
         </el-select>
 
         <el-select v-model="queryStreet" class="m-2" placeholder="请选择严管街" size="large" clearable>
-            <el-option v-for="item in regionList" :key="item.name" :label="item.name" :value="item.name" />
+            <el-option v-for="item in regionList" :key="item" :label="item" :value="item" />
         </el-select>
         <template #footer>
             <span class="dialog-footer">
@@ -340,13 +353,14 @@ export default {
         const ruleFormRef = ref();
         const addPersonFormRef = ref();
         const queryName = ref("");
-        const banshichuNoneSelectedStyle = ref("text-align: center; padding-top: 10px; padding-bottom:10px;");
+        const banshichuNoneSelectedStyle = ref("text-align: center; padding-top: 10px; padding-bottom:10px; ");
+        const agencySelectedStyle = ref("text-align: center; padding-top: 10px; padding-bottom:10px; background: linear-gradient(white, #1E90FF); color: white;");
         const banshichuSelectedStyle = ref("text-align: center; padding-top: 10px; padding-bottom:10px; background-color: #0D6EFD; color: white;");
-        const banshichuSelected = ref("");
+        const banshichuSelected = ref("全部");
         const queryDepartment = ref('');
         const queryStreet = ref('');
         const queryIdentity = ref('');
-        const person_state = ["全部", "在岗在位", "请假", "补休", "未打卡"];
+        const person_state = ["全部", "在岗在位", "请假", "补休", "未打卡", "抽调"];
         const personStateSelected = ref('全部');
         const selectStreetVisiable = ref(false);
 
@@ -450,7 +464,7 @@ export default {
 
 
                 if (checkState.value == false && isSelectRealTime.value == false) {
-                    queryByCondition(current_page.value);
+                    queryStateByCondition(current_page.value);
                 } else if (checkState.value == true) {
                     queryStateByCondition(current_page.value);
                 } else if (isSelectRealTime.value == true) {
@@ -603,7 +617,7 @@ export default {
         }
 
         const backToFirstPage = () => {
-            queryByCondition(current_page.value);
+            queryStateByCondition(current_page.value);
         }
 
         let total_records = ref(0);
@@ -967,7 +981,7 @@ export default {
                 record_identity.value == '' && record_street.value == '' && record_agency.value == '') {
                 checkState.value = false;
                 isSelectRealTime.value = false;
-                queryByCondition(1);
+                queryStateByCondition(1);
 
             } else {
                 checkState.value = true;
@@ -984,13 +998,23 @@ export default {
                 record_person_state.value = '';
                 checkState.value = false;
                 isSelectRealTime.value = false;
-                queryByCondition(1);
+                queryStateByCondition(1);
             } else {
                 record_person_state.value = name;
                 checkState.value = true;
                 isSelectRealTime.value = false;
                 queryStateByCondition(1);
             }
+        }
+
+        const selectAgency = agency => {
+            banshichuSelected.value = agency;
+            if (agency == '全部') {
+                record_department.value = '';
+            } else {
+                record_department.value = agency + "街道执法中队";
+            }
+            queryStateByCondition(1);
         }
 
         const agency_region_relation = reactive({});
@@ -1004,11 +1028,13 @@ export default {
                 },
             }).then(function (resp) {
                 if (resp.status == 200) {
-                    for (let key in resp.data.data) {
-                        banshichu_list.push(key);
-                        agency_region_relation[key] = resp.data.data[key];
+
+                    for (let key of resp.data.data) {
+                        banshichu_list.push(key.agency);
+                        agency_region_relation[key.agency] = key.regions;
 
                     }
+                    banshichu_list.unshift('全部');
                 }
             })
         }
@@ -1092,6 +1118,7 @@ export default {
             queryStateByCondition,
             disabledDate,
             getRealTimeOnWork,
+            selectAgency,
             rules,
             form,
             dialogFormVisible,
@@ -1125,6 +1152,8 @@ export default {
             emptyText,
             checkState,
             isSelectRealTime,
+            agencySelectedStyle,
+            record_agency,
             Search,
         }
     },

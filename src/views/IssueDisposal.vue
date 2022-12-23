@@ -4,7 +4,7 @@
 
             <div class="col-1"></div>
 
-            <div class="col-10">
+            <div class="col-11">
                 <div class="card select-box">
                     <div class="card-body">
                         <el-row :gutter="12">
@@ -24,8 +24,36 @@
 
                         </el-row>
 
+                        <hr>
+
+                        <el-row :gutter="12">
+                            <el-col v-for="(item, idx) in banshichu_list" :key="idx" :span="2.5"
+                                class="select-state-box" @click="selectAgency(item)">
+                                <el-card shadow="always" style="margin-bottom: 1vh;"
+                                    :body-style="banshichuSelected == item ? agencySelectedStyle : categoryNoneSelectedStyle">
+                                    <span>{{ item }}</span>
+                                    <div class="state-number">20</div>
+                                </el-card>
+                            </el-col>
+
+                        </el-row>
+
+                        <hr>
+
+                        <el-row :gutter="12">
+                            <el-col v-for="(item, idx) in stateList" :key="idx" :span="2.5" class="select-state-box"
+                                @click="selectState(item)">
+                                <el-card shadow="always" style="margin-bottom: 1vh;"
+                                    :body-style="stateSelected == item ? stateSelectedStyle : categoryNoneSelectedStyle">
+                                    <span>{{ item }}</span>
+                                    <div class="state-number">20</div>
+                                </el-card>
+                            </el-col>
+
+                        </el-row>
+
                         <el-row :gutter="12" class="text-select">
-                            <el-input style="width: 20%" id="select-street-box" class="select-text-box"
+                            <!-- <el-input style="width: 20%" id="select-street-box" class="select-text-box"
                                 ref="selectStreetInput" v-model="queryRegion" placeholder="请选择区域" clearable size="large"
                                 @click="selectStreet">
 
@@ -35,7 +63,7 @@
                                 size="large" style="margin-right: 1vw; width: 15%;" clearable>
                                 <el-option v-for="item in stateOption" :key="item.value" :label="item.label"
                                     :value="item.value" />
-                            </el-select>
+                            </el-select> -->
 
                             <!-- <el-date-picker v-model="record_date" type="date" placeholder="默认查询当天" size="large"
                                 :disabled-date="disabledDate" style=" width: 20%; margin-right: 1vw;" /> -->
@@ -121,35 +149,37 @@ const store = useStore();
 const categorySelected = ref('全部');
 const categoryNoneSelectedStyle = ref("text-align: center; padding-top: 10px; padding-bottom:10px;  vertical-align:center;");
 const categorySelectedStyle = ref("text-align: center; padding-top: 10px; padding-bottom:10px; background-color: #0D6EFD; color: white;");
+const agencySelectedStyle = ref("text-align: center; padding-top: 10px; padding-bottom:10px; background: linear-gradient(white, #1E90FF); color: white;");
+const stateSelectedStyle = ref("text-align: center; padding-top: 10px; padding-bottom:10px; background: linear-gradient(white, 	#00BFFF); color: white;");
 const selectStreetVisiable = ref(false);
-const banshichuSelected = ref('');
+const banshichuSelected = ref('全部');
 const queryStreet = ref('');
 const queryRegion = ref('');
 const selectStreetInput = ref(null);
-const stateSelected = ref('');
+const stateSelected = ref('全部');
 const current_page = ref(1);
 const total_records = ref(0);
 const case_category = reactive(['全部'])
+const stateList = ["全部", "未接收", "待处置", "首次整改", "二次整改", "执法查处"];
+// const stateOption = [
+//     {
+//         value: '未接收',
+//         label: '未接收',
+//     },
+//     {
+//         value: '未处理',
+//         label: '未处理',
+//     },
+//     {
+//         value: '处理中',
+//         label: '处理中',
+//     },
+//     {
+//         value: '整改完成',
+//         label: '整改完成',
+//     },
 
-const stateOption = [
-    {
-        value: '未接收',
-        label: '未接收',
-    },
-    {
-        value: '未处理',
-        label: '未处理',
-    },
-    {
-        value: '处理中',
-        label: '处理中',
-    },
-    {
-        value: '整改完成',
-        label: '整改完成',
-    },
-
-]
+// ]
 
 const date_shortcuts = [
     {
@@ -207,7 +237,14 @@ const getIssueList = page => {
     let agency = banshichuSelected.value;
     let region = queryStreet.value;
     let category = categorySelected.value;
+    let state = stateSelected.value;
+    if (state == '全部') {
+        state = '';
+    }
     if (region != '') {
+        agency = '';
+    }
+    if (agency == '全部') {
         agency = '';
     }
 
@@ -223,7 +260,7 @@ const getIssueList = page => {
         subCategory: '',
         region: region,
         agency: agency,
-        rectifyStatus: stateSelected.value,
+        rectifyStatus: state,
         startRectifyDate: '',
         endRectifyDate: '',
         startPostDate: record_date.value[0],
@@ -292,12 +329,12 @@ const selectStreethandleClose = () => {
     })
 }
 
-const selectStreet = () => {
-    banshichuSelected.value = '';
-    regionList.splice(0, regionList.length);
-    queryStreet.value = '';
-    selectStreetVisiable.value = true;
-}
+// const selectStreet = () => {
+//     banshichuSelected.value = '';
+//     regionList.splice(0, regionList.length);
+//     queryStreet.value = '';
+//     selectStreetVisiable.value = true;
+// }
 
 const selectStreetConfirm = () => {
     if (queryStreet.value == '' && banshichuSelected.value != '') {
@@ -331,6 +368,7 @@ const getAgencyRegionRelation = () => {
                 agency_region_relation[item.agency] = item.regions;
 
             }
+            banshichu_list.unshift("全部");
         }
     })
 }
@@ -384,6 +422,16 @@ getCategory();
 
 const checkDetail = row => {
     router.push({ name: 'problem_detail_index', query: { 'problem_id': row.id } })
+}
+
+const selectAgency = agency => {
+    banshichuSelected.value = agency;
+    getIssueList(1);
+}
+
+const selectState = state => {
+    stateSelected.value = state;
+    getIssueList(1);
 }
 
 watch(queryRegion, (newValue) => {
