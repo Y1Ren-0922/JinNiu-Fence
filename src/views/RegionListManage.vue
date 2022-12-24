@@ -23,9 +23,11 @@
                                 placeholder="请输入严管街名称" clearable size="large">
                             </el-input>
 
-                            <el-input style="width: 18%" class="select-text-box" v-model="queryAgency"
+                            <!-- <el-input style="width: 18%" class="select-text-box" v-model="queryAgency"
                                 placeholder="请输入部门名称" clearable size="large">
-                            </el-input>
+                            </el-input> -->
+                            <el-button type="primary" :icon="Search" size="large"
+                                @click="getRegionListByName">搜索</el-button>
                         </div>
                     </div>
                 </div>
@@ -89,7 +91,7 @@
 import axios from 'axios';
 import { reactive, ref, nextTick } from 'vue';
 import { useStore } from 'vuex';
-import { Location } from '@element-plus/icons-vue';
+import { Location, Search } from '@element-plus/icons-vue';
 import router from '@/router'
 
 const store = useStore();
@@ -97,7 +99,7 @@ const regionList = reactive([]);
 const current_page = ref(1);
 const total_records = ref(0);
 const queryName = ref('');
-const queryAgency = ref('');
+// const queryAgency = ref('');
 const banshichuSelected = ref('全部');
 
 const banshichuNoneSelectedStyle = ref("text-align: center; padding-top: 10px; padding-bottom:10px; ");
@@ -122,7 +124,6 @@ const getRegionList = page => {
             current_page.value = page;
 
             for (const item of resp.data.data.records) {
-                item.createTime = switchTime(item.createTime);
                 item.shouldArrive = 10;
                 item.actualArrive = 10;
                 item.regionLength = 200;
@@ -134,9 +135,9 @@ const getRegionList = page => {
 }
 getRegionList(1);
 
-const switchTime = time => {
-    return time.replace('T', ' ');
-}
+// const switchTime = time => {
+//     return time.replace('T', ' ');
+// }
 
 const regionLocation = row => {
     router.push({ name: 'fench_index', query: { 'region_id': row.id } })
@@ -183,8 +184,64 @@ const agencySelect = agency => {
     banshichuSelected.value = agency;
     if (agency == '全部') {
         record_agency.value = '';
+
     } else {
         record_agency.value = agency;
+    }
+
+}
+
+const getRegionListByAgency = agency => {
+    if (agency == '全部') {
+        agency = '';
+    }
+
+    axios({
+        url: '/api/region/select/by_agency',
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: store.state.user.tokenHeader + store.state.user.token,
+        },
+        data: JSON.stringify({
+            agency: agency
+        })
+    }).then(function (resp) {
+        console.log(resp);
+    })
+}
+getRegionListByAgency('抚琴');
+
+const getRegionListByName = () => {
+    if (queryName.value == '') {
+        getRegionList(1);
+    } else {
+        axios({
+            url: '/api/region/select/by_name',
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: store.state.user.tokenHeader + store.state.user.token,
+            },
+            data: JSON.stringify({
+                name: queryName.value
+            })
+        }).then(function (resp) {
+            if (resp.status == 200) {
+                queryName.value = '';
+                regionList.splice(0, regionList.length);
+                total_records.value = resp.data.data.length;
+                current_page.value = 1;
+
+                for (const item of resp.data.data) {
+                    item.shouldArrive = 10;
+                    item.actualArrive = 10;
+                    item.regionLength = 200;
+                    item.arriveRate = '90%';
+                    regionList.push(item);
+                }
+            }
+        })
     }
 
 }

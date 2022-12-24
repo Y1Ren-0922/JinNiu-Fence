@@ -710,7 +710,7 @@ export default {
         let record_name = ref('');
         let record_department = ref('');
         let record_agency = ref('');
-        let record_identity = ref('');
+        let record_identity = ref('执法人员');
         let record_street = ref('');
         let record_person_state = ref('');
 
@@ -1012,7 +1012,7 @@ export default {
             if (agency == '全部') {
                 record_department.value = '';
             } else {
-                record_department.value = agency + "街道执法中队";
+                record_department.value = agency + "执法中队";
             }
             queryStateByCondition(1);
         }

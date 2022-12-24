@@ -5,7 +5,29 @@
             <div class="card select-box">
                 <div class="card-body">
                     <div class="col-12">
+                        <el-row :gutter="12">
+                            <el-col v-for="(item, idx) in identityList" :key="idx" :span="2.5" class="select-state-box">
+                                <el-card shadow="always" style="margin-bottom: 1vh;" @click="selectIdentity(item)"
+                                    :body-style="identitySelected == item ? identitySelectedStyle : identityNoneSelectedStyle">
+                                    <span>{{ item }}</span>
+                                    <div class="state-number">20</div>
+                                </el-card>
+                            </el-col>
 
+                        </el-row>
+                        <hr>
+                        <el-row :gutter="12">
+                            <el-col v-for="(item, idx) in banshichu_list" :key="idx" :span="2.5"
+                                class="select-state-box">
+                                <el-card shadow="always" style="margin-bottom: 1vh;" @click="selectAgency(item)"
+                                    :body-style="agencySelected == item ? agencySelectedStyle : identityNoneSelectedStyle">
+                                    <span>{{ item }}</span>
+                                    <div class="state-number">20</div>
+                                </el-card>
+                            </el-col>
+
+                        </el-row>
+                        <hr>
                         <el-input ref="selectDepartmentInput" style="width: 22%" class="select-text-box"
                             v-model="queryDepartment" placeholder="请输入部门名称" clearable size="large"
                             @click="selectDepartment">
@@ -51,6 +73,11 @@ import axios from "axios";
 import { useStore } from 'vuex'
 
 const store = useStore();
+const identityList = ["全部", "执法人员", "协管人员"];
+const identityNoneSelectedStyle = ref("text-align: center; padding-top: 10px; padding-bottom:10px;  vertical-align:center;");
+const identitySelectedStyle = ref("text-align: center; padding-top: 10px; padding-bottom:10px; background-color: #0D6EFD; color: white;");
+const agencySelectedStyle = ref("text-align: center; padding-top: 10px; padding-bottom:10px; background: linear-gradient(white, #1E90FF); color: white;");
+const identitySelected = ref('全部');
 const department_list = reactive([]);
 const selectDepartmentVisiable = ref(false);
 const queryDepartment = ref('');
@@ -84,7 +111,6 @@ const get_department = () => {
             for (const item of resp.data.data) {
                 department_list.push(item);
             }
-            console.log(department_list);
         }
     })
 }
@@ -99,99 +125,176 @@ const fontSizeSwitch = (res) => {
 }
 
 let person_age_chart = null;
+let person_age_option = {
+    title: {
+        text: '人员年龄占比图',
+        left: 'center',
+        // textStyle: {
+        //     color: 'white',
+        // }
+    },
+    tooltip: {
+        trigger: 'item'
+    },
+    legend: {
+        top: 'bottom'
+    },
+    series: [
+        {
+            type: 'pie',
+            radius: '50%',
+            data: [
+                { value: 0, name: '30岁及以下' },
+                { value: 0, name: '30-35岁' },
+                { value: 0, name: '35-40岁' },
+                { value: 0, name: '40-45岁' },
+                { value: 0, name: '45-50岁' },
+                { value: 0, name: '50岁及以上' },
+            ],
+            label: {
+
+                formatter: '{b}: {c}人',
+                fontSize: fontSizeSwitch(0.15),
+            },
+            emphasis: {
+                itemStyle: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)',
+                }
+            }
+        }
+    ]
+}
 const create_person_age_data = () => {
     let chartDom = document.getElementById("age-diagram");
     person_age_chart = echarts.init(chartDom);
-    let option = {
-        title: {
-            text: '人员年龄占比图',
-            left: 'center',
-            // textStyle: {
-            //     color: 'white',
-            // }
-        },
-        tooltip: {
-            trigger: 'item'
-        },
-        legend: {
-            top: 'bottom'
-        },
-        series: [
-            {
-                type: 'pie',
-                radius: '50%',
-                data: [
-                    { value: 1048, name: '30岁及以下' },
-                    { value: 735, name: '30-35岁' },
-                    { value: 580, name: '40-45岁' },
-                    { value: 484, name: '45-50岁' },
-                    { value: 484, name: '50岁及以上' },
-                ],
-                label: {
 
-                    formatter: '{b}: {c}人',
-                    fontSize: fontSizeSwitch(0.15),
-                },
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)',
-                    }
-                }
-            }
-        ]
-    }
-
-    option && person_age_chart.setOption(option);
+    getPatrolData();
     window.addEventListener("resize", person_age_chart.resize);
 }
 
 let person_sex_chart = null;
+let personSexOption = {
+    title: {
+        text: '人员性别占比图',
+        left: 'center',
+        // textStyle: {
+        //     color: 'white',
+        // }
+    },
+    tooltip: {
+        trigger: 'item'
+    },
+    legend: {
+        top: 'bottom'
+    },
+    series: [
+        {
+            type: 'pie',
+            radius: '50%',
+            data: [
+                { value: 0, name: '男性' },
+                { value: 0, name: '女性' },
+            ],
+            label: {
+
+                formatter: '{b}: {c}人',
+                fontSize: fontSizeSwitch(0.15),
+            },
+            emphasis: {
+                itemStyle: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)',
+                }
+            }
+        }
+    ]
+}
 const create_sex_age_data = () => {
     let chartDom = document.getElementById("sex-diagram");
     person_sex_chart = echarts.init(chartDom);
-    let option = {
-        title: {
-            text: '人员性别占比图',
-            left: 'center',
-            // textStyle: {
-            //     color: 'white',
-            // }
-        },
-        tooltip: {
-            trigger: 'item'
-        },
-        legend: {
-            top: 'bottom'
-        },
-        series: [
-            {
-                type: 'pie',
-                radius: '50%',
-                data: [
-                    { value: 1048, name: '男性' },
-                    { value: 735, name: '女性' },
-                ],
-                label: {
 
-                    formatter: '{b}: {c}人',
-                    fontSize: fontSizeSwitch(0.15),
-                },
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 10,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)',
-                    }
-                }
-            }
-        ]
-    }
-
-    option && person_sex_chart.setOption(option);
+    getPatrolData();
     window.addEventListener("resize", person_sex_chart.resize);
 }
+
+const selectIdentity = identity => {
+    identitySelected.value = identity;
+    getPatrolData();
+}
+
+const agencySelected = ref('全部');
+const selectAgency = agency => {
+    agencySelected.value = agency;
+    getPatrolData();
+}
+
+const getPatrolData = () => {
+    let agency;
+    let identity;
+
+    if (agencySelected.value == '全部') {
+        agency = '';
+    } else {
+        agency = agencySelected.value + '执法中队'
+    }
+
+    if (identitySelected.value == '全部') {
+        identity = '';
+    } else {
+        identity = identitySelected.value;
+    }
+    axios({
+        url: '/api/patrol/stat',
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: store.state.user.tokenHeader + store.state.user.token,
+        },
+        data: JSON.stringify({
+            department: agency,
+            identity: identity,
+        })
+    }).then(function (resp) {
+        let data = resp.data.data;
+
+        person_age_option.series[0].data[0].value = data.age25;
+        person_age_option.series[0].data[1].value = data.age30;
+        person_age_option.series[0].data[2].value = data.age35;
+        person_age_option.series[0].data[3].value = data.age40;
+        person_age_option.series[0].data[4].value = data.age45;
+        person_age_option.series[0].data[5].value = data.age50;
+        person_age_chart.setOption(person_age_option);
+
+        personSexOption.series[0].data[0].value = data.male;
+        personSexOption.series[0].data[1].value = data.female;
+        person_sex_chart.setOption(personSexOption);
+    })
+}
+
+const banshichu_list = reactive([]);
+const getAgencyRegionRelation = () => {
+    axios({
+        url: '/api/region/get_relation',
+        method: 'get',
+        headers: {
+            Authorization: store.state.user.tokenHeader + store.state.user.token,
+        },
+    }).then(function (resp) {
+        if (resp.status == 200) {
+
+            for (let key of resp.data.data) {
+                banshichu_list.push(key.agency);
+
+
+            }
+            banshichu_list.unshift('全部');
+        }
+    })
+}
+getAgencyRegionRelation();
 
 onMounted(() => {
     create_person_age_data();
@@ -199,6 +302,8 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+    window.removeEventListener('resize', person_age_chart.resize);
+    window.removeEventListener('resize', person_sex_chart.resize);
     if (person_age_chart) {
         person_age_chart.dispose();
         person_age_chart = null;
@@ -238,5 +343,9 @@ onBeforeUnmount(() => {
 #sex-diagram {
     width: 50%;
     height: 50vh;
+}
+
+.select-state-box {
+    cursor: pointer;
 }
 </style>

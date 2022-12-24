@@ -203,25 +203,34 @@
                     <hr>
                     <div>
                         <div class="check-title">按街道选择</div>
-                        <el-checkbox v-model="streetCheckAll" :indeterminate="isStreetIndeterminate"
+                        <!-- <el-checkbox v-model="streetCheckAll" :indeterminate="isStreetIndeterminate"
                             @change="handleCheckStreetAllChange">全选</el-checkbox>
                         <el-checkbox-group v-model="streetCheckList" @change="handleStreetChange">
-                            <!-- <el-checkbox label="街道1" />
-                            <el-checkbox label="街道2" />
-                            <el-checkbox label="街道3" /> -->
+                    
                             <el-checkbox v-for="(agency, idx) in agencyList" :key="idx" :label="agency" />
-                        </el-checkbox-group>
+                        </el-checkbox-group> -->
+                        <el-radio-group v-model="streetSelected">
+                            <el-radio label="全部">全部</el-radio>
+                            <el-radio v-for="(agency, idx) in agencyList" :key="idx" :label="agency">{{ agency
+                            }}</el-radio>
+
+                        </el-radio-group>
                     </div>
 
                     <div>
                         <div class="check-title">按人员类型选择</div>
-                        <el-checkbox v-model="peopleCheckAll" :indeterminate="isPeopleIndeterminate"
+                        <!-- <el-checkbox v-model="peopleCheckAll" :indeterminate="isPeopleIndeterminate"
                             @change="handleCheckPeopleAllChange">全选</el-checkbox>
                         <el-checkbox-group v-model="peopleCheckList" @change="handlePeopleChange">
                             <el-checkbox label="执法人员" />
                             <el-checkbox label="协管人员" />
 
-                        </el-checkbox-group>
+                        </el-checkbox-group> -->
+                        <el-radio-group v-model="identitySelected">
+                            <el-radio label="全部">全部</el-radio>
+                            <el-radio label="执法人员">执法人员</el-radio>
+                            <el-radio label="协管人员">协管人员</el-radio>
+                        </el-radio-group>
                     </div>
 
                 </div>
@@ -469,13 +478,13 @@ let streetDetailsTitle = ref("");
 let isStreetCenter = ref(true);
 let derectiveIssueVisiable = ref(false);
 let derectiveInfo = ref("");
-let streetCheckList = ref([]);
-let streetCheckAll = ref(false);
-let isStreetIndeterminate = ref(true);
-let peopleCheckList = ref([]);
-let peopleCheckAll = ref(false);
-let isPeopleIndeterminate = ref(true);
-let peoples = ["执法人员", "协管人员"];
+// let streetCheckList = ref([]);
+// let streetCheckAll = ref(false);
+// let isStreetIndeterminate = ref(true);
+// let peopleCheckList = ref([]);
+// let peopleCheckAll = ref(false);
+// let isPeopleIndeterminate = ref(true);
+// let peoples = ["执法人员", "协管人员"];
 let streetsClockInfoVisiable = ref(false);
 let streetsClockInfoTitle = ref("");
 let locationExceptionInfoVisiable = ref(false);
@@ -494,16 +503,15 @@ const isShowBadge = ref(false);
 const websocketConnect = () => {
     if (store.state.user.socket == null) {
         const socketUrl = `ws://101.37.246.72:9090/websocket/admin${store.state.user.telephone}`;
-        console.log(socketUrl);
         socket = new WebSocket(socketUrl);
         socket.onopen = () => {
-            console.log("websocket connected!");
+
             store.commit("updateSocket", socket);
         }
 
         socket.onmessage = msg => {
             const data = JSON.parse(msg.data);
-
+            console.log(data);
             getBackMessage.data.splice(0, getBackMessage.data.length);
             for (let i = 0; i <= data.msgs.length - 1; i++) {
                 if (data.msgs[i].message != "Heartbeat") {
@@ -634,27 +642,27 @@ const streetDetails = (row, column) => {
     }
 }
 
-const handleCheckStreetAllChange = (val) => {
-    streetCheckList.value = val ? agencyList : [];
-    isStreetIndeterminate.value = false;
-}
+// const handleCheckStreetAllChange = (val) => {
+//     streetCheckList.value = val ? agencyList : [];
+//     isStreetIndeterminate.value = false;
+// }
 
-const handleStreetChange = (val) => {
-    const checkedCount = val.length;
-    streetCheckAll.value = checkedCount == agencyList.length;
-    isStreetIndeterminate.value = checkedCount > 0 && checkedCount < agencyList.length;
-}
+// const handleStreetChange = (val) => {
+//     const checkedCount = val.length;
+//     streetCheckAll.value = checkedCount == agencyList.length;
+//     isStreetIndeterminate.value = checkedCount > 0 && checkedCount < agencyList.length;
+// }
 
-const handleCheckPeopleAllChange = (val) => {
-    peopleCheckList.value = val ? peoples : [];
-    isPeopleIndeterminate.value = false;
-}
+// const handleCheckPeopleAllChange = (val) => {
+//     peopleCheckList.value = val ? peoples : [];
+//     isPeopleIndeterminate.value = false;
+// }
 
-const handlePeopleChange = (val) => {
-    const checkedCount = val.length;
-    peopleCheckAll.value = checkedCount == peoples.length;
-    isPeopleIndeterminate.value = checkedCount > 0 && checkedCount < peoples.length;
-}
+// const handlePeopleChange = (val) => {
+//     const checkedCount = val.length;
+//     peopleCheckAll.value = checkedCount == peoples.length;
+//     isPeopleIndeterminate.value = checkedCount > 0 && checkedCount < peoples.length;
+// }
 
 const issueDirective = () => {
     derectiveIssueVisiable.value = true;
@@ -665,7 +673,8 @@ const issueDirective = () => {
 }
 
 
-
+const streetSelected = ref('');
+const identitySelected = ref('');
 const sendDerective = () => {
     // console.log(streetCheckList.value)
     // console.log(Object.keys(streetCheckList.value))
@@ -685,11 +694,26 @@ const sendDerective = () => {
 
     const socket = store.state.user.socket;
     if (derectiveInfo.value != "") {
+        let agency;
+        let identity;
+        if (streetSelected.value == '全部' || streetSelected.value == '') {
+            agency = '';
+        } else {
+            agency = streetSelected.value;
+        }
+
+        if (identitySelected.value == '全部' || identitySelected.value == '') {
+            identity = '';
+        } else {
+            identity = identitySelected.value;
+        }
 
         socket.send(JSON.stringify({
             type: 2,
-            identity: Object.values(peopleCheckList.value)[0],
-            agency: Object.values(streetCheckList.value)[0],
+            // identity: Object.values(peopleCheckList.value)[0],
+            // agency: Object.values(streetCheckList.value)[0],
+            identity: identity,
+            agency: agency,
             message: derectiveInfo.value,
         }))
         ElMessage({
@@ -697,6 +721,8 @@ const sendDerective = () => {
             type: 'success',
         })
         derectiveInfo.value = "";
+        streetSelected.value = "";
+        identitySelected.value = "";
 
     } else if (derectiveInfo.value == "") {
         ElMessage({
@@ -705,12 +731,13 @@ const sendDerective = () => {
         })
     }
 
-    Object.keys(peopleCheckList.value).map(key => {
-        delete peopleCheckList.value[key]
-    });
-    Object.keys(streetCheckList.value).map(key => {
-        delete streetCheckList.value[key]
-    });
+
+    // Object.keys(peopleCheckList.value).map(key => {
+    //     delete peopleCheckList.value[key]
+    // });
+    // Object.keys(streetCheckList.value).map(key => {
+    //     delete streetCheckList.value[key]
+    // });
 
 }
 
@@ -862,7 +889,7 @@ const create_warden_data = () => {
     // warden_chart.setOption(warden_option);
     warden_chart.on('click', (params) => {
 
-        router.push({ name: 'person_index', query: { status: parseInt(patrolStatusMap[params.data.name]) + 1, range: '协管人员' } })
+        router.push({ name: 'warden_index', query: { status: parseInt(patrolStatusMap[params.data.name]) + 1, range: '协管人员' } })
     })
     getPatrolStatusCount();
     window.addEventListener("resize", warden_chart.resize);
@@ -1066,6 +1093,7 @@ const create_case_data = () => {
 }
 
 let getPatrolStatusCountInterval = null;
+let getProblemCountInterval = null;
 onMounted(() => {
     create_law_enforce_data();
     show_bicycle_data();
@@ -1075,7 +1103,7 @@ onMounted(() => {
     create_case_data();
     create_problem_data();
     getPatrolStatusCountInterval = setInterval(getPatrolStatusCount, 60000);
-    setInterval(getProblemCount, 60000);
+    getProblemCountInterval = setInterval(getProblemCount, 60000);
 })
 
 
@@ -1104,13 +1132,16 @@ onBeforeUnmount(() => {
         case_chart.dispose();
         case_chart = null;
     }
-    if (problem_chart) {
+    if (problem_chart != null) {
         problem_chart.dispose();
         problem_chart = null;
     }
 
     clearInterval(getPatrolStatusCountInterval);
     getPatrolStatusCountInterval = null;
+
+    clearInterval(getProblemCountInterval);
+    getProblemCountInterval = null;
 })
 
 
@@ -1198,7 +1229,12 @@ const getPatrolStatusCount = () => {
 }
 
 const toOnWorkDetail = identity => {
-    router.push({ name: 'person_index', query: { status: '1', range: identity } })
+    if (identity == "协管人员") {
+        router.push({ name: 'warden_index', query: { status: '1', range: identity } })
+    } else {
+        router.push({ name: 'person_index', query: { status: '1', range: identity } })
+    }
+
 }
 
 const problem_option = reactive({
@@ -1268,11 +1304,14 @@ const create_problem_data = () => {
     let chartDom = document.getElementById("problem-disposal");
     problem_chart = echarts.init(chartDom);
 
-    // warden_chart.setOption(warden_option);
     problem_chart.on('click', (params) => {
         router.push({ name: 'issue_index', query: { name: params.name } })
     })
+
+
     getProblemCount();
+
+
     window.addEventListener("resize", problem_chart.resize);
 }
 
