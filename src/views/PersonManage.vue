@@ -338,7 +338,7 @@
 
 <script>
 import { reactive } from 'vue';
-import { ref, nextTick, watch } from 'vue';
+import { ref, nextTick, watch, onMounted } from 'vue';
 import { PhoneFilled, Search, Location, Document, EditPen, Delete } from "@element-plus/icons-vue";
 import axios from 'axios';
 import { useStore } from 'vuex';
@@ -1095,6 +1095,12 @@ export default {
             }
         })
 
+        onMounted(() => {
+            if (window.screen.width > 2000 && window.devicePixelRatio == 1) {
+                document.getElementsByClassName('container')[1].style.marginLeft = "750px";
+            }
+        })
+
         return {
             editInfo,
             confirmEdit,
@@ -1202,5 +1208,29 @@ export default {
 .allocateFench,
 .allocateFench:focus:not(.allocateFench:hover) {
     color: #409EFF;
+}
+
+@media (min-width: 1600px) {
+    .container {
+        width: 1500px;
+        margin-left: 350px;
+        font-size: 16px;
+    }
+
+    .data-table {
+        font-size: 16px;
+    }
+}
+
+@media (min-width: 2000px) {
+    .container {
+        max-width: 1800px;
+        margin-left: 500px;
+        font-size: 18px;
+    }
+
+    .data-table {
+        font-size: 20px;
+    }
 }
 </style>

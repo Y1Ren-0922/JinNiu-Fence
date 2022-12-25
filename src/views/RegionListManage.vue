@@ -34,16 +34,16 @@
 
                 <div class="card">
                     <div class="card-body">
-                        <el-table :data="regionList" style="width: 100%; font-size: 1.1rem;" size="large"
+                        <el-table :data="regionList" style="width: 100%; " size="large" class="data-table"
                             @cell-dblclick="changeShouldArrive">
 
-                            <el-table-column prop="name" label="名称" width="350" header-align="center" align="center"
+                            <el-table-column prop="name" label="名称" min-width="350" header-align="center" align="center"
                                 :show-overflow-tooltip="true" />
-                            <el-table-column prop="agency" label="办事处" width="140" header-align="center"
+                            <el-table-column prop="agency" label="办事处" min-width="140" header-align="center"
                                 align="center" />
-                            <el-table-column prop="regionLength" label="街道长度" width="120" header-align="center"
+                            <el-table-column prop="regionLength" label="街道长度" min-width="120" header-align="center"
                                 align="center" :show-overflow-tooltip="true" />
-                            <el-table-column label="定岗人数" width="120" header-align="center" align="center">
+                            <el-table-column label="定岗人数" min-width="120" header-align="center" align="center">
                                 <template #default="scope">
                                     <el-input ref="shouldArriveInput" @blur="changeFinished"
                                         v-model="scope.row.shouldArrive"
@@ -51,13 +51,14 @@
                                     <span v-else>{{ scope.row.shouldArrive }}</span>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="actualArrive" label="实到人数" width="120" header-align="center"
+                            <el-table-column prop="actualArrive" label="实到人数" min-width="120" header-align="center"
                                 align="center" />
-                            <el-table-column prop="arriveRate" label="实时到岗率" width="120" header-align="center"
+                            <el-table-column prop="arriveRate" label="实时到岗率" min-width="150" header-align="center"
                                 align="center" :show-overflow-tooltip="true" />
                             <!-- <el-table-column prop="creator" label="操作人" width="120" header-align="center"
                                 align="center" /> -->
-                            <el-table-column fixed="right" label="操作" width="150" header-align="center" align="center">
+                            <el-table-column fixed="right" label="操作" min-width="150" header-align="center"
+                                align="center">
                                 <template #default="scope">
                                     <!-- <el-button link size="small" type="primary" plain text style="font-size:1rem;">
                                         详情
@@ -89,7 +90,7 @@
 
 <script setup>
 import axios from 'axios';
-import { reactive, ref, nextTick } from 'vue';
+import { reactive, ref, nextTick, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import { Location, Search } from '@element-plus/icons-vue';
 import router from '@/router'
@@ -204,7 +205,9 @@ const getRegionListByAgency = agency => {
             Authorization: store.state.user.tokenHeader + store.state.user.token,
         },
         data: JSON.stringify({
-            agency: agency
+            agency: agency,
+            pageNum: 1,
+            pageSize: 10
         })
     }).then(function (resp) {
         console.log(resp);
@@ -246,7 +249,27 @@ const getRegionListByName = () => {
 
 }
 
-</script>
+onMounted(() => {
+    // console.log(document.getElementsByClassName('container')[0])
+    // for (let item of document.getElementsByTagName('ul')) {
+    //     item.style.zoom = 1 / window.devicePixelRatio;
+    // }
+
+    //document.getElementsByClassName('container')[1].style.zoom = 1.5 / window.devicePixelRatio;
+
+
+    // if (window.screen.width > 2000) {
+    //     let left = 700 * (1 / window.devicePixelRatio)
+    //     console.log(left);
+    //     document.getElementsByClassName('container')[1].style.marginLeft = left.toString() + "px";
+    // }
+    // console.log(document.getElementsByClassName('container')[1].style.marginLeft)
+
+    if (window.screen.width > 2000 && window.devicePixelRatio == 1) {
+        document.getElementsByClassName('container')[1].style.marginLeft = "750px";
+    }
+})
+</script> 
 
 <style scoped>
 .container {
@@ -269,5 +292,29 @@ const getRegionListByName = () => {
 
 .select-state-box {
     cursor: pointer;
+}
+
+@media (min-width: 1600px) {
+    .container {
+        width: 1500px;
+        margin-left: 350px;
+        font-size: 16px;
+    }
+
+    .data-table {
+        font-size: 16px;
+    }
+}
+
+@media (min-width: 2000px) {
+    .container {
+        max-width: 2000px;
+        margin-left: 500px;
+        font-size: 18px;
+    }
+
+    .data-table {
+        font-size: 20px;
+    }
 }
 </style>

@@ -168,10 +168,13 @@
             </el-menu-item>
         </el-sub-menu>
         <el-menu-item index="/issue-disposal/">
-            <el-icon>
-                <document />
-            </el-icon>
-            <span>问题处置</span>
+            <template #title>
+                <el-icon>
+                    <document />
+                </el-icon>
+                <span>问题处置</span>
+            </template>
+
         </el-menu-item>
         <el-sub-menu index="5">
             <template #title>
@@ -209,7 +212,7 @@
 
 <script>
 import { useRoute } from 'vue-router'
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import {
     Document,
@@ -247,6 +250,12 @@ export default {
     }
 }
 
+onMounted(() => {
+    for (let item of document.getElementsByTagName('ul')) {
+        item.style.zoom = 1 / window.devicePixelRatio;
+    }
+
+})
 </script>
 
 <style scoped>
@@ -283,5 +292,23 @@ nav {
 
 .glyphicon-bell:before {
     content: "\e123";
+}
+
+@media (min-width: 2000px) {
+    :deep(.el-sub-menu__title) {
+        font-size: 16px;
+    }
+
+    :deep(.el-menu-item) {
+        font-size: 16px;
+    }
+
+    :deep(.navbar-brand) {
+        font-size: 20px;
+    }
+
+    :deep(.nav-link) {
+        font-size: 20px;
+    }
 }
 </style>

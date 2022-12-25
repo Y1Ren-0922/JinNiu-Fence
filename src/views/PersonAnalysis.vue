@@ -10,7 +10,7 @@
                                 <el-card shadow="always" style="margin-bottom: 1vh;" @click="selectIdentity(item)"
                                     :body-style="identitySelected == item ? identitySelectedStyle : identityNoneSelectedStyle">
                                     <span>{{ item }}</span>
-                                    <div class="state-number">20</div>
+                                    <div class="state-number">{{ identityNumMap[item] }}</div>
                                 </el-card>
                             </el-col>
 
@@ -22,7 +22,9 @@
                                 <el-card shadow="always" style="margin-bottom: 1vh;" @click="selectAgency(item)"
                                     :body-style="agencySelected == item ? agencySelectedStyle : identityNoneSelectedStyle">
                                     <span>{{ item }}</span>
-                                    <div class="state-number">20</div>
+                                    <div class="state-number" v-if="item != '全部'">{{ departmentNumMap[item + "执法中队"] }}
+                                    </div>
+                                    <div class="state-number" v-else>{{ departmentNumMap[item] }}</div>
                                 </el-card>
                             </el-col>
 
@@ -247,7 +249,7 @@ const getPatrolData = () => {
         identity = identitySelected.value;
     }
     axios({
-        url: '/api/patrol/stat',
+        url: '/api/patrol/stat/age_gender',
         method: 'post',
         headers: {
             'Content-Type': 'application/json',
@@ -295,6 +297,49 @@ const getAgencyRegionRelation = () => {
     })
 }
 getAgencyRegionRelation();
+
+const departmentNumMap = reactive({});
+const identityNumMap = reactive({});
+const getNum = num => {
+    axios({
+        url: '/api/patrol/stat/num',
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: store.state.user.tokenHeader + store.state.user.token,
+        },
+        data: JSON.stringify({
+            param: num
+        })
+    }).then(function (resp) {
+
+        if (resp.data.code == 2000) {
+            if (num == 1) {
+                let total = 0;
+                for (const item of resp.data.data) {
+                    departmentNumMap[item.department] = item.num;
+                    total += item.num;
+                }
+                departmentNumMap['全部'] = total;
+            } else if (num == 2) {
+                let total = 0;
+
+                for (const item of resp.data.data) {
+                    identityNumMap[item.identity] = item.num;
+                    total += item.num;
+                }
+                identityNumMap['全部'] = total;
+            }
+
+        }
+    })
+}
+
+const getPatrolNum = () => {
+    getNum(1);
+    getNum(2);
+}
+getPatrolNum();
 
 onMounted(() => {
     create_person_age_data();
