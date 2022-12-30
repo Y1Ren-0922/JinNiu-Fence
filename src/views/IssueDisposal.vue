@@ -2,9 +2,7 @@
     <div class="container">
         <div class="row">
 
-            <div class="col-1"></div>
-
-            <div class="col-11">
+            <div class="col-12">
                 <div class="card select-box">
                     <div class="card-body">
                         <el-row :gutter="12">
@@ -77,25 +75,27 @@
                 </div>
                 <div class="card issue-box">
                     <div class="card-body">
-                        <el-table :data="issueInfoList" style="width: 100%; font-size: 1.1rem;" size="large">
+                        <el-table class="data-table" :data="issueInfoList" style="width: 100%;" size="large">
 
-                            <el-table-column prop="id" label="问题编号" width="120" header-align="center" align="center" />
-                            <el-table-column prop="region" label="区域" width="120" header-align="center"
+                            <el-table-column prop="id" label="问题编号" min-width="120" header-align="center"
                                 align="center" />
-                            <el-table-column prop="category" label="问题类别" width="120" header-align="center"
+                            <el-table-column prop="region" label="区域" min-width="120" header-align="center"
                                 align="center" />
-                            <el-table-column prop="state" label="流程状态" width="120" header-align="center"
+                            <el-table-column prop="category" label="问题类别" min-width="120" header-align="center"
+                                align="center" />
+                            <el-table-column prop="state" label="流程状态" min-width="120" header-align="center"
                                 align="center" />
                             <!-- <el-table-column prop="term" label="流程期限" width="120" header-align="center"
                                 align="center" /> -->
-                            <el-table-column prop="createTime" label="生成时间" width="150" header-align="center"
+                            <el-table-column prop="createTime" label="生成时间" min-width="150" header-align="center"
                                 align="center" :show-overflow-tooltip="true" />
-                            <el-table-column prop="deadline" label="时限" width="150" header-align="center" align="center"
-                                :show-overflow-tooltip="true" />
+                            <el-table-column prop="deadline" label="时限" min-width="150" header-align="center"
+                                align="center" :show-overflow-tooltip="true" />
 
-                            <el-table-column prop="handler" label="发布人" width="120" header-align="center"
+                            <el-table-column prop="handler" label="发布人" min-width="120" header-align="center"
                                 align="center" />
-                            <el-table-column fixed="right" label="操作" width="150" header-align="center" align="center">
+                            <el-table-column fixed="right" label="操作" min-width="150" header-align="center"
+                                align="center">
                                 <template #default="scope">
                                     <el-button link size="small" type="primary" plain text style="font-size:1rem;"
                                         @click="checkDetail(scope.row)">
@@ -139,7 +139,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, nextTick, watch } from 'vue'
+import { reactive, ref, nextTick, watch, onMounted } from 'vue'
 import axios from 'axios';
 import { useStore } from 'vuex';
 import { Search } from "@element-plus/icons-vue";
@@ -160,7 +160,7 @@ const stateSelected = ref('全部');
 const current_page = ref(1);
 const total_records = ref(0);
 const case_category = reactive(['全部'])
-const stateList = ["全部", "未接收", "待处置", "首次整改", "二次整改", "执法查处"];
+const stateList = ["全部", "未接收", "待处置", "首次整改", "二次整改", "执法查处", "整改完成"];
 // const stateOption = [
 //     {
 //         value: '未接收',
@@ -283,6 +283,7 @@ const getIssueList = page => {
                 delete issueList[key]
             });
 
+            current_page.value = page;
             total_records.value = resp.data.data.total;
 
             for (const item of resp.data.data.records) {
@@ -434,6 +435,12 @@ const selectState = state => {
     getIssueList(1);
 }
 
+onMounted(() => {
+    if (window.screen.width > 2000 && window.devicePixelRatio == 1) {
+        document.getElementsByClassName('container')[1].style.marginLeft = "750px";
+    }
+})
+
 watch(queryRegion, (newValue) => {
     if (newValue == '') {
         banshichuSelected.value = '';
@@ -443,6 +450,10 @@ watch(queryRegion, (newValue) => {
 </script>
 
 <style scoped>
+.container {
+    margin-left: 16vw;
+}
+
 .select-box {
     margin-top: 8vh;
     margin-bottom: 2vh;
@@ -462,5 +473,29 @@ watch(queryRegion, (newValue) => {
 
 :deep(.el-date-editor.el-input__wrapper) {
     flex-grow: 0;
+}
+
+@media (min-width: 1600px) {
+    .container {
+        width: 1500px;
+        margin-left: 350px;
+        font-size: 16px;
+    }
+
+    .data-table {
+        font-size: 16px;
+    }
+}
+
+@media (min-width: 2000px) {
+    .container {
+        max-width: 1800px;
+        margin-left: 500px;
+        font-size: 18px;
+    }
+
+    .data-table {
+        font-size: 20px;
+    }
 }
 </style>

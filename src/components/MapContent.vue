@@ -34,22 +34,22 @@
                 <div class="mid-head-left">
                     <h4>在岗在位</h4>
                     <div class="mid-head-left-num" @click="toOnWorkDetail('')" style="cursor:pointer;">{{
-                            patrolOnWorkTotal
-                    }}人
+        patrolOnWorkTotal
+}}人
                     </div>
                 </div>
                 <div class="mid-head-left-right">
                     <div class="mid-head-left-right-top">
                         <div class="mid-head-left-right-title">执法人员</div>
                         <div class="mid-head-left-right-num" @click="toOnWorkDetail('执法人员')" style="cursor:pointer;">{{
-                                lawEnforceOnWork
-                        }}人</div>
+        lawEnforceOnWork
+}}人</div>
                     </div>
                     <div class="mid-head-left-right-bottom">
                         <div class="mid-head-left-right-title">协管人员</div>
                         <div class="mid-head-left-right-num" @click="toOnWorkDetail('协管人员')" style="cursor:pointer;"> {{
-                                wardenOnWork
-                        }}人</div>
+        wardenOnWork
+}}人</div>
                     </div>
                 </div>
 
@@ -212,7 +212,7 @@
                         <el-radio-group v-model="streetSelected">
                             <el-radio label="全部">全部</el-radio>
                             <el-radio v-for="(agency, idx) in agencyList" :key="idx" :label="agency">{{ agency
-                            }}</el-radio>
+}}</el-radio>
 
                         </el-radio-group>
                     </div>
@@ -242,7 +242,7 @@
                 <div style="width: 100%; height: 5vh;"></div>
             </el-tab-pane>
             <el-tab-pane label="未读消息" name="second">
-                <el-button type="danger" plain>删除全部消息</el-button>
+                <!-- <el-button type="danger" plain>删除全部消息</el-button> -->
                 <hr>
                 <el-scrollbar max-height="450px">
                     <div v-for="(backMessage, idx) in getBackMessage.data" :key="idx" @mouseenter="is_read(idx)">
@@ -251,14 +251,14 @@
                         <el-descriptions>
                             <el-descriptions-item label="姓名">{{ backMessage.name }}</el-descriptions-item>
                             <el-descriptions-item label="电话号码">{{ backMessage.telephone }}</el-descriptions-item>
-                            <el-descriptions-item>
+                            <!-- <el-descriptions-item>
                                 <el-button type="danger" :icon="Delete" circle />
-                            </el-descriptions-item>
+                            </el-descriptions-item> -->
 
                             <el-descriptions-item label="消息" :span="3" class-name="read-message"
                                 style="font-weight:900;">{{
-                                        backMessage.message
-                                }}</el-descriptions-item>
+        backMessage.message
+}}</el-descriptions-item>
 
                             <el-descriptions-item label="回复时间">{{ backMessage.backTime }}</el-descriptions-item>
                         </el-descriptions>
@@ -269,7 +269,7 @@
 
             </el-tab-pane>
             <el-tab-pane label="已读消息" name="third">
-                <el-button type="danger" plain>删除全部消息</el-button>
+                <el-button type="danger" plain @click="deleteAllReaded">删除全部消息</el-button>
                 <hr>
                 <el-scrollbar max-height="450px">
                     <div v-for="(backMessage, idx) in readedMessage.data" :key="idx">
@@ -283,8 +283,8 @@
 
                             <el-descriptions-item label="消息" :span="3" class-name="read-message"
                                 style="font-weight:900;">{{
-                                        backMessage.message
-                                }}</el-descriptions-item>
+        backMessage.message
+}}</el-descriptions-item>
 
                             <el-descriptions-item label="回复时间">{{ backMessage.backTime }}</el-descriptions-item>
                         </el-descriptions>
@@ -1194,11 +1194,15 @@ const lawEnforceOnWork = ref(0);
 const wardenOnWork = ref(0);
 const getPatrolStatusCount = () => {
     axios({
-        url: '/api/patrol/count_by_status',
-        method: 'get',
+        url: '/api/patrol/stat/status',
+        method: 'post',
         headers: {
+            'Content-Type': 'application/json',
             Authorization: store.state.user.tokenHeader + store.state.user.token,
         },
+        data: JSON.stringify({
+            param: 1
+        })
     }).then(function (resp) {
         if (resp.status == 200) {
 
@@ -1207,16 +1211,17 @@ const getPatrolStatusCount = () => {
             }
 
             for (const item of resp.data.data) {
-                if (item.identity == '协管人员' && item.status != '未打卡') {
-                    warden_option.series[0].data[patrolStatusMap[item.status]].value = item.count;
+
+                if (item.identity == '协管人员' && item.status != '未打卡' && item.status != '下班') {
+                    warden_option.series[0].data[patrolStatusMap[item.status]].value = item.num;
                     if (item.status == '在岗') {
-                        wardenOnWork.value = item.count;
+                        wardenOnWork.value = item.num;
                     }
                 }
-                if (item.identity == '执法人员' && item.status != '未打卡') {
-                    law_enforce_option.series[0].data[patrolStatusMap[item.status]].value = item.count;
+                if (item.identity == '执法人员' && item.status != '未打卡' && item.status != '下班') {
+                    law_enforce_option.series[0].data[patrolStatusMap[item.status]].value = item.num;
                     if (item.status == '在岗') {
-                        lawEnforceOnWork.value = item.count;
+                        lawEnforceOnWork.value = item.num;
                     }
                 }
             }
@@ -1339,6 +1344,24 @@ const getProblemCount = () => {
 
         }
     })
+}
+
+const deleteAllReaded = () => {
+    axios({
+        url: '/api/ws-message/delete_web',
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: store.state.user.tokenHeader + store.state.user.token,
+        },
+        data: JSON.stringify({
+            phone: "admin" + store.state.user.telephone
+        })
+    }).then(function (resp) {
+        console.log(resp);
+        readedMessage.data.splice(0, readedMessage.data.length);
+    })
+
 }
 // getProblemCount();
 // setInterval(getProblemCount, 60000);

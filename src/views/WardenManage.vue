@@ -27,7 +27,7 @@
                             <el-card shadow="always"
                                 :body-style="personStateSelected == item ? banshichuSelectedStyle : banshichuNoneSelectedStyle">
                                 <span>{{ item }}</span>
-                                <div class="state-number">20</div>
+                                <div class="state-number">{{ statusNumMap[item] }}</div>
                             </el-card>
                         </el-col>
 
@@ -40,7 +40,7 @@
                             <el-card shadow="always" style="margin-bottom: 1vh;"
                                 :body-style="banshichuSelected == item ? agencySelectedStyle : banshichuNoneSelectedStyle">
                                 <span>{{ item }}</span>
-                                <div class="state-number">20</div>
+                                <div class="state-number">{{ streetPatrolNumMap[item] }}</div>
                             </el-card>
                         </el-col>
 
@@ -112,13 +112,14 @@
                     <el-table :data="patrols" style="width: 100%; font-size: 1.1rem;" size="large" max-height="700"
                         :empty-text="emptyText">
 
-                        <el-table-column prop="name" label="姓名" width="180" header-align="center" align="center" />
-                        <el-table-column prop="title" label="职务" width="320" header-align="center" align="center"
+                        <el-table-column prop="name" label="姓名" min-width="180" header-align="center" align="center" />
+                        <el-table-column prop="title" label="职务" min-width="200" header-align="center" align="center"
                             :show-overflow-tooltip="true" />
 
-                        <el-table-column prop="department" label="中队" width="350" header-align="center"
+                        <el-table-column prop="department" label="中队" min-width="350" header-align="center"
                             align="center" />
-                        <el-table-column prop="telephone" label="电话" width="160" header-align="center" align="center" />
+                        <el-table-column prop="telephone" label="电话" min-width="200" header-align="center"
+                            align="center" />
                         <!-- <el-table-column prop="identity" label="人员类型" width="120" header-align="center"
                             align="center" />
                         <el-table-column prop="regionName" label="所处围栏" width="200" header-align="center" align="center"
@@ -126,7 +127,7 @@
                         <el-table-column prop="task" label="任务" width="100" header-align="center" align="center" /> -->
 
 
-                        <el-table-column fixed="right" label="操作" width="250" header-align="center" align="center">
+                        <el-table-column fixed="right" label="操作" min-width="250" header-align="center" align="center">
                             <template #default="scope">
                                 <!-- <el-button class="allocateFench" link size="small" type="primary" plain text
                                     style="font-size:1rem;" @click="editInfo(scope.$index)">
@@ -343,6 +344,7 @@ import { PhoneFilled, Search, Location, Document, EditPen, Delete } from "@eleme
 import axios from 'axios';
 import { useStore } from 'vuex';
 import router from '@/router'
+import { ElMessage } from 'element-plus';
 
 export default {
     setup() {
@@ -690,7 +692,20 @@ export default {
         }
 
         const personLocation = row => {
-            router.push({ name: 'bicycle_map_index', query: { "patrol": row.id } })
+            if (row.status == '未打卡') {
+                ElMessage({
+                    message: '该人员未打卡！',
+                    type: 'error'
+                })
+            } else if (row.status == '下班') {
+                ElMessage({
+                    message: '该人员已下班！',
+                    type: 'error'
+                })
+            } else {
+                router.push({ name: 'map_mode_index', query: { "patrol": row.id } })
+            }
+
         }
 
         const personDetailInfo = row => {
@@ -807,9 +822,9 @@ export default {
                 name: record_name.value,
                 agency: record_agency.value,
                 department: record_department.value,
-                identity: record_identity.value,
+                identity: '协管人员',
                 region: record_street.value,
-                date: record_date.value,
+                date: switchDate(record_date.value),
                 status: status,
                 pageNum: page,
                 pageSize: 10,
@@ -832,12 +847,16 @@ export default {
                 total_records.value = parseInt(resp.data.data.total);
                 page_count = parseInt(resp.data.data.pages);
 
+                const date = switchDate(record_date.value);
+                getPatrolStatusCount(date);
+                getStreetPatrolStatusCount(date);
 
                 if (resp.data.data.records.length == 0) {
                     emptyText.value = '暂无数据';
                 } else {
                     emptyText.value = 'loading...'
                 }
+
                 for (let item of resp.data.data.records) {
                     let relatedRegion;
                     let regionName;
@@ -846,7 +865,12 @@ export default {
                         regionName = "暂未分配";
                     } else {
                         relatedRegion = item.relatedRegion;
-                        regionName = polygons[relatedRegion]["name"];
+                        if (polygons[relatedRegion]) {
+                            regionName = polygons[relatedRegion]["name"];
+                        } else {
+                            regionName = "暂未分配";
+                        }
+
                     }
 
                     let task;
@@ -857,7 +881,7 @@ export default {
                     }
 
                     let patrol = {
-                        id: item.id,
+                        id: item.patrolId,
                         name: item.name,
                         title: item.title,
                         department: item.department,
@@ -866,9 +890,10 @@ export default {
                         telephone: item.telephone,
                         wechat: item.wechat,
                         identity: item.identity,
+                        status: item.status,
                         task: task,
                     }
-                    patrolInfo[item.id] = patrol;
+                    patrolInfo[item.patrolId] = patrol;
                     patrols.value.push(patrol);
                 }
             })
@@ -1012,7 +1037,7 @@ export default {
             if (agency == '全部') {
                 record_department.value = '';
             } else {
-                record_department.value = agency + "街道执法中队";
+                record_department.value = agency + "执法中队";
             }
             queryStateByCondition(1);
         }
@@ -1032,10 +1057,10 @@ export default {
                     for (let key of resp.data.data) {
                         banshichu_list.push(key.agency);
                         agency_region_relation[key.agency] = key.regions;
-
                     }
                     banshichu_list.unshift('全部');
                 }
+                getStreetPatrolStatusCount('');
             })
         }
 
@@ -1086,6 +1111,80 @@ export default {
 
         const disabledDate = time => {
             return time.getTime() > Date.now()
+        }
+
+        const statusNumMap = reactive({});
+        const getPatrolStatusCount = date => {
+            axios({
+                url: '/api/patrol/stat/status',
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: store.state.user.tokenHeader + store.state.user.token,
+                },
+                data: JSON.stringify({
+                    param: 1,
+                    date: date,
+                })
+            }).then(function (resp) {
+                if (resp.status == 200) {
+                    let statusTotal = 0;
+                    for (const item of person_state) {
+                        statusNumMap[item] = 0;
+                    }
+
+                    for (const item of resp.data.data) {
+                        if (item.status == '下班') continue;
+                        if (item.identity == '协管人员') {
+                            if (item.status == '在岗') {
+                                statusNumMap['在岗在位'] = item.num;
+                            } else {
+                                statusNumMap[item.status] = item.num;
+                            }
+                            statusTotal += item.num;
+                        }
+                    }
+
+                    statusNumMap["全部"] = statusTotal;
+                }
+            })
+        }
+        getPatrolStatusCount("");
+
+        const streetPatrolNumMap = reactive({});
+        const getStreetPatrolStatusCount = date => {
+            axios({
+                url: "/api/patrol/stat/status",
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: store.state.user.tokenHeader + store.state.user.token,
+                },
+                data: JSON.stringify({
+                    param: 2,
+                    date: date
+                })
+            }).then(function (resp) {
+                let total = 0;
+                for (const item of banshichu_list) {
+                    streetPatrolNumMap[item] = 0;
+                }
+                if (resp.data.code == 2000) {
+                    for (const item of resp.data.data) {
+                        if (item.identity == '协管人员') {
+                            streetPatrolNumMap[item.department.substring(0, item.department.length - 4)] = item.num;
+                            total += item.num;
+                        }
+                    }
+                    streetPatrolNumMap["全部"] = total;
+                }
+            })
+        }
+
+        const switchDate = date => {
+            const date2 = new Date(date);
+            const currentDate = date2.toLocaleDateString().replaceAll('/', '-');
+            return currentDate;
         }
 
         watch(queryRegion, (newValue) => {
@@ -1160,6 +1259,8 @@ export default {
             isSelectRealTime,
             agencySelectedStyle,
             record_agency,
+            statusNumMap,
+            streetPatrolNumMap,
             Search,
         }
     },

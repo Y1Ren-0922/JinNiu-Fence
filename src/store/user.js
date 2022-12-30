@@ -3,11 +3,14 @@ import axios from "axios";
 export default {
     state: {
         id: "",
+        roleId: "",
         username: "",
+        name: "",
         token: "",
         tokenHeader: "",
         telephone: "",
         is_login: false,
+        department: "",
         socket: null,
         replyMessage: [],
     },
@@ -17,9 +20,16 @@ export default {
         },
         updateUser(state, user) {
             state.id = user.id;
+            state.name = user.name;
+            state.telephone = user.telephone;
+            state.department = user.department;
+            state.is_login = user.is_login;
+        },
+        updateLoginInfo(state, user) {
+            state.id = user.id;
             state.username = user.username;
-            state.telephone = user.telephone,
-                state.is_login = user.is_login;
+            state.roleId = user.roleId;
+            state.is_login = user.is_login;
         },
         updateToken(state, token) {
             state.token = token;
@@ -50,11 +60,12 @@ export default {
                     localStorage.setItem("jwt_token", resp.data.data.token);
                     context.commit('updateToken', resp.data.data.token);
                     context.commit('updateTokenHeader', resp.data.data.tokenHead);
-                    context.commit("updateUser", {
+                    context.commit("updateLoginInfo", {
                         id: resp.data.data.id,
                         roleId: resp.data.data.roleId,
                         username: resp.data.data.username,
-                        telephone: resp.data.data.telephone,
+                        // telephone: resp.data.data.telephone,
+                        //department: resp.data.data.department,
                         is_login: true,
                     });
                     data.success(resp);
@@ -65,24 +76,31 @@ export default {
         },
         getInfo(context, data) {
             axios({
-                url: '/api/info',
-                method: 'get',
+                url: '/api/patrol/get_by_phone',
+                method: 'post',
                 headers: {
+                    'Content-Type': 'application/json',
                     Authorization: context.state.tokenHeader + context.state.token,
                 },
+                data: JSON.stringify({
+                    phone: '',
+                })
             }).then(function (resp) {
-                if (resp.data.data.error_message == "success") {
+                console.log(resp);
+                if (resp.data.code == 2000) {
                     context.commit("updateUser", {
                         id: resp.data.data.id,
-                        roleId: resp.data.data.roleId,
-                        username: resp.data.data.username,
+                        name: resp.data.data.name,
                         telephone: resp.data.data.telephone,
+                        department: resp.data.data.department,
                         is_login: true,
                     });
                     data.success(resp.status);
                 } else {
                     data.error(resp.status);
                 }
+            }).catch(function (error) {
+                data.error(error);
             })
         },
 

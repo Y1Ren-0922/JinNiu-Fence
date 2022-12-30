@@ -82,6 +82,8 @@ import { useStore } from 'vuex';
 import { defaults as defaultControls } from 'ol/control'
 import { ElMessage } from 'element-plus';
 import router from "@/router";
+import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
+// import {createStringXY} from 'ol/coordinate'
 
 let Amap;
 const value1 = ref('');
@@ -98,6 +100,14 @@ let popup;
 let closer;
 const store = useStore();
 let ifShowWorkStatistics = ref(false);
+const locale = zhCn;
+
+// const mousePositionControl = new MousePosition({
+//         coordinateFormat: createStringXY(2),
+//         projection: 'EPSG: 4326',
+
+//         }
+//     })
 
 const initMap = () => {
 
@@ -114,6 +124,9 @@ const initMap = () => {
         }),
     });
     map = terMap;
+
+
+
     //   添加地图
     let Tersource = new XYZ({
         url: "http://t4.tianditu.com/DataServer?T=vec_w&tk=b523e4ded27f524672a488e758227070&x={x}&y={y}&l={z}",
@@ -240,7 +253,12 @@ const refresh_polygonInfo = () => {
                 feature: polygonFeature
             }
         }
-        getPatrolsLocation();
+        if (router.currentRoute.value.query.patrol) {
+            getPatrolsLocation(router.currentRoute.value.query.patrol);
+        } else {
+            getPatrolsLocation("");
+        }
+
     })
 }
 refresh_polygonInfo();
@@ -249,13 +267,28 @@ setInterval(refresh_polygonInfo, 60000);
 
 let patrolLocation = reactive({});
 let iconFeatureList = reactive([]);
-const getPatrolsLocation = () => {
+const getPatrolsLocation = id => {
+
+    let patrol = {
+        id: id,
+        name: "",
+        agency: '',
+        department: '',
+        identity: '',
+        region: '',
+        date: '',
+        status: '',
+        pageNum: 1,
+        pageSize: 5000,
+    }
     axios({
-        url: '/api/patrol-whole-info',
-        method: 'get',
+        url: '/api/patrol-whole-info/select/conditions',
+        method: 'post',
         headers: {
-            Authorization: store.state.user.tokenHeader + store.state.user.token,
+            'Content-Type': 'application/json',
+            'Authorization': store.state.user.tokenHeader + store.state.user.token,
         },
+        data: JSON.stringify(patrol)
     }).then(function (resp) {
         if (resp.status == 200) {
 
@@ -264,12 +297,12 @@ const getPatrolsLocation = () => {
             }
             iconFeatureList.splice(0, iconFeatureList.length);
 
-            for (const item of resp.data.data) {
+            for (const item of resp.data.data.records) {
 
-                if (item.location != null && item.patrol_id != null && item.relatedRegion != null) {
+                if (item.location != null && item.patrolId != null) {
 
-                    patrolLocation[item.patrol_id] = {
-                        patrolId: item.patrol_id,
+                    patrolLocation[item.patrolId] = {
+                        patrolId: item.patrolId,
                         location: stringToSingleLocation(item.location),
                     }
 
@@ -281,32 +314,39 @@ const getPatrolsLocation = () => {
 
                     iconFeature.set('name', 'icon');
                     iconFeature.set('polygonId', item.relatedRegion);
-                    iconFeature.set('patrolId', item.patrol_id);
+                    iconFeature.set('patrolId', item.patrolId);
                     iconFeature.set('patrolName', item.name);
                     iconFeature.set('department', item.department);
                     iconFeature.set('telephone', item.telephone);
                     iconFeature.set('identity', item.identity);
 
-                    let relateRegion = polygonInfo[item.relatedRegion].markList;
-                    if (item.identity == "执法人员") {
-                        let isInRing = Amap.GeometryUtil.isPointInRing(point, relateRegion);
-                        if (isInRing) {
-                            iconFeature.set('bgId', 0);
+                    if (item.relatedRegion != null && polygonInfo[item.relatedRegion]) {
 
-                        } else {
-                            iconFeature.set('bgId', 1);
-                        }
-                        iconFeature.set('isInOwnRing', isInRing);
+                        let relateRegion = polygonInfo[item.relatedRegion].markList;
+                        if (item.identity == "执法人员") {
+                            let isInRing = Amap.GeometryUtil.isPointInRing(point, relateRegion);
+                            if (isInRing) {
+                                iconFeature.set('bgId', 0);
 
-                    } else if (item.identity == "协管人员") {
-                        let isInRing = Amap.GeometryUtil.isPointInRing(point, relateRegion);
-                        if (isInRing) {
-                            iconFeature.set('bgId', 2);
-                        } else {
-                            iconFeature.set('bgId', 3);
+                            } else {
+                                iconFeature.set('bgId', 1);
+                            }
+                            iconFeature.set('isInOwnRing', isInRing);
+
+                        } else if (item.identity == "协管人员") {
+                            let isInRing = Amap.GeometryUtil.isPointInRing(point, relateRegion);
+                            if (isInRing) {
+                                iconFeature.set('bgId', 2);
+                            } else {
+                                iconFeature.set('bgId', 3);
+                            }
+                            iconFeature.set('isInOwnRing', isInRing);
                         }
-                        iconFeature.set('isInOwnRing', isInRing);
+                    } else {
+                        iconFeature.set('bgId', 1);
+                        iconFeature.set('isInOwnRing', false);
                     }
+
                     iconSource.addFeature(iconFeature);
                     iconFeatureList.push(iconFeature);
 
@@ -315,6 +355,7 @@ const getPatrolsLocation = () => {
         }
     })
 }
+
 
 const stringToSingleLocation = path => {
     let pathLng = path.replace("[", "").replace("]", "").split(",")[0] * 1;
@@ -382,6 +423,7 @@ const createIconLayer = () => {
 const createOverlayClick = () => {
     map.on("singleclick", function (e) {
         let coordinate = e.coordinate;
+        console.log(coordinate);
         let feature = map.forEachFeatureAtPixel(e.pixel, function (feature) {
             return feature;
         });
@@ -441,18 +483,23 @@ const checkWorkStatistics = (feature) => {
 
     workStat.push({
         name: feature.get('patrolName'),
-        status: "在岗",
-        onWorkTime: "2022-10-14 8:13:5",
-        offWorkTime: "2022-10-14 17:40:00",
+        status: "",
+        onWorkTime: "",
+        offWorkTime: "",
     })
     //ifShowWorkStatistics.value = true;
+    getOnWorkStatus(value1.value);
+}
+
+const switchDate = date => {
+    const date2 = new Date(date);
+    const currentDate = date2.toLocaleDateString().replaceAll('/', '-');
+    return currentDate;
 }
 
 const dateChange = () => {
-    const date2 = new Date(value1.value);
-    const currentDate = date2.toLocaleDateString().replaceAll('/', '-');
-    console.log(currentDate);
-    console.log(selectPatrolId.value);
+    const currentDate = switchDate(value1.value);
+    getOnWorkStatus(currentDate);
 }
 
 let num = 0;
@@ -512,6 +559,53 @@ const personDetailInfo = () => {
     router.push({ name: 'person_detail_index', query: { "patrol": patrolWorkStatistics[0].id } })
 }
 
+const switchTime = time => {
+    return time.replace('T', ' ')
+}
+
+const getOnWorkStatus = (time) => {
+    axios({
+        url: '/api/patrol-status/status/' + patrolWorkStatistics[0].id + '/' + value1.value,
+        method: 'get',
+        headers: {
+            'Authorization': store.state.user.tokenHeader + store.state.user.token,
+        },
+        params: {
+            date: time,
+            patrol_id: patrolWorkStatistics[0].id
+        }
+    }).then(function (resp) {
+
+        if (resp.data.code == 2000) {
+            workStat[0].status = resp.data.data.status;
+            if (resp.data.data.onWork) {
+                workStat[0].onWorkTime = switchTime(resp.data.data.onWork);
+            } else {
+                workStat[0].onWorkTime = "暂无"
+            }
+
+            if (resp.data.data.offWork) {
+                workStat[0].offWorkTime = switchTime(resp.data.data.offWork);
+            } else {
+                workStat[0].offWorkTime = "暂无"
+            }
+
+        }
+    })
+}
+
+const disabledDate = (time) => {
+    return time.getTime() > Date.now()
+}
+
+// const getLocation = () => {
+//     if (router.currentRoute.value.query.patrol) {
+//         getSingleBikePersonnel(1233432578);
+//     } else {
+//         getBikePersonnelLocation();
+//     }
+// }
+
 onMounted(() => {
     initMap();
 })
@@ -555,5 +649,54 @@ onMounted(() => {
     margin: auto;
     background-color: rgba(43, 51, 73, 0.82);
     background-image: radial-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.3), #000);
+}
+
+.ol-popup {
+    position: absolute;
+    background-color: white;
+    -webkit-filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.2));
+    filter: drop-shadow(0 1px 4px #FFC125);
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #cccccc;
+    bottom: 12px;
+    left: -50px;
+    min-width: 200px;
+}
+
+.ol-popup:after,
+.ol-popup:before {
+    top: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+}
+
+.ol-popup:after {
+    border-top-color: white;
+    border-width: 10px;
+    left: 48px;
+    margin-left: -10px;
+}
+
+.ol-popup:before {
+    border-top-color: #cccccc;
+    border-width: 11px;
+    left: 48px;
+    margin-left: -11px;
+}
+
+.ol-popup-closer {
+    text-decoration: none;
+    position: absolute;
+    top: 2px;
+    right: 8px;
+}
+
+.ol-popup-closer:after {
+    content: "×";
 }
 </style>

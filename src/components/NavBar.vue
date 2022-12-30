@@ -80,7 +80,8 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
-                            {{ $store.state.user.username }}
+                            <!-- {{ $store.state.user.name }} -->
+                            jinniu
                         </a>
 
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -205,6 +206,9 @@
             </el-menu-item>
             <el-menu-item index="/rectify-date-analysis/">
                 <span>交办周期统计</span>
+            </el-menu-item>
+            <el-menu-item index="/region-person-situation/">
+                <span>严管街人员达标情况</span>
             </el-menu-item>
         </el-sub-menu>
     </el-menu>

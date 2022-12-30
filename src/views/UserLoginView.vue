@@ -47,6 +47,7 @@ import { User, Lock } from '@element-plus/icons-vue'
 import { useStore } from "vuex";
 import router from '@/router'
 import { onMounted } from "vue";
+import { ElMessage } from 'element-plus';
 
 export default {
 
@@ -67,17 +68,7 @@ export default {
         if (jwt_token && tokenHead) {
             store.commit("updateToken", jwt_token);
             store.commit("updateTokenHeader", tokenHead);
-            // store.dispatch("getInfo", {
-            //     success() {
-            //         router.push({ name: "home" });
-            //     },
-            //     error() {
-            //         console.log("获取用户出错");
-            //     }
-            // })
-            store.dispatch("login", {
-                name: 'lyh',
-                password: 'string',
+            store.dispatch("getInfo", {
                 success() {
                     router.push({ name: "home" });
                 },
@@ -85,13 +76,23 @@ export default {
                     console.log("获取用户出错");
                 }
             })
-            router.push({ name: 'home' });
+            // store.dispatch("login", {
+            //     name: 'lyh',
+            //     password: 'string',
+            //     success() {
+            //         router.push({ name: "home" });
+            //     },
+            //     error() {
+            //         console.log("获取用户出错");
+            //     }
+            // })
+            // router.push({ name: 'home' });
         }
 
         const loginFromGuanJia = () => {
             store.dispatch("login", {
-                name: "lyh",
-                password: "string",
+                name: "15928158150",
+                password: "123456",
                 success() {
                     Object.defineProperty(document, 'referrer', { value: '' });
                     router.push({ name: "home" });
@@ -114,19 +115,25 @@ export default {
                 name: params.username,
                 password: params.password,
                 success() {
-                    router.push({ name: "home" });
-                    // store.dispatch("getInfo", {
-                    //     success() {
-                    //         router.push({ name: "home" });
-                    //     },
-                    //     error() {
-                    //         console.log("获取用户出错");
-                    //     }
-                    // });
+                    //router.push({ name: "home" });
+                    store.dispatch("getInfo", {
+                        success() {
+                            router.push({ name: "home" });
+                        },
+                        error() {
+                            ElMessage({
+                                message: '用户名或密码错误！',
+                                type: 'error',
+                            })
+                        }
+                    });
 
                 },
-                error(resp) {
-                    console.log(resp);
+                error() {
+                    ElMessage({
+                        message: '用户名或密码错误！',
+                        type: 'error',
+                    })
                 }
             })
         }

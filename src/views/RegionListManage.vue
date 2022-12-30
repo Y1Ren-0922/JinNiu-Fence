@@ -11,7 +11,7 @@
                                 <el-card shadow="always" style="margin-bottom: 1vh;" @click="agencySelect(item)"
                                     :body-style="banshichuSelected == item ? banshichuSelectedStyle : banshichuNoneSelectedStyle">
                                     <span>{{ item }}</span>
-                                    <div class="state-number">20</div>
+                                    <div class="state-number">{{ agencyNumMap[item] }}</div>
                                 </el-card>
                             </el-col>
 
@@ -78,8 +78,12 @@
                         </el-table>
 
                         <div class="float-end" style="margin-top: 1vh">
-                            <el-pagination background layout="total, prev, pager, next, jumper" :total="total_records"
-                                :current-page="current_page" @current-change="getRegionList" />
+                            <el-pagination v-if="isSearchByAgency == true" background
+                                layout="total, prev, pager, next, jumper" :total="total_records"
+                                :current-page="current_page" @current-change="getRegionListByAgency" />
+                            <el-pagination v-else background layout="total, prev, pager, next, jumper"
+                                :total="total_records" :current-page="current_page" @current-change="getRegionList" />
+
                         </div>
                     </div>
                 </div>
@@ -185,17 +189,18 @@ const agencySelect = agency => {
     banshichuSelected.value = agency;
     if (agency == '全部') {
         record_agency.value = '';
-
+        isSearchByAgency.value = false;
+        getRegionList(1);
     } else {
         record_agency.value = agency;
+        isSearchByAgency.value = true;
+        getRegionListByAgency(1);
     }
 
 }
 
-const getRegionListByAgency = agency => {
-    if (agency == '全部') {
-        agency = '';
-    }
+const isSearchByAgency = ref(false);
+const getRegionListByAgency = page => {
 
     axios({
         url: '/api/region/select/by_agency',
@@ -205,15 +210,27 @@ const getRegionListByAgency = agency => {
             Authorization: store.state.user.tokenHeader + store.state.user.token,
         },
         data: JSON.stringify({
-            agency: agency,
-            pageNum: 1,
+            agency: record_agency.value,
+            pageNum: page,
             pageSize: 10
         })
     }).then(function (resp) {
-        console.log(resp);
+        if (resp.status == 200) {
+            regionList.splice(0, regionList.length);
+            total_records.value = resp.data.data.total;
+            current_page.value = page;
+
+            for (const item of resp.data.data.records) {
+                item.shouldArrive = 10;
+                item.actualArrive = 10;
+                item.regionLength = 200;
+                item.arriveRate = '90%';
+                regionList.push(item);
+            }
+        }
     })
 }
-getRegionListByAgency('抚琴');
+
 
 const getRegionListByName = () => {
     if (queryName.value == '') {
@@ -248,6 +265,28 @@ const getRegionListByName = () => {
     }
 
 }
+
+const agencyNumMap = reactive({});
+const getNumPerAgency = () => {
+    axios({
+        url: '/api/region/cnt/by_agency',
+        method: 'get',
+        headers: {
+
+            Authorization: store.state.user.tokenHeader + store.state.user.token,
+        },
+    }).then(function (resp) {
+        if (resp.data.code == 2000) {
+            let total = 0;
+            for (const item of resp.data.data) {
+                agencyNumMap[item.agency] = item.num;
+                total += item.num;
+            }
+            agencyNumMap["全部"] = total;
+        }
+    })
+}
+getNumPerAgency();
 
 onMounted(() => {
     // console.log(document.getElementsByClassName('container')[0])

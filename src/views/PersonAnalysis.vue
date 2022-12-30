@@ -35,7 +35,8 @@
                             @click="selectDepartment">
 
                         </el-input>
-                        <el-button type="primary" :icon="Search" size="large">搜索</el-button>
+                        <el-button type="primary" :icon="Search" size="large"
+                            @click="searchDataByDepartment">搜索</el-button>
                     </div>
                 </div>
             </div>
@@ -134,6 +135,9 @@ let person_age_option = {
         // textStyle: {
         //     color: 'white',
         // }
+        textStyle: {
+            fontSize: fontSizeSwitch(0.20),
+        }
     },
     tooltip: {
         trigger: 'item'
@@ -184,6 +188,9 @@ let personSexOption = {
         // textStyle: {
         //     color: 'white',
         // }
+        textStyle: {
+            fontSize: fontSizeSwitch(0.20),
+        }
     },
     tooltip: {
         trigger: 'item'
@@ -224,30 +231,22 @@ const create_sex_age_data = () => {
 
 const selectIdentity = identity => {
     identitySelected.value = identity;
-    getPatrolData();
+    if (agencySelected.value == '全部' && queryDepartment.value != '') {
+        searchDataByDepartment();
+    } else {
+        queryDepartment.value = '';
+        getPatrolData();
+    }
 }
 
 const agencySelected = ref('全部');
 const selectAgency = agency => {
+    queryDepartment.value = "";
     agencySelected.value = agency;
     getPatrolData();
 }
 
-const getPatrolData = () => {
-    let agency;
-    let identity;
-
-    if (agencySelected.value == '全部') {
-        agency = '';
-    } else {
-        agency = agencySelected.value + '执法中队'
-    }
-
-    if (identitySelected.value == '全部') {
-        identity = '';
-    } else {
-        identity = identitySelected.value;
-    }
+const ageGenderRequest = (agency, identity) => {
     axios({
         url: '/api/patrol/stat/age_gender',
         method: 'post',
@@ -274,6 +273,25 @@ const getPatrolData = () => {
         personSexOption.series[0].data[1].value = data.female;
         person_sex_chart.setOption(personSexOption);
     })
+}
+
+const getPatrolData = () => {
+
+    let agency;
+    let identity;
+
+    if (agencySelected.value == '全部') {
+        agency = '';
+    } else {
+        agency = agencySelected.value + '执法中队'
+    }
+
+    if (identitySelected.value == '全部') {
+        identity = '';
+    } else {
+        identity = identitySelected.value;
+    }
+    ageGenderRequest(agency, identity);
 }
 
 const banshichu_list = reactive([]);
@@ -341,9 +359,24 @@ const getPatrolNum = () => {
 }
 getPatrolNum();
 
+const searchDataByDepartment = () => {
+    let identity;
+    if (identitySelected.value == '全部') {
+        identity = '';
+    } else {
+        identity = identitySelected.value;
+    }
+
+    ageGenderRequest(queryDepartment.value, identity);
+}
+
 onMounted(() => {
     create_person_age_data();
     create_sex_age_data();
+
+    if (window.screen.width > 2000 && window.devicePixelRatio == 1) {
+        document.getElementsByClassName('container')[1].style.marginLeft = "750px";
+    }
 })
 
 onBeforeUnmount(() => {
@@ -392,5 +425,29 @@ onBeforeUnmount(() => {
 
 .select-state-box {
     cursor: pointer;
+}
+
+@media (min-width: 1600px) {
+    .container {
+        width: 1500px;
+        margin-left: 350px;
+        font-size: 16px;
+    }
+
+    .data-table {
+        font-size: 16px;
+    }
+}
+
+@media (min-width: 2000px) {
+    .container {
+        max-width: 1800px;
+        margin-left: 500px;
+        font-size: 18px;
+    }
+
+    .data-table {
+        font-size: 20px;
+    }
 }
 </style>

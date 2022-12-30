@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="row">
-            <div class="col-10">
+            <div class="col-12">
                 <div class="card select-box">
 
                     <div class="card-body">
@@ -44,22 +44,23 @@
                 </div>
             </div>
 
-            <div class="col-10">
+            <div class="col-12">
                 <div class="card person-list">
                     <div class="card-body">
 
-                        <el-table :data="bicyclePersonList" style="width: 100%;font-size: 1.1rem;">
-                            <el-table-column fixed prop="name" label="姓名" width="120" header-align="center"
+                        <el-table class="data-table" :data="bicyclePersonList" style="width: 100%;">
+                            <el-table-column fixed prop="name" label="姓名" min-width="120" header-align="center"
                                 align="center" />
-                            <el-table-column prop="company" label="所属公司" width="120" header-align="center"
+                            <el-table-column prop="company" label="所属公司" min-width="120" header-align="center"
                                 align="center" />
-                            <el-table-column prop="idNumber" label="身份证号" width="220" header-align="center"
+                            <el-table-column prop="idNumber" label="身份证号" min-width="220" header-align="center"
                                 align="center" />
-                            <el-table-column prop="regionResponsibity" label="责任区域" width="180" header-align="center"
+                            <el-table-column prop="regionResponsibity" label="责任区域" min-width="180"
+                                header-align="center" align="center" />
+                            <el-table-column prop="telephone" label="联系电话" min-width="200" header-align="center"
                                 align="center" />
-                            <el-table-column prop="telephone" label="联系电话" width="200" header-align="center"
-                                align="center" />
-                            <el-table-column fixed="right" label="操作" width="120" header-align="center" align="center">
+                            <el-table-column fixed="right" label="操作" min-width="120" header-align="center"
+                                align="center">
                                 <template #default>
                                     <el-button link type="primary" size="small" style="font-size:1rem;">详情</el-button>
                                 </template>
@@ -76,7 +77,7 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue';
+import { reactive, ref, onMounted } from 'vue';
 import { Search } from "@element-plus/icons-vue";
 
 const queryName = ref('');
@@ -91,7 +92,7 @@ const bicyclePersonList = reactive([
     {
         name: '张三',
         company: '美团',
-        idNumber: '620102200908227003',
+        idNumber: '6201022009082270**',
         regionResponsibity: '抚琴',
         telephone: '12345678978'
     }
@@ -111,6 +112,12 @@ const bicyclePersonList = reactive([
 //         label: '青桔',
 //     },
 // ]
+
+onMounted(() => {
+    if (window.screen.width > 2000 && window.devicePixelRatio == 1) {
+        document.getElementsByClassName('container')[1].style.marginLeft = "750px";
+    }
+})
 </script>
 
 <style scoped>
@@ -133,5 +140,29 @@ const bicyclePersonList = reactive([
 
 .should-arrive {
     font-size: 0.5rem;
+}
+
+@media (min-width: 1600px) {
+    .container {
+        width: 1500px;
+        margin-left: 350px;
+        font-size: 16px;
+    }
+
+    .data-table {
+        font-size: 16px;
+    }
+}
+
+@media (min-width: 2000px) {
+    .container {
+        max-width: 1800px;
+        margin-left: 500px;
+        font-size: 18px;
+    }
+
+    .data-table {
+        font-size: 20px;
+    }
 }
 </style>

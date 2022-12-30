@@ -20,6 +20,7 @@ import WardenManage from '../views/WardenManage'
 import RegionArriveRate from '../views/RegionArriveRate'
 import CaseHandling from '../views/CaseHandling'
 import CaseAnalysis from '../views/CaseAnalysis'
+import RegionPersonStandard from '../views/RegionPersonStandard'
 import store from '@/store'
 
 const routes = [
@@ -172,6 +173,14 @@ const routes = [
     path: '/rectify-date-analysis/',
     name: 'rectify_date_analysis_index',
     component: RectifyDateAnalysis,
+    meta: {
+      requestAuth: true,
+    }
+  },
+  {
+    path: '/region-person-situation/',
+    name: 'region_person_situation',
+    component: RegionPersonStandard,
     meta: {
       requestAuth: true,
     }

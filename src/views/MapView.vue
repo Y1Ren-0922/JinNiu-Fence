@@ -289,13 +289,27 @@ export default {
         let patrolLocation = reactive({});
         let iconFeatureList = reactive([]);
         const getPatrolsLocation = () => {
+            let patrol = {
+                name: '',
+                agency: '',
+                department: '',
+                identity: '',
+                region: '',
+                date: '',
+                status: '',
+                pageNum: 1,
+                pageSize: 5000,
+            }
             axios({
-                url: '/api/patrol-whole-info',
-                method: 'get',
+                url: '/api/patrol-whole-info/select/conditions',
+                method: 'post',
                 headers: {
-                    Authorization: store.state.user.tokenHeader + store.state.user.token,
+                    'Content-Type': 'application/json',
+                    'Authorization': store.state.user.tokenHeader + store.state.user.token,
                 },
+                data: JSON.stringify(patrol)
             }).then(function (resp) {
+
                 if (resp.status == 200) {
 
                     for (const feature of iconFeatureList) {
@@ -303,12 +317,12 @@ export default {
                     }
                     iconFeatureList.splice(0, iconFeatureList.length);
 
-                    for (const item of resp.data.data) {
+                    for (const item of resp.data.data.records) {
 
-                        if (item.location != null && item.patrol_id != null && item.relatedRegion != null) {
+                        if (item.location != null && item.patrolId != null) {
 
-                            patrolLocation[item.patrol_id] = {
-                                patrolId: item.patrol_id,
+                            patrolLocation[item.patrolId] = {
+                                patrolId: item.patrolId,
                                 location: stringToSingleLocation(item.location),
                             }
 
@@ -320,32 +334,39 @@ export default {
 
                             iconFeature.set('name', 'icon');
                             iconFeature.set('polygonId', item.relatedRegion);
-                            iconFeature.set('patrolId', item.patrol_id);
+                            iconFeature.set('patrolId', item.patrolId);
                             iconFeature.set('patrolName', item.name);
                             iconFeature.set('department', item.department);
                             iconFeature.set('telephone', item.telephone);
                             iconFeature.set('identity', item.identity);
 
-                            let relateRegion = polygonInfo[item.relatedRegion].markList;
-                            if (item.identity == "执法人员") {
-                                let isInRing = Amap.GeometryUtil.isPointInRing(point, relateRegion);
-                                if (isInRing) {
-                                    iconFeature.set('bgId', 0);
 
-                                } else {
-                                    iconFeature.set('bgId', 1);
-                                }
-                                iconFeature.set('isInOwnRing', isInRing);
+                            if (item.relatedRegion !== null && polygonInfo[item.relatedRegion]) {
+                                let relateRegion = polygonInfo[item.relatedRegion].markList;
+                                if (item.identity == "执法人员") {
+                                    let isInRing = Amap.GeometryUtil.isPointInRing(point, relateRegion);
+                                    if (isInRing) {
+                                        iconFeature.set('bgId', 0);
 
-                            } else if (item.identity == "协管人员") {
-                                let isInRing = Amap.GeometryUtil.isPointInRing(point, relateRegion);
-                                if (isInRing) {
-                                    iconFeature.set('bgId', 2);
-                                } else {
-                                    iconFeature.set('bgId', 3);
+                                    } else {
+                                        iconFeature.set('bgId', 1);
+                                    }
+                                    iconFeature.set('isInOwnRing', isInRing);
+
+                                } else if (item.identity == "协管人员") {
+                                    let isInRing = Amap.GeometryUtil.isPointInRing(point, relateRegion);
+                                    if (isInRing) {
+                                        iconFeature.set('bgId', 2);
+                                    } else {
+                                        iconFeature.set('bgId', 3);
+                                    }
+                                    iconFeature.set('isInOwnRing', isInRing);
                                 }
-                                iconFeature.set('isInOwnRing', isInRing);
+                            } else {
+                                iconFeature.set('bgId', 1);
+                                iconFeature.set('isInOwnRing', false);
                             }
+
                             iconSource.addFeature(iconFeature);
                             iconFeatureList.push(iconFeature);
 
@@ -546,6 +567,7 @@ export default {
 
             workStat.push({
                 name: feature.get('patrolName'),
+                id: feature.get('patrolId'),
                 status: "在岗",
                 onWorkTime: "2022-10-14 8:13:5",
                 offWorkTime: "2022-10-14 17:40:00",
