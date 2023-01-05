@@ -29,39 +29,44 @@
         </div>
     </div>
     <div class="content-mid">
-        <border-box-7 class="mid-head-show" v-if="$route.path != '/bicycle-map/'">
+        <border-box-7 class="mid-head-show" v-if="$route.path != '/bicycle-map/' && isSelectRegionMode === 'false'">
             <div class="mid-box">
                 <div class="mid-head-left">
                     <h4>在岗在位</h4>
                     <div class="mid-head-left-num" @click="toOnWorkDetail('')" style="cursor:pointer;">{{
-        patrolOnWorkTotal
-}}人
+                        patrolOnWorkTotal
+                    }}人
                     </div>
                 </div>
                 <div class="mid-head-left-right">
                     <div class="mid-head-left-right-top">
                         <div class="mid-head-left-right-title">执法人员</div>
                         <div class="mid-head-left-right-num" @click="toOnWorkDetail('执法人员')" style="cursor:pointer;">{{
-        lawEnforceOnWork
-}}人</div>
+                            lawEnforceOnWork
+                        }}人</div>
                     </div>
                     <div class="mid-head-left-right-bottom">
                         <div class="mid-head-left-right-title">协管人员</div>
                         <div class="mid-head-left-right-num" @click="toOnWorkDetail('协管人员')" style="cursor:pointer;"> {{
-        wardenOnWork
-}}人</div>
+                            wardenOnWork
+                        }}人</div>
                     </div>
                 </div>
 
             </div>
 
         </border-box-7>
+        <!-- <el-button type="primary" plain v-if="isSelectRegionMode == 'true'">开始选择</el-button>
+        <el-button type="primary" plain v-if="isSelectRegionMode == 'true'">选择结束</el-button> -->
 
-
-        <border-box-7 class="mid-head-show" style="margin-left: 2vw;" v-if="$route.path != '/bicycle-map/'">
+        <border-box-7 class="mid-head-show" style="margin-left: 2vw;"
+            v-if="$route.path != '/bicycle-map/' && isSelectRegionMode === 'false'">
             <div class="mid-box">
                 <div class="mid-head-left">
-                    <h4>定位异常</h4>
+                    <el-tooltip class="box-item" effect="dark" content="连续20分钟不移动且未回复工作状态" placement="bottom">
+                        <h4>定位异常</h4>
+                    </el-tooltip>
+
                     <div class="mid-head-left-num" style="color: #E95547;">{{ locationException }}人</div>
                 </div>
                 <div class="mid-head-left-right">
@@ -201,7 +206,7 @@
                 <div style="margin-top: 5vh;">
                     <div class="dialog-title-content">选择接收人员</div>
                     <hr>
-                    <div>
+                    <div class="select-recieve">
                         <div class="check-title">按街道选择</div>
                         <!-- <el-checkbox v-model="streetCheckAll" :indeterminate="isStreetIndeterminate"
                             @change="handleCheckStreetAllChange">全选</el-checkbox>
@@ -211,13 +216,14 @@
                         </el-checkbox-group> -->
                         <el-radio-group v-model="streetSelected">
                             <el-radio label="全部">全部</el-radio>
-                            <el-radio v-for="(agency, idx) in agencyList" :key="idx" :label="agency">{{ agency
-}}</el-radio>
+                            <el-radio v-for="(agency, idx) in agencyList" :key="idx" :label="agency">{{
+                                agency
+                            }}</el-radio>
 
                         </el-radio-group>
                     </div>
 
-                    <div>
+                    <div class="select-recieve">
                         <div class="check-title">按人员类型选择</div>
                         <!-- <el-checkbox v-model="peopleCheckAll" :indeterminate="isPeopleIndeterminate"
                             @change="handleCheckPeopleAllChange">全选</el-checkbox>
@@ -231,6 +237,11 @@
                             <el-radio label="执法人员">执法人员</el-radio>
                             <el-radio label="协管人员">协管人员</el-radio>
                         </el-radio-group>
+                    </div>
+
+                    <div>
+                        <div class="check-title">按划分区域选择</div>
+                        <el-button type="primary" plain @click="selectRegion">选择区域</el-button>
                     </div>
 
                 </div>
@@ -257,8 +268,8 @@
 
                             <el-descriptions-item label="消息" :span="3" class-name="read-message"
                                 style="font-weight:900;">{{
-        backMessage.message
-}}</el-descriptions-item>
+                                    backMessage.message
+                                }}</el-descriptions-item>
 
                             <el-descriptions-item label="回复时间">{{ backMessage.backTime }}</el-descriptions-item>
                         </el-descriptions>
@@ -283,8 +294,8 @@
 
                             <el-descriptions-item label="消息" :span="3" class-name="read-message"
                                 style="font-weight:900;">{{
-        backMessage.message
-}}</el-descriptions-item>
+                                    backMessage.message
+                                }}</el-descriptions-item>
 
                             <el-descriptions-item label="回复时间">{{ backMessage.backTime }}</el-descriptions-item>
                         </el-descriptions>
@@ -1363,6 +1374,27 @@ const deleteAllReaded = () => {
     })
 
 }
+
+const isSelectRegionMode = ref("false");
+const selectRegion = () => {
+    if (derectiveInfo.value == '') {
+        ElMessage({
+            message: "请输入指令内容",
+            type: 'error'
+        })
+    } else {
+        isSelectRegionMode.value = "true";
+        router.push({ name: 'map_mode_index', query: { param: 'selectRegion' } })
+    }
+
+}
+
+const judgeMode = () => {
+    if (router.currentRoute.value.query.param) {
+        isSelectRegionMode.value = "true";
+    }
+}
+judgeMode();
 // getProblemCount();
 // setInterval(getProblemCount, 60000);
 
@@ -1384,6 +1416,10 @@ const deleteAllReaded = () => {
 } */
 .is-read-word {
     color: #FFC125;
+}
+
+.select-recieve {
+    margin-bottom: 2vh;
 }
 
 .problem-title {

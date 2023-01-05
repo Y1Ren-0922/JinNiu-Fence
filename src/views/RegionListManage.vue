@@ -247,6 +247,7 @@ const getRegionListByName = () => {
                 name: queryName.value
             })
         }).then(function (resp) {
+            console.log(resp);
             if (resp.status == 200) {
                 queryName.value = '';
                 regionList.splice(0, regionList.length);

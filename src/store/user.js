@@ -49,13 +49,13 @@ export default {
             axios({
                 url: '/api/auth/loginV2',
                 method: 'post',
+
                 data: {
-                    name: data.name,
+                    phone: data.name,
                     password: data.password,
                 },
             }).then(function (resp) {
                 if (resp.status == 200) {
-
                     localStorage.setItem("jwt_tokenHeader", resp.data.data.tokenHead);
                     localStorage.setItem("jwt_token", resp.data.data.token);
                     context.commit('updateToken', resp.data.data.token);

@@ -89,8 +89,8 @@
                                 align="center" /> -->
                             <el-table-column prop="createTime" label="生成时间" min-width="150" header-align="center"
                                 align="center" :show-overflow-tooltip="true" />
-                            <el-table-column prop="deadline" label="时限" min-width="150" header-align="center"
-                                align="center" :show-overflow-tooltip="true" />
+                            <!-- <el-table-column prop="deadline" label="时限" min-width="150" header-align="center"
+                                align="center" :show-overflow-tooltip="true" /> -->
 
                             <el-table-column prop="handler" label="发布人" min-width="120" header-align="center"
                                 align="center" />
@@ -144,6 +144,12 @@ import axios from 'axios';
 import { useStore } from 'vuex';
 import { Search } from "@element-plus/icons-vue";
 import router from '@/router';
+
+onMounted(() => {
+    if (window.screen.width > 2000 && window.devicePixelRatio == 1) {
+        document.getElementsByClassName('container')[1].style.marginLeft = "750px";
+    }
+})
 
 const store = useStore();
 const categorySelected = ref('全部');
@@ -226,6 +232,15 @@ const switchTime = time => {
     return time.replace('T', ' ')
 }
 
+// const stateMap = {
+//     "未接收": 0,
+//     "待处置": 1,
+//     "整改完成": 3,
+//     "首次整改": 1,
+//     "二次整改": 2,
+//     "执法查处": 3,
+// }
+
 const issueList = reactive({});
 let record_date = ref(['', '']);
 const getIssueList = page => {
@@ -238,9 +253,32 @@ const getIssueList = page => {
     let region = queryStreet.value;
     let category = categorySelected.value;
     let state = stateSelected.value;
+
+    let progressStatus;
+    let rectifyStatus;
     if (state == '全部') {
-        state = '';
+        progressStatus = '';
+        rectifyStatus = '';
+    } else if (state == '未接收') {
+        progressStatus = 0;
+        rectifyStatus = '';
+    } else if (state == '待处置') {
+        progressStatus = 1;
+        rectifyStatus = '';
+    } else if (state == '整改完成') {
+        progressStatus = 3;
+        rectifyStatus = '';
+    } else if (state == '首次整改') {
+        progressStatus = '';
+        rectifyStatus = 1;
+    } else if (state == '二次整改') {
+        progressStatus = '';
+        rectifyStatus = 2;
+    } else if (state == '执法查处') {
+        progressStatus = '';
+        rectifyStatus = 3;
     }
+
     if (region != '') {
         agency = '';
     }
@@ -260,7 +298,8 @@ const getIssueList = page => {
         subCategory: '',
         region: region,
         agency: agency,
-        rectifyStatus: state,
+        progressStatus: progressStatus,
+        rectifyStatus: rectifyStatus,
         startRectifyDate: '',
         endRectifyDate: '',
         startPostDate: record_date.value[0],
@@ -287,14 +326,27 @@ const getIssueList = page => {
             total_records.value = resp.data.data.total;
 
             for (const item of resp.data.data.records) {
+
+                let realTimeStatus;
+                if (!item.acceptDate) {
+                    realTimeStatus = "未接收";
+                    if (state == "首次整改") continue;
+                } else if (!item.processingDate) {
+                    realTimeStatus = "待处置";
+                } else if (item.stage) {
+                    realTimeStatus = item.stage;
+                } else if (item.actualRectified_date) {
+                    realTimeStatus = "整改完成"
+                }
+
                 let issue = {
                     id: item.id,
                     region: item.agency,
                     category: item.category,
                     handler: item.patrolName,
-                    state: item.rectifyStatus,
+                    state: realTimeStatus,
                     createTime: switchTime(item.postDate),
-                    deadline: switchTime(item.rectifyDate),
+                    // deadline: switchTime(item.rectifyDate),
                 }
 
                 issueList[item.id] = issue;
@@ -422,7 +474,7 @@ const getCategory = () => {
 getCategory();
 
 const checkDetail = row => {
-    router.push({ name: 'problem_detail_index', query: { 'problem_id': row.id } })
+    router.push({ name: 'problem_detail_index', query: { 'problem_id': row.id, "postPatrol": row.handler, "state": row.state, "region": row.region } })
 }
 
 const selectAgency = agency => {
@@ -435,11 +487,7 @@ const selectState = state => {
     getIssueList(1);
 }
 
-onMounted(() => {
-    if (window.screen.width > 2000 && window.devicePixelRatio == 1) {
-        document.getElementsByClassName('container')[1].style.marginLeft = "750px";
-    }
-})
+
 
 watch(queryRegion, (newValue) => {
     if (newValue == '') {

@@ -9,6 +9,11 @@
         <div id="popup-content"></div>
     </div>
 
+    <div class="content-mid">
+        <el-button type="primary" plain v-if="isSelectRegionMode == 'true'" @click="createMarker">开始选择</el-button>
+        <el-button type="primary" plain v-if="isSelectRegionMode == 'true'" @click="selectDone">选择结束</el-button>
+    </div>
+
     <el-dialog v-model="ifShowWorkStatistics" width="45%">
         <div>
             <div class="dialog-title">个人信息</div>
@@ -68,8 +73,8 @@ import Map from "ol/Map.js";
 import View from "ol/View.js";
 import { reactive, onMounted, ref } from "vue";
 import { Style, Fill, Circle, Stroke, Icon } from "ol/style"
-import { Overlay, Feature } from "ol";
-import { DoubleClickZoom } from "ol/interaction";
+import { Overlay, Feature, Collection } from "ol";
+import { DoubleClickZoom, Translate } from "ol/interaction";
 import { Polygon } from "ol/geom";
 // import ImageLayer from "ol/layer/Image";
 import MapContent from "@/components/MapContent.vue";
@@ -83,6 +88,7 @@ import { defaults as defaultControls } from 'ol/control'
 import { ElMessage } from 'element-plus';
 import router from "@/router";
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
+import { unByKey } from "ol/Observable";
 // import {createStringXY} from 'ol/coordinate'
 
 let Amap;
@@ -396,7 +402,7 @@ const createPolygonLayer = () => {
 let iconSource;
 let iconLayer;
 const createIconLayer = () => {
-    let bg = ['/images/staff.png', '/images/staff2.png', '/images/staff3.png', '/images/staff4.png']
+    let bg = ['/images/staff.png', '/images/staff2.png', '/images/staff3.png', '/images/staff4.png', '/images/location2.png']
     iconSource = new SourceVec();
     iconLayer = new LayerVec({
         source: iconSource,
@@ -423,7 +429,7 @@ const createIconLayer = () => {
 const createOverlayClick = () => {
     map.on("singleclick", function (e) {
         let coordinate = e.coordinate;
-        console.log(coordinate);
+
         let feature = map.forEachFeatureAtPixel(e.pixel, function (feature) {
             return feature;
         });
@@ -456,6 +462,126 @@ const createOverlayClick = () => {
             }
         }
     });
+};
+
+let dblClickEvent;
+const createDblClick = () => {
+    dblClickEvent = map.on('dblclick', function (e) {
+        let feature = map.forEachFeatureAtPixel(e.pixel, function (feature) {
+            return feature;
+        });
+
+        if (feature) {
+            if (feature.get('name') == 'icon') {
+
+                delete markerInfo[feature.get('iconName')];
+                iconSource.removeFeature(feature);
+                preview();
+            } else {
+                clickHandler(e);
+            }
+
+        } else {
+            clickHandler(e);
+        }
+
+    });
+}
+
+let markerInfo = reactive({});
+const createMarkerSignal = ref(false);
+const createMarker = () => {
+    if (createMarkerSignal.value === false) {
+        markId = 0;
+        // unByKey(overlayClick);
+        createDblClick();
+        // fenceInfo.value.name = "";
+        // fenceInfo.value.operator = "";
+        // fenceInfo.value.agency = "";
+        // fenceInfo.value.editTime = getTTime(new Date().toISOString());
+
+        createMarkerSignal.value = true;
+    } else {
+        for (let point in markerInfo) {
+            iconSource.removeFeature(markerInfo[point].feature);
+        }
+        if (beforePreview != null) {
+            polygonSource.removeFeature(beforePreview);
+            beforePreview = null;
+        }
+        unByKey(dblClickEvent);
+        // unByKey(clickEvent);
+
+        markerInfo = reactive({});
+        createMarkerSignal.value = false;
+    }
+}
+
+const clickHandler = (e) => {
+
+    let point = e.coordinate;
+    let iconFeature = new Feature({
+        geometry: new Point(point, "XY")
+    });
+
+    iconFeature.set('name', 'icon');
+    iconFeature.set('iconName', markId);
+    iconFeature.set('bgId', 4);
+    markId++;
+
+    iconSource.addFeature(iconFeature);
+
+    let iconTranslate = new Translate({
+        features: new Collection([iconFeature])
+    });
+    map.addInteraction(iconTranslate);
+
+    iconTranslate.on('translateend', () => {
+        let clickPoint = iconFeature.getGeometry().flatCoordinates;
+        markerInfo[iconFeature.get('iconName')].point = clickPoint;
+        preview();
+    })
+
+    markerInfo[iconFeature.get('iconName')] = {
+        point: point,
+        feature: iconFeature
+    };
+    preview();
+
+}
+
+let markId;
+let beforePreview = null;
+let markerList;
+const preview = () => {
+    let len = Object.keys(markerInfo).length;
+    if (len >= 3) {
+        if (beforePreview != null) {
+            polygonSource.removeFeature(beforePreview);
+        }
+        markerList = [];
+
+        for (let point in markerInfo) {
+            markerList.push(markerInfo[point].point);
+        }
+
+        let nowFeature = createPolygonFeature(markerList);
+        nowFeature.setStyle(
+            new Style({
+                stroke: new Stroke({
+                    lineDash: [10, 10, 10, 10],
+                    color: "#4e98f444",
+                    width: 3
+                })
+            })
+        );
+        beforePreview = nowFeature;
+        polygonSource.addFeature(nowFeature);
+    } else {
+        if (beforePreview != null) {
+            polygonSource.removeFeature(beforePreview);
+        }
+    }
 };
 
 let patrolWorkStatistics = reactive([]);
@@ -598,6 +724,36 @@ const disabledDate = (time) => {
     return time.getTime() > Date.now()
 }
 
+const isSelectRegionMode = ref("false");
+const judgeMode = () => {
+    if (router.currentRoute.value.query.param) {
+        isSelectRegionMode.value = "true";
+    }
+}
+judgeMode();
+
+const selectDone = () => {
+
+    if (Object.keys(markerInfo).length < 3) {
+
+        ElMessage({
+            message: '区域未选择或不合法',
+            type: 'error',
+        })
+    } else {
+        ElMessage({
+            message: '发送成功',
+            type: 'success',
+        })
+        router.push({ name: 'map_index' });
+    }
+}
+// const selectRegion = () => {
+//     if (router.currentRoute.value.query.param) {
+
+//     }
+// }
+
 // const getLocation = () => {
 //     if (router.currentRoute.value.query.patrol) {
 //         getSingleBikePersonnel(1233432578);
@@ -698,5 +854,20 @@ onMounted(() => {
 
 .ol-popup-closer:after {
     content: "×";
+}
+
+.content-mid {
+    left: 20vw;
+    width: 56vw;
+    height: 30vh;
+    padding: 1vh;
+    padding-left: 5vw;
+    /* background-color: rgba(0, 11, 61, 0.2); */
+    position: absolute;
+    top: 8vh;
+    z-index: 20;
+    display: flex;
+    flex-flow: wrap;
+    user-select: none;
 }
 </style>

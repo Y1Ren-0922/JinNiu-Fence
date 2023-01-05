@@ -263,7 +263,7 @@ export default {
             // refresh_polygonInfo();
             createOverlayClick();
         }
-
+        createMarkerSignal
         let markerInfo = reactive({});     // 存放每次创建或编辑中的点信息
         let polygonInfo = reactive({});   // 存放围栏点集以及feature
         let confirmOperation = ref(false);
