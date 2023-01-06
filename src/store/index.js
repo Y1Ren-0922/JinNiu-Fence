@@ -1,6 +1,7 @@
 import { createStore } from 'vuex'
 import ModuleUser from './user'
 import ModuleMap from './map'
+import ModuleDerective from './derective'
 
 export default createStore({
   state: {
@@ -14,5 +15,6 @@ export default createStore({
   modules: {
     user: ModuleUser,
     map: ModuleMap,
+    derective: ModuleDerective,
   }
 })

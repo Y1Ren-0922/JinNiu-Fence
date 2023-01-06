@@ -269,14 +269,14 @@ const getIssueList = page => {
         progressStatus = 3;
         rectifyStatus = '';
     } else if (state == '首次整改') {
-        progressStatus = '';
+        progressStatus = 2;
         rectifyStatus = 1;
     } else if (state == '二次整改') {
-        progressStatus = '';
+        progressStatus = 2;
         rectifyStatus = 2;
     } else if (state == '执法查处') {
-        progressStatus = '';
-        rectifyStatus = 3;
+        progressStatus = 2;
+        rectifyStatus = 6;
     }
 
     if (region != '') {
@@ -330,13 +330,13 @@ const getIssueList = page => {
                 let realTimeStatus;
                 if (!item.acceptDate) {
                     realTimeStatus = "未接收";
-                    if (state == "首次整改") continue;
+                    // if (state == "首次整改") continue;
                 } else if (!item.processingDate) {
                     realTimeStatus = "待处置";
+                } else if (item.rectifiedDate) {
+                    realTimeStatus = "整改完成"
                 } else if (item.stage) {
                     realTimeStatus = item.stage;
-                } else if (item.actualRectified_date) {
-                    realTimeStatus = "整改完成"
                 }
 
                 let issue = {
@@ -367,6 +367,8 @@ const isRoutePushHere = () => {
             category = '共享单车';
         }
         categorySelected.value = category;
+        record_date.value[0] = get_now_date() + ' 00:00:00';
+        record_date.value[1] = get_now_date() + ' 23:59:59';
     }
     getIssueList(1);
 }

@@ -61,6 +61,20 @@
         </div>
 
     </el-dialog>
+
+    <el-dialog v-model="confirmDerectiveDialogVisible" title="是否确认发布指令？" width="30%">
+        <div>指令内容：</div>
+        <el-input v-model="derectiveInfo" autosize type="textarea" placeholder="请输入指令" />
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button type="primary" @click="confirmPost">
+                    确认发布
+                </el-button>
+                <el-button @click="confirmDerectiveDialogVisible = false">取消</el-button>
+
+            </span>
+        </template>
+    </el-dialog>
 </template>
 
 <script setup>
@@ -728,9 +742,12 @@ const isSelectRegionMode = ref("false");
 const judgeMode = () => {
     if (router.currentRoute.value.query.param) {
         isSelectRegionMode.value = "true";
+        derectiveInfo.value = store.state.derective.msg;
     }
 }
 judgeMode();
+
+const confirmDerectiveDialogVisible = ref(false);
 
 const selectDone = () => {
 
@@ -741,19 +758,23 @@ const selectDone = () => {
             type: 'error',
         })
     } else {
-        ElMessage({
-            message: '发送成功',
-            type: 'success',
-        })
-        router.push({ name: 'map_index' });
+        confirmDerectiveDialogVisible.value = true;
+        // ElMessage({
+        //     message: '发送成功',
+        //     type: 'success',
+        // })
+        // router.push({ name: 'map_index' });
     }
 }
-// const selectRegion = () => {
-//     if (router.currentRoute.value.query.param) {
 
-//     }
-// }
 
+const confirmPost = () => {
+    ElMessage({
+        message: '发送成功',
+        type: 'success',
+    })
+    router.push({ name: 'map_index' });
+}
 // const getLocation = () => {
 //     if (router.currentRoute.value.query.patrol) {
 //         getSingleBikePersonnel(1233432578);

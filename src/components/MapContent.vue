@@ -1384,6 +1384,7 @@ const selectRegion = () => {
         })
     } else {
         isSelectRegionMode.value = "true";
+        store.commit("updateMsg", derectiveInfo.value);
         router.push({ name: 'map_mode_index', query: { param: 'selectRegion' } })
     }
 
