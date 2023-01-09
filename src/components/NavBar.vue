@@ -71,16 +71,16 @@
                     <li class="nav-item">
                         <router-link class="nav-link" :to="{ name: 'map_index' }">大屏</router-link>
                     </li>
-                    <!-- <li class="nav-item">
-                        <a class="nav-link" href="#">{{ $store.state.user.username }}</a>
-                    </li>
+
                     <li class="nav-item">
-                        <a class="nav-link" href="#" @click="logout">登出</a>
-                    </li> -->
-                    <li class="nav-item dropdown">
+                        <a class="nav-link" href="#" role="button" aria-expanded="false">
+                            jinniu
+                        </a>
+                    </li>
+
+                    <!-- <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
-                            <!-- {{ $store.state.user.name }} -->
                             jinniu
                         </a>
 
@@ -90,7 +90,7 @@
                             </li>
 
                         </ul>
-                    </li>
+                    </li> -->
                 </ul>
 
                 <!-- <ul class="navbar-nav">

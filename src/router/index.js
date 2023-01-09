@@ -222,9 +222,38 @@ const router = createRouter({
   routes
 })
 
+
+const login = () => {
+
+  store.dispatch("login", {
+    name: "15928158150",
+    password: "123456",
+    success() {
+      //router.push({ name: "home" });
+      store.dispatch("getInfo", {
+        success() {
+
+          router.push({ name: "map_index" });
+
+        },
+        error() {
+          console.log("用户名或密码错误");
+        }
+      });
+
+    },
+    error() {
+      console.log("用户名或密码错误");
+    }
+  })
+}
+
 router.beforeEach((to, from, next) => {
+
   if (!store.state.user.is_login && to.meta.requestAuth) {
-    next({ name: "user_login_index" });
+
+    login();
+    //next({ name: "user_login_index" });
   } else {
     next();
   }

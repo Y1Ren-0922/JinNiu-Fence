@@ -1,6 +1,6 @@
 <template>
   <NavBar
-    v-if="$store.state.user.is_login && $route.path != '/map/' && $route.path != '/bicycle-map/' && $route.path != '/login/'" />
+    v-if="$store.state.user.is_login && $route.path != '/' && $route.path != '/map/' && $route.path != '/bicycle-map/' && $route.path != '/login/'" />
   <router-view />
 </template>
 

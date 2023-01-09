@@ -27,7 +27,6 @@
                             </template>
                         </el-input>
                     </el-form-item>
-                    <el-checkbox v-model="checked">记住密码</el-checkbox>
 
                     <!-- 找回密码 -->
 
@@ -61,7 +60,6 @@ export default {
             password: ""
         })
 
-        let checked = ref(false);
 
         const jwt_token = localStorage.getItem("jwt_token");
         const tokenHead = localStorage.getItem('jwt_tokenHeader');
@@ -146,7 +144,6 @@ export default {
         return {
             seen,
             params,
-            checked,
             login,
         }
     },

@@ -16,7 +16,7 @@
                                 <el-card shadow="always" class="select-card"
                                     :body-style="categorySelected == item ? categorySelectedStyle : categoryNoneSelectedStyle">
                                     <span>{{ item }}</span>
-                                    <div class="state-number">20</div>
+                                    <div class="state-number">{{ categoryProblemMap[item] }}</div>
                                 </el-card>
                             </el-col>
 
@@ -30,7 +30,7 @@
                                 <el-card shadow="always" style="margin-bottom: 1vh;"
                                     :body-style="banshichuSelected == item ? agencySelectedStyle : categoryNoneSelectedStyle">
                                     <span>{{ item }}</span>
-                                    <div class="state-number">20</div>
+                                    <div class="state-number">{{ agencyProblemMap[item]}}</div>
                                 </el-card>
                             </el-col>
 
@@ -44,7 +44,7 @@
                                 <el-card shadow="always" style="margin-bottom: 1vh;"
                                     :body-style="stateSelected == item ? stateSelectedStyle : categoryNoneSelectedStyle">
                                     <span>{{ item }}</span>
-                                    <div class="state-number">20</div>
+                                    <div class="state-number">{{ stateProblemMap[item] }}</div>
                                 </el-card>
                             </el-col>
 
@@ -317,6 +317,7 @@ const getIssueList = page => {
         data: JSON.stringify(issue_request)
     }).then(function (resp) {
         if (resp.status == 200) {
+
             issueInfoList.splice(0, issueInfoList.length);
             Object.keys(issueList).map(key => {
                 delete issueList[key]
@@ -354,6 +355,12 @@ const getIssueList = page => {
             }
         }
     })
+}
+
+
+const get_now_date = () => {
+    let date = new Date();
+    return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
 }
 
 const isRoutePushHere = () => {
@@ -424,6 +431,7 @@ const getAgencyRegionRelation = () => {
 
             }
             banshichu_list.unshift("全部");
+            getProblemAgencyCount();
         }
     })
 }
@@ -444,10 +452,6 @@ const selectCategory = category => {
     getIssueList(1);
 }
 
-const get_now_date = () => {
-    let date = new Date();
-    return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
-}
 
 
 // const disabledDate = time => {
@@ -489,7 +493,130 @@ const selectState = state => {
     getIssueList(1);
 }
 
+const agencyProblemMap = reactive({});
+const getProblemAgencyCount = () => {
+    for (const item of banshichu_list) {
+        agencyProblemMap[item] = 0;
+    }
 
+    axios({
+        url: '/api/problem/count/agency',
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: store.state.user.tokenHeader + store.state.user.token,
+        },
+        data: JSON.stringify({
+
+        })
+    }).then(function (resp) {
+        if (resp.data.code == 2000) {
+            let total = 0;
+            for (const item of resp.data.data) {
+                agencyProblemMap[item.agency] = item.num;
+                total += item.num;
+            }
+            agencyProblemMap["全部"] = total;
+        }
+    })
+}
+
+const categoryProblemMap = reactive({});
+const getProblemCategoryCount = () => {
+    for (const item of case_category) {
+        categoryProblemMap[item] = 0;
+    }
+
+    axios({
+        url: '/api/problem/count/category',
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: store.state.user.tokenHeader + store.state.user.token,
+        },
+        data: JSON.stringify({
+            today: false,
+        })
+    }).then(function (resp) {
+        if (resp.data.code == 2000) {
+            let total = 0;
+            for (const item of resp.data.data) {
+                categoryProblemMap[item.category] = item.count;
+                total += item.count;
+            }
+            categoryProblemMap["全部"] = total;
+        }
+    })
+}
+getProblemCategoryCount();
+
+const stateProblemMap = reactive({});
+const getProblemStateCount = () => {
+    for (const item of stateList) {
+        stateProblemMap[item] = 0;
+    }
+
+    axios({
+        url: '/api/problem/count/rectifyStatus',
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: store.state.user.tokenHeader + store.state.user.token,
+        },
+        data: JSON.stringify({
+            finished: false,
+        })
+    }).then(function (resp) {
+
+        if (resp.data.code == 2000) {
+
+            let enforceTotal = 0;
+            let total = 0;
+            for (const item of resp.data.data) {
+                if (item.stage.startsWith("执法查处")) {
+                    enforceTotal += item.num;
+                } else {
+                    stateProblemMap[item.stage] = item.num;
+                }
+                total += item.num;
+            }
+            stateProblemMap["执法查处"] = enforceTotal;
+            stateProblemMap["全部"] += total;
+        }
+    })
+
+    axios({
+        url: '/api/problem/count/progressStatus',
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: store.state.user.tokenHeader + store.state.user.token,
+        },
+        data: JSON.stringify({
+            today: false,
+        })
+    }).then(function (resp) {
+        if (resp.data.code == 2000) {
+            let total = 0;
+            for (const item of resp.data.data) {
+                if (item.progressStatus == 0) {
+                    stateProblemMap["未接收"] = item.num;
+                    total += item.num;
+                } else if (item.progressStatus == 1) {
+                    stateProblemMap["待处置"] = item.num;
+                    total += item.num;
+                } else if (item.progressStatus == 3) {
+                    stateProblemMap["整改完成"] = item.num;
+                    total += item.num;
+                }
+
+            }
+
+            stateProblemMap["全部"] += total;
+        }
+    })
+}
+getProblemStateCount();
 
 watch(queryRegion, (newValue) => {
     if (newValue == '') {

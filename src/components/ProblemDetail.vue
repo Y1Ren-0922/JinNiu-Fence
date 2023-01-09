@@ -7,8 +7,9 @@
                         <div v-for="item in timeLineList" :key="item.id"
                             style="flex:1; display:flex; flex-direction:column;">
                             <div style="flex:1; display:flex" class="timeline-content">
-                                <div class="timeline-title" :class="{ 'left10': item.title === '最近30天' }">{{ item.title
-}}
+                                <div class="timeline-title" :class="{ 'left10': item.title === '最近30天' }">{{
+                                    item.title
+                                }}
                                 </div>
                                 <div class="dot" @click="changeActive(item.id, item.title)"
                                     :class="{ 'active-dot': item.id <= timeIndex }"></div>
@@ -123,7 +124,7 @@ const getProblemInfo = () => {
             problemId: router.currentRoute.value.query.problem_id,
         }
         axios({
-            url: '/api/problem-status/details',
+            url: '/api/problem-status/history',
             method: 'post',
             headers: {
                 'Content-Type': 'application/json',

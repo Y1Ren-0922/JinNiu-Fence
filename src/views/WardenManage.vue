@@ -362,7 +362,7 @@ export default {
         const queryDepartment = ref('');
         const queryStreet = ref('');
         const queryIdentity = ref('');
-        const person_state = ["全部", "在岗在位", "请假", "补休", "未打卡", "抽调"];
+        const person_state = ["全部", "在岗在位", "请假", "轮休", "未打卡", "抽调"];
         const personStateSelected = ref('全部');
         const selectStreetVisiable = ref(false);
 
@@ -812,7 +812,7 @@ export default {
                 status = '1';
             } else if (personStateSelected.value == '请假') {
                 status = '3';
-            } else if (personStateSelected.value == '补休') {
+            } else if (personStateSelected.value == '轮休') {
                 status = '2';
             } else if (personStateSelected.value == '未打卡') {
                 status = '0';
@@ -941,11 +941,12 @@ export default {
                 for (let item of resp.data.data.records) {
                     let relatedRegion;
                     let regionName;
-                    if (item.relatedRegion == null) {
+                    if (item.relatedRegion == null || !polygons[relatedRegion]) {
                         relatedRegion = "暂未分配";
                         regionName = "暂未分配";
                     } else {
                         relatedRegion = item.relatedRegion;
+
                         regionName = polygons[relatedRegion]["name"];
                     }
 
@@ -957,7 +958,7 @@ export default {
                     }
 
                     let patrol = {
-                        id: item.id,
+                        id: item.patrolId,
                         name: item.name,
                         title: item.title,
                         department: item.department,
@@ -968,7 +969,7 @@ export default {
                         identity: item.identity,
                         task: task,
                     }
-                    patrolInfo[item.id] = patrol;
+                    patrolInfo[item.patrolId] = patrol;
                     patrols.value.push(patrol);
                 }
             })
@@ -982,7 +983,7 @@ export default {
                 if (getRealTimeStatus.value == '1') {
                     personStateSelected.value = '在岗在位';
                 } else if (getRealTimeStatus.value == '2') {
-                    personStateSelected.value = '补休';
+                    personStateSelected.value = '轮休';
                 } else if (getRealTimeStatus.value == '3') {
                     personStateSelected.value = '请假';
                 }

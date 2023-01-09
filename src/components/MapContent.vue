@@ -179,7 +179,7 @@
             <el-table-column property="street" label="街道" width="200" header-align="center" align="center" />
             <el-table-column property="regularPayroll" label="在编" header-align="center" align="center" />
             <el-table-column property="transfer" label="抽调" header-align="center" align="center" />
-            <el-table-column property="deferHoliday" label="补休" header-align="center" align="center" />
+            <el-table-column property="deferHoliday" label="轮休" header-align="center" align="center" />
             <el-table-column property="onHoliday" label="请假" header-align="center" align="center" />
             <el-table-column property="onWork" width="130" label="在岗在位" header-align="center" align="center" />
             <el-table-column property="notOnTime" label="未按时打卡" width="130" header-align="center" align="center" />
@@ -820,7 +820,7 @@ let law_enforce_option = {
             radius: '50%',
             data: [
                 { value: 0, name: '在岗' },
-                { value: 0, name: '补休' },
+                { value: 0, name: '轮休' },
                 { value: 0, name: '请假' },
             ],
             label: {
@@ -874,7 +874,7 @@ let warden_option = reactive({
             radius: '50%',
             data: [
                 { value: 0, name: '在岗' },
-                { value: 0, name: '补休' },
+                { value: 0, name: '轮休' },
                 { value: 0, name: '请假' },
 
             ],
@@ -1195,7 +1195,7 @@ const problemConfigMap = {
 
 const patrolStatusMap = {
     '在岗': 0,
-    '补休': 1,
+    '轮休': 1,
     '请假': 2,
 
 }
@@ -1223,13 +1223,15 @@ const getPatrolStatusCount = () => {
 
             for (const item of resp.data.data) {
 
-                if (item.identity == '协管人员' && item.status != '未打卡' && item.status != '下班') {
+                if (item.identity === '协管人员' && (item.status === '在岗' || item.status === '轮休' || item.status === '请假')) {
+
                     warden_option.series[0].data[patrolStatusMap[item.status]].value = item.num;
                     if (item.status == '在岗') {
                         wardenOnWork.value = item.num;
                     }
                 }
-                if (item.identity == '执法人员' && item.status != '未打卡' && item.status != '下班') {
+                if (item.identity === '执法人员' && (item.status === '在岗' || item.status === '轮休' || item.status === '请假')) {
+
                     law_enforce_option.series[0].data[patrolStatusMap[item.status]].value = item.num;
                     if (item.status == '在岗') {
                         lawEnforceOnWork.value = item.num;
@@ -1333,11 +1335,16 @@ const create_problem_data = () => {
 
 const getProblemCount = () => {
     axios({
-        url: '/api/problem/count_by_category',
-        method: 'get',
+        url: '/api/problem/count/category',
+        method: 'post',
         headers: {
+            'Content-Type': 'application/json',
             Authorization: store.state.user.tokenHeader + store.state.user.token,
         },
+        data: JSON.stringify({
+            today: true,
+
+        })
     }).then(function (resp) {
         if (resp.status == 200) {
             for (const item of problemConfig.data) {

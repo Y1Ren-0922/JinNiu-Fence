@@ -319,7 +319,7 @@ export default {
 
                     for (const item of resp.data.data.records) {
 
-                        if (item.location != null && item.patrolId != null) {
+                        if (item.location != null && item.location != '' && item.patrolId != null) {
 
                             patrolLocation[item.patrolId] = {
                                 patrolId: item.patrolId,
@@ -363,6 +363,7 @@ export default {
                                     iconFeature.set('isInOwnRing', isInRing);
                                 }
                             } else {
+
                                 iconFeature.set('bgId', 1);
                                 iconFeature.set('isInOwnRing', false);
                             }

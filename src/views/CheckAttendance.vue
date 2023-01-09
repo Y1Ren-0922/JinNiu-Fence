@@ -14,7 +14,7 @@
                                 align="center" />
                             <el-table-column prop="choudiao" label="抽调" width="180" header-align="center"
                                 align="center" />
-                            <el-table-column prop="buxiu" label="补休" width="180" header-align="center" align="center" />
+                            <el-table-column prop="buxiu" label="轮休" width="180" header-align="center" align="center" />
                             <el-table-column prop="qingjia" label="请假" width="180" header-align="center"
                                 align="center" />
                             <el-table-column prop="onWork" label="在岗在位" width="180" header-align="center"

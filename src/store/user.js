@@ -56,8 +56,8 @@ export default {
                 },
             }).then(function (resp) {
                 if (resp.status == 200) {
-                    localStorage.setItem("jwt_tokenHeader", resp.data.data.tokenHead);
-                    localStorage.setItem("jwt_token", resp.data.data.token);
+                    // localStorage.setItem("jwt_tokenHeader", resp.data.data.tokenHead);
+                    // localStorage.setItem("jwt_token", resp.data.data.token);
                     context.commit('updateToken', resp.data.data.token);
                     context.commit('updateTokenHeader', resp.data.data.tokenHead);
                     context.commit("updateLoginInfo", {
@@ -86,7 +86,7 @@ export default {
                     phone: '',
                 })
             }).then(function (resp) {
-                console.log(resp);
+
                 if (resp.data.code == 2000) {
                     context.commit("updateUser", {
                         id: resp.data.data.id,

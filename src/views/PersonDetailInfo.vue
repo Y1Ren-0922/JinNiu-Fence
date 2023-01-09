@@ -182,6 +182,7 @@ const getPersonInfo = () => {
                 Authorization: store.state.user.tokenHeader + store.state.user.token,
             },
         }).then(function (response) {
+            console.log(response);
             if (response.status === 200) {
                 let patrol = response.data.data;
                 detail_info.name = patrol.name;

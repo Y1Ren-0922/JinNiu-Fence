@@ -319,7 +319,7 @@ const getPatrolsLocation = id => {
 
             for (const item of resp.data.data.records) {
 
-                if (item.location != null && item.patrolId != null) {
+                if (item.location != null && item.location != "" && item.patrolId != null) {
 
                     patrolLocation[item.patrolId] = {
                         patrolId: item.patrolId,
